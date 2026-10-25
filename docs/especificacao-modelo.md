@@ -3407,6 +3407,33 @@ Continuam pendentes, entre outros:
 
 A V3.2 não deve inventar regras para preencher esses gaps.
 
+# 80A. Arquitetura de testes de integração
+
+Desde a V3.11:
+- `model-core.js` contém regras financeiras puras de baixo nível;
+- `scenario-engine.js` contém o motor completo `runScenario`, sem dependência do DOM;
+- `index.html` usa `scenario-engine.js`;
+- os testes Node usam exatamente o mesmo módulo do navegador.
+
+Regressões de integração cobrem:
+1. operação de quatro cotas R$400k + R$400k + R$370k + R$200k;
+2. contemplação conjunta no mês 4 antes do reajuste;
+3. crédito líquido pós-embutido de R$959 mil;
+4. cashback conservador de R$95,9 mil;
+5. contemplação no mês 12 após reajuste de 3%;
+6. contemplações escalonadas;
+7. separação entre principal e rendimentos;
+8. política alternativa de cashback;
+9. financiamento de 100% da parte em dinheiro do lance;
+10. cronologia de 210 meses remanescentes após contemplação no mês 4;
+11. invariante mensal anti-pooling por cota:
+   `yieldUsed_j <= min(yield_j, installment_j)`.
+
+O histórico mensal do motor expõe, para auditoria/teste:
+- parcela por cota;
+- rendimento por cota;
+- rendimento usado por cota.
+
 # 80. Estado de qualidade da V3.2
 
 A V3.2 deriva da V2.54, mas houve mudança arquitetural substancial desde a última auditoria independente.
