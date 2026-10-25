@@ -1,3 +1,28 @@
+### SW-084 — Motor completo sem DOM + regressões de integração
+
+**Status:** IMPLEMENTADA — V3.11  
+**Prioridade:** P1 CONCLUÍDA  
+**Tipo:** ARQUITETURA / TESTES / CI  
+**Origem:** auditoria V3.5 / issue #8
+
+**Implementado:**
+- `scenario-engine.js` com `runScenario`;
+- `index.html` consome o mesmo motor;
+- `tests/scenario-engine.test.js`;
+- CI executa testes unitários e de integração;
+- histórico mensal expõe parcela/rendimento/abatimento por cota para proteger o invariante anti-pooling.
+
+**Invariantes protegidos:**
+- multi-cota;
+- reajuste;
+- Lance Livre/embutido;
+- cashback;
+- 210 meses remanescentes após mês 4;
+- tranches de financiamento;
+- no-pooling mensal por cota.
+
+---
+
 ### SW-083 — Base de cashback separada de rendimentos acumulados
 
 **Status:** IMPLEMENTADA — V3.10  
