@@ -1,3 +1,24 @@
+### SW-081 — Migração segura de presets antigos
+
+**Status:** IMPLEMENTADA — V3.8  
+**Prioridade:** P0 CONCLUÍDA  
+**Tipo:** PERSISTÊNCIA / MIGRAÇÃO / UX  
+**Origem:** auditoria V3.5 / issue #10
+
+**Implementado:**
+- detecção de presets anteriores aos marcos 3.3, 3.4 e 3.7;
+- alerta apenas quando o valor coincide com antigo default;
+- original preservado;
+- cópia migrada criada sob ação explícita;
+- presets sem `appVersion` são tratados como legados;
+- `formatVersion=2` e `stateVersion=2`;
+- migração compatível da antiga política `buyAtLastCont`.
+
+**Guardrail:**
+Nenhum valor customizado é sobrescrito silenciosamente.
+
+---
+
 ### SW-080 — CDI bruto separado do CDB líquido
 
 **Status:** IMPLEMENTADA — V3.7  
