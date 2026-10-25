@@ -6,7 +6,7 @@
   root.ConsorcioEngine=api;
 })(typeof globalThis!=='undefined' ? globalThis : this,function(core){
   if(!core) throw new Error('ConsorcioModel is required before ConsorcioEngine');
-  const {resolveEffectiveLance,resolveCashbackBase,calculateCashback}=core;
+  const {resolveEffectiveBid,resolveCashbackBase,calculateCashback}=core;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const pct=x=>Number(x)/100;
 
@@ -328,7 +328,7 @@ function runScenario(cfg,overrides={}){
     cotas.forEach(q=>{
       if(m===q.cont && !quotaSold && !redeemed && !q.contemplated){
         q.contemplated=true;
-        const lance=resolveEffectiveLance(q.credit,q.outstanding,lancePct,embPct);
+        const lance=resolveEffectiveBid(q.credit,q.outstanding,cfg.lanceMode||'free',lancePct,cfg.fixedLancePct??0.30,embPct);
         q.requestedLanceAtCont=lance.requestedTotal;
         q.effectiveLanceAtCont=lance.effectiveTotal;
         q.requestedEmbeddedAtCont=lance.requestedEmbedded;
