@@ -4,7 +4,7 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estado atual
 
-- **Aplicação:** V3.11 em `index.html`, servida diretamente pelo GitHub Pages.
+- **Aplicação:** V3.14 em `index.html`, servida diretamente pelo GitHub Pages.
 - **Documentação canônica:** consolidada a partir da rodada `pre_respostas30`, com limpeza de inconsistências residuais e a divergência posterior sobre o histórico de lances.
 - **Histórico:** preservado pelo Git; não mantemos cópias versionadas redundantes na árvore atual.
 
@@ -45,9 +45,12 @@ As issues #5–#10 abertas pela auditoria foram concluídas nas versões V3.6–
 - **V3.8 / #10:** presets antigos recebem alerta/migração explícita;
 - **V3.9 / #6:** sensibilidades de financiamento do lance em 0% / 50% / 100%;
 - **V3.10 / #7:** cashback conservador exclui rendimentos acumulados da base por default;
-- **V3.11 / #8:** motor completo extraído para `scenario-engine.js` e protegido por testes de integração.
+- **V3.11 / #8:** motor completo extraído para `scenario-engine.js` e protegido por testes de integração;
+- **V3.12 / #12:** cashback recebido no mês seguinte à compra por default;
+- **V3.13 / #13:** taxa de transferência calculada sobre saldo devedor por cota;
+- **V3.14 / #14:** crédito residual pós-compra deixa de ser contado como ativo livre sem política explícita.
 
-A documentação canônica foi saneada na **#11** para descrever V3.11 linearmente; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
+A documentação canônica foi saneada na **#11** e continua sincronizada com V3.14; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
 
 Os gaps ainda reais ficam concentrados em `docs/pendencias.md` e em novas issues de implementação quando necessário.
 
