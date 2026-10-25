@@ -564,17 +564,20 @@ function runScenario(cfg,overrides={}){
       propertySaleTax=simplifiedCapitalGain*cfg.sellerCapitalGainTaxPct;
       propertySaleTotalCosts=propertySaleBrokerage+propertySaleOtherCosts+propertySaleTax;
 
-      propertySaleConsortiumPayoff=cfg.sellPropertyPayoff ? sumQ(q=>q.outstanding) : 0;
-      propertySaleLoanPayoff=cfg.payLanceLoanOnPropertySale ? sumQ(q=>q.loanBalance) : 0;
+      propertySaleConsortiumPayoff=cfg.sellPropertyPayoff ? sumQ(q=>q.usedInPurchase ? q.outstanding : 0) : 0;
+      propertySaleLoanPayoff=cfg.payLanceLoanOnPropertySale ? sumQ(q=>q.usedInPurchase ? q.loanBalance : 0) : 0;
 
       let netSale=propertySalePrice-propertySaleTotalCosts-propertySaleConsortiumPayoff-propertySaleLoanPayoff;
       if(netSale<0){propertySaleTopUp=-netSale;cashObrigacoes += propertySaleTopUp;netSale=0;} else propertySaleTopUp=0;
       propertySaleNetCash=netSale;
       propertySaleCashThisMonth=netSale;
 
-      if(cfg.sellPropertyPayoff) cotas.forEach(q=>{q.outstanding=0;q.fullInstall=0;});
+      if(cfg.sellPropertyPayoff) cotas.forEach(q=>{
+        if(q.usedInPurchase){q.outstanding=0;q.fullInstall=0;}
+      });
       if(cfg.payLanceLoanOnPropertySale && propertySaleLoanPayoff>0){
         cotas.forEach(q=>{
+          if(!q.usedInPurchase) return;
           if(q.loanBalance>0){q.totalLoanPayments+=q.loanBalance;totalLoanPayments+=q.loanBalance;}
           q.loanBalance=0;q.loanMonthsPaid=q.loanTerm;
         });
@@ -650,9 +653,12 @@ function runScenario(cfg,overrides={}){
     const allContemplated=cotas.every(q=>q.contemplated);
     const aggregateLetterBalance=sumQ(q=>q.letterBalance);
     const aggregateOutstanding=sumQ(q=>q.outstanding);
-    // A9 multi-cota: antes da compra, cotas ainda não contempladas não entram
-    // como dívida líquida sem um ativo correspondente mensurado.
-    const comparableOutstanding = purchased ? aggregateOutstanding : sumQ(q=>q.contemplated ? q.outstanding : 0);
+    // Cotas ainda não contempladas e não usadas na compra não entram como
+    // dívida comparável sem ativo correspondente. Após compra parcial, somente
+    // cotas usadas no imóvel ou já contempladas entram no passivo comparável.
+    const comparableOutstanding = purchased
+      ? sumQ(q=>(q.usedInPurchase || q.contemplated) ? q.outstanding : 0)
+      : sumQ(q=>q.contemplated ? q.outstanding : 0);
     const aggregateLoanBalance=sumQ(q=>q.loanBalance);
 
     let grossAsset=0;
@@ -667,17 +673,17 @@ function runScenario(cfg,overrides={}){
       grossAsset=aggregateLetterBalance;
       comparableAsset=aggregateLetterBalance;
     }else if(propertySold){
-      grossAsset=residualComparableAsset;
-      comparableAsset=residualComparableAsset;
+      grossAsset=aggregateLetterBalance+residualComparableAsset;
+      comparableAsset=aggregateLetterBalance+residualComparableAsset;
     }else{
-      grossAsset=propertyValue+residualComparableAsset;
+      grossAsset=propertyValue+aggregateLetterBalance+residualComparableAsset;
       const hypotheticalBrokerage=propertyValue*cfg.sellerBrokeragePct;
       const hypotheticalOtherCosts=cfg.sellerOtherCosts;
       const simplifiedTaxBasis=price+purchaseCostsGross;
       const hypotheticalGain=Math.max(0,propertyValue-simplifiedTaxBasis);
       const hypotheticalTax=hypotheticalGain*cfg.sellerCapitalGainTaxPct;
       propertyNetRealizationThisMonth=Math.max(0,propertyValue-hypotheticalBrokerage-hypotheticalOtherCosts-hypotheticalTax);
-      comparableAsset=propertyNetRealizationThisMonth+residualComparableAsset;
+      comparableAsset=propertyNetRealizationThisMonth+aggregateLetterBalance+residualComparableAsset;
       if(m===N){
         finalPropertyMarketValue=propertyValue;
         finalPropertyNetRealization=propertyNetRealizationThisMonth;
