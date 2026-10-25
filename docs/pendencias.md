@@ -1,4 +1,29 @@
 ============================================================
+AUDITORIA V3.14 — CRÉDITO RESIDUAL
+============================================================
+
+Issue #14: RESOLVIDA QUANTO À CONTAGEM PATRIMONIAL; POLÍTICAS CONTRATUAIS COMPLETAS CONTINUAM PENDENTES.
+
+Problema:
+O residual pós-compra era mantido indefinidamente como ativo genérico, embora seu uso seja regulado e dependa de destinação.
+
+Implementado na V3.14:
+- residual bruto rastreado separadamente;
+- default “não assumir destinação”;
+- residual não alocado NÃO entra no patrimônio comparável;
+- opção “usar em custos de aquisição”;
+- teto configurável, default 10% do principal líquido disponível;
+- custos pagos do bolso são reduzidos apenas pelo residual efetivamente aplicado;
+- eventual sobra continua não alocada e fora do patrimônio;
+- KPIs mostram residual bruto, aplicado em custos e não alocado;
+- testes de integração protegem as duas políticas.
+
+Ainda pendente:
+- amortização/quitação de prestações;
+- devolução em dinheiro;
+- mecânica multi-cota e ordem indireta específicas.
+
+============================================================
 AUDITORIA V3.13 — TAXA DE TRANSFERÊNCIA
 ============================================================
 
@@ -1017,14 +1042,20 @@ Conclusões importantes:
 - a negativa para reforma livre/móveis planejados é compatível com as destinações listadas para a diferença após aquisição do bem;
 - enquanto a compra ainda não foi concluída/valor não utilizado, a parcela do crédito continua vinculada à contemplação e remunerada até sua utilização, conforme a regra geral já documentada.
 
-Estado atual do software:
-O motor ainda preserva o crédito residual como ativo vinculado, sem rendimento e sem destinação automática depois da compra. Esse comportamento permanece inadequado como regra definitiva.
+Estado atual do software — V3.14:
+PARCIALMENTE RESOLVIDO COM POLÍTICA CONSERVADORA.
 
-Mudança ainda necessária:
-substituir “crédito residual congelado” por uma escolha explícita de destino, limitada às opções contratuais/regulatórias:
-A. despesas vinculadas ao bem, até o teto permitido;
-B. quitação de prestações vincendas / antecipação do saldo conforme contrato;
-C. devolução em dinheiro apenas quando as obrigações estiverem integralmente quitadas.
+O motor deixou de preservar a sobra como ativo genérico.
+
+Implementado:
+A. “não assumir destinação”: residual rastreado, mas excluído do patrimônio comparável;
+B. “usar em custos de aquisição”: reduz o desembolso do bolso até o teto configurável; eventual sobra continua não alocada e fora do patrimônio comparável.
+
+Ainda não implementado:
+C. quitação de prestações vincendas / antecipação do saldo conforme contrato;
+D. devolução em dinheiro quando as obrigações estiverem integralmente quitadas.
+
+Portanto, a falha de superestimar patrimônio com “residual congelado” está resolvida. A pendência remanescente é ampliar as políticas quando a mecânica contratual estiver suficientemente definida.
 
 Pontos ainda a confirmar com a Bamaq:
 - no Grupo 4012, a antecipação com crédito residual é obrigatoriamente em ordem indireta?
