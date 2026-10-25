@@ -7,7 +7,7 @@
 
 **Estado canônico da documentação:** pós-rodada `pre_respostas30`.
 
-> P0 antes de nova decisão econômica: (1) alterar a premissa-base líquida da carta de 98% para ~80% do CDI; (2) adicionar regressões para Lance Livre, embutido e cashback multi-cota. A recalibração do Lance Livre foi implementada na V3.3.
+> P0 antes de nova decisão econômica: adicionar regressões para Lance Livre, embutido e cashback multi-cota. Lance Livre foi recalibrado na V3.3 e o rendimento líquido-base da carta foi corrigido na V3.4.
 
 ## Regra de uso
 
@@ -206,7 +206,7 @@ junto com SW-001
 
 ### SW-004 — Recalibrar sensibilidade da remuneração líquida da carta
 
-**Status:** IMPLEMENTADA PARCIALMENTE — INPUT/MATRIZ EXISTEM; DEFAULT E PRESETS PRECISAM SER RECALIBRADOS  
+**Status:** IMPLEMENTADA — V3.4  
 **Prioridade:** MÉDIA  
 **Tipo:** UX / EXPLICAÇÃO / SENSIBILIDADE  
 **Origem:** esclarecimento de Michele em 29/09/2026  
@@ -219,11 +219,13 @@ A sensibilidade foi criada quando 98% era tratado como possível percentual líq
 - 98%–105% = camada bruta das aplicações;
 - 80% = orientação de projeção para o retorno líquido da carta.
 
-**Mudança futura:**  
-- default/base: 80% do CDI;
-- manter campo manual;
-- rever presets e matriz para que não usem 98%/100%/105% como se fossem rendimento líquido;
-- explicar que 80% é premissa prudencial/comercial, não garantia.
+**Implementado na V3.4:**  
+- default/base: 80% do CDI líquido;
+- campo manual preservado;
+- presets de rendimento recalibrados para 70% / 80% / 90%;
+- 100% permanece apenas como ponto explícito de sensibilidade no gráfico;
+- texto deixa claro que 98%–105% era referência bruta da aplicação;
+- nenhum IR adicional é aplicado sobre o percentual líquido configurado.
 
 **Impacto esperado:**  
 Material nos resultados de cenários com longa permanência do crédito contemplado aplicado.
