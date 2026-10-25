@@ -130,8 +130,8 @@ Pendência removida:
 A matriz deixa de ter como problema estrutural a falta de comparabilidade entre política de compra e tamanho do ativo.
 
 PENDÊNCIAS — SIMULADOR CONSÓRCIO x CDB x IMÓVEL
-Base atual de software: V3.2
-Baseline auditada histórica: V2.54
+Base atual de software: V3.11
+Estado: documento canônico de incertezas e gaps ainda reais
 
 Objetivo: registrar tudo o que ainda não está suficientemente confirmado ou modelado, deixando explícito:
 1) o que precisamos resolver;
@@ -145,13 +145,13 @@ Fonte: respostas escritas de Michele Ramalho Coelho (QuintoAndar/Bamaq).
 Nível de evidência:
 - Resposta comercial escrita reduz incerteza, mas regras de alto impacto devem ser confrontadas com contrato/regulamento da Bamaq e, quando possível, com norma do Banco Central.
 - Nesta rodada também confrontamos as afirmações legais com fontes oficiais atuais do Banco Central e da Lei nº 11.795/2008.
-- Na rodada comercial de 28/09 não alteramos automaticamente o motor. Depois daquela rodada, porém, houve uma sequência deliberada de evoluções de software até a V3.2. As pendências abaixo continuam preservando a evidência comercial, mas as referências à V2.54 devem ser lidas como histórico quando conflitarem com a seção de sincronização V3.2.
+- O histórico de versões e auditorias permanece no Git e em `docs/follow-up-auditorias.md`. Este arquivo deve registrar prioritariamente o que ainda está aberto na V3.11; referências históricas só são mantidas quando explicam a origem de uma pendência.
 
 ============================================================
 0. ESTADO ATUAL DO SOFTWARE — V3.11
 ============================================================
 
-Esta seção descreve o estado canônico atual. Referências posteriores a V2.54/V3.2 dentro de itens históricos devem ser lidas apenas como registro da evolução, não como descrição do software vigente.
+Esta seção descreve o estado canônico atual. O histórico detalhado de versões anteriores fica no follow-up das auditorias e no Git.
 
 IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
 - arquitetura multi-cota configurável;
@@ -356,7 +356,7 @@ Verificação externa:
 A Resolução BCB nº 285/2023, art. 17, determina que o crédito do contemplado seja acrescido dos “rendimentos líquidos financeiros” proporcionais ao período em que permaneceu aplicado.
 
 Impacto na modelagem:
-- a V2.54 já trata a taxa da carta como líquida;
+- o motor atual trata a taxa da carta como líquida;
 - o campo de “IR/custo do resgate” em 0% é coerente como default;
 - aplicar automaticamente outro IR sobre todos os rendimentos provavelmente duplicaria um haircut que já ocorreu antes do crédito líquido ser reconhecido;
 - eventual campo de haircut adicional deve ser entendido apenas como sensibilidade para custo/tributação EXTRA, não como regra-base.
@@ -977,10 +977,11 @@ Conclusões importantes:
 - a negativa para reforma livre/móveis planejados é compatível com as destinações listadas para a diferença após aquisição do bem;
 - enquanto a compra ainda não foi concluída/valor não utilizado, a parcela do crédito continua vinculada à contemplação e remunerada até sua utilização, conforme a regra geral já documentada.
 
-Impacto direto na V2.54:
-A V2.54 hoje preserva o crédito residual como ativo vinculado, sem rendimento e sem destinação automática. Esse comportamento agora está comprovadamente inadequado após a conclusão da compra.
+Estado atual do software:
+O motor ainda preserva o crédito residual como ativo vinculado, sem rendimento e sem destinação automática depois da compra. Esse comportamento permanece inadequado como regra definitiva.
 
-A próxima versão deve substituir “crédito residual congelado” por uma escolha explícita de destino, limitada às opções contratuais/regulatórias:
+Mudança ainda necessária:
+substituir “crédito residual congelado” por uma escolha explícita de destino, limitada às opções contratuais/regulatórias:
 A. despesas vinculadas ao bem, até o teto permitido;
 B. quitação de prestações vincendas / antecipação do saldo conforme contrato;
 C. devolução em dinheiro apenas quando as obrigações estiverem integralmente quitadas.
@@ -1061,7 +1062,7 @@ Pontos ainda abertos:
 - como são tratados rateios adicionais decorrentes de recuperações posteriores.
 
 Impacto de modelagem:
-A V2.54 é conservadora demais ao tratar todo o Fundo de Reserva como custo perdido.
+O motor atual continua conservador demais ao tratar todo o Fundo de Reserva como custo perdido.
 
 Mudança futura recomendada:
 - manter default conservador de rateio = 0 apenas como stress;
@@ -1189,8 +1190,8 @@ Logo:
 - para a venda de uma COTA CONTEMPLADA a um terceiro, objeto da pergunta atual, não identificamos isenção promocional;
 - para a venda promocional de COTA NÃO CONTEMPLADA diretamente ao QuintoAndar nos termos da campanha, existe isenção expressa.
 
-Impacto na V2.54:
-A V2.54 hoje calcula a taxa sobre a OFERTA de compra da cota:
+Estado atual do software:
+O módulo de cessão ainda calcula a taxa sobre a OFERTA de compra da cota:
 `taxa = min(oferta × pct_taxa, teto)`
 
 Isso está incorreto para a regra documental da Bamaq.
@@ -1323,8 +1324,8 @@ Precisamos confirmar:
 - qual parte do prazo depende da Bamaq e qual depende do cartório;
 - se a venda pode ser assinada sob condição antes da baixa ou se a escritura/registro da venda só pode ocorrer depois da substituição concluída.
 
-Impacto de modelagem:
-A V2.54 já permite escolher entre:
+Estado atual do software:
+O simulador permite escolher entre:
 - quitar o consórcio na venda; ou
 - manter a dívida com substituição de garantia.
 
@@ -1415,10 +1416,9 @@ Conclusão:
 - pedir eventual aditivo/regulamento mais novo;
 - para especificação contratual, manter 5 dias úteis até prova posterior.
 
-Impacto na V2.54:
-O modelo ainda não deve ser alterado nesta etapa. Quando for revisado, cashback deve ocorrer após a compra/registro, e não antes.
+Estado atual do software:
+O cashback ainda entra no fim do mesmo mês da compra. Isso permanece desalinhado com o timing documental, que exige evento posterior de registro/pagamento.
 
-8.2. Livre movimentação
 8.2. Livre movimentação
 
 Confirmado pelo Regulamento, item 4.1.4:
@@ -1524,10 +1524,10 @@ A Central de Ajuda da Bamaq diz que o Seguro Prestamista:
 O Regulamento Geral Bamaq 2026 também prevê que prestações podem incluir seguro de vida/acidentes pessoais “caso tenha contrato”, o que é compatível com caráter facultativo.
 
 Conclusão:
-- o default `seguro = desativado` da V2.54 está correto para esta proposta;
+- o default atual `seguro = desativado` está correto para esta proposta;
 - o simulador NÃO deve incluir custo de seguro por padrão;
 - a atual seção de seguro continua útil como sensibilidade;
-- porém, os três modos genéricos da V2.54 (fixo, % parcela, % saldo) ainda NÃO representam necessariamente a fórmula real do produto.
+- porém, os três modos genéricos atuais (fixo, % parcela, % saldo) ainda NÃO representam necessariamente a fórmula real do produto.
 
 Ponto de modelagem importante:
 A frase “calculado percentualmente e dividido nas parcelas vincendas” pode significar:
@@ -1698,24 +1698,24 @@ Definir convenção global ou seletor por campo.
 
 
 12.2. Patrimônio antes da contemplação
-Status:
-Na V2.50 optamos por não exibir patrimônio comparável antes da contemplação; essa decisão permanece na V2.53.
+Status atual:
+O simulador não exibe patrimônio comparável antes da contemplação.
 
 Pendência futura:
 Se quisermos curva completa, modelar valor econômico de desistência/restituição.
 
 
 12.3. Reajuste e contemplação no mesmo mês
-Status:
-Resolvido desde a V2.50 como opção configurável e mantido na V2.54.
+Status atual:
+A ordem entre reajuste e contemplação no mesmo mês é configurável.
 
 Pendência futura:
 Quando soubermos a ordem real da Bamaq, definir default específico.
 
 
 12.4. Pisos/clamps que ainda podem esconder perdas [B8]
-Status:
-A V2.54 corrigiu o caso identificado na venda da carta em que custos superiores à proposta podiam desaparecer. A segunda auditoria, porém, recomendou continuar procurando outros `Math.max(0, ...)`, clamps ou pisos que possam transformar uma posição econômica negativa em zero sem gerar aporte compensatório.
+Status atual:
+O caso histórico da venda da carta foi corrigido, mas continua válido o princípio de procurar `Math.max(0, ...)`, clamps ou pisos que possam transformar uma posição econômica negativa em zero sem gerar aporte compensatório.
 
 Ação:
 - manter teste de regressão específico para fluxos líquidos negativos;
