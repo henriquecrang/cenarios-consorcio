@@ -1,3 +1,23 @@
+### SW-086 — Taxa de transferência por saldo devedor
+
+**Status:** IMPLEMENTADA — V3.13  
+**Prioridade:** P1 CONCLUÍDA  
+**Tipo:** CESSÃO / REGRA FINANCEIRA  
+**Origem:** limpeza canônica / issue #13
+
+**Implementado:**
+- taxa calculada por cota sobre saldo devedor;
+- default de 1%;
+- teto de R$1.000 por cota;
+- cessão conjunta soma as tarifas;
+- resultado expõe `quotaSaleDebtByQuota` e `quotaSaleTransferFeeByQuota`;
+- teste prova independência entre tarifa e valor da oferta.
+
+**Pendente:**
+Taxa de cadastro R$150 por cota versus por cessionário.
+
+---
+
 ### SW-085 — Timing mensal do cashback
 
 **Status:** IMPLEMENTADA — V3.12  
