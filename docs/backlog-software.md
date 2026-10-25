@@ -1,3 +1,23 @@
+### SW-080 — CDI bruto separado do CDB líquido
+
+**Status:** IMPLEMENTADA — V3.7  
+**Prioridade:** P0 CONCLUÍDA  
+**Tipo:** PREMISSA MACRO / MODELAGEM  
+**Origem:** auditoria V3.5 / issue #9
+
+**Implementado:**
+- CDB benchmark permanece retorno líquido projetado;
+- CDI é campo bruto independente;
+- default CDI = 13,65% a.a., spot BCB/SGS 4389 em 23/10/2026;
+- default CDB = 11,5% a.a. líquido;
+- texto da interface impede leitura de equivalência entre as duas taxas;
+- CDI spot é explicitamente uma sensibilidade, não previsão constante de longo prazo.
+
+**Risco residual:**
+O motor ainda não possui curva temporal de CDI. Para horizontes longos, testar cenários alternativos.
+
+---
+
 # Backlog de possíveis mudanças no software — Simulador Consórcio × CDB × Imóvel
 
 **Criado em:** 28/09/2026  
