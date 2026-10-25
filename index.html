@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.11 · Motor integrado testável</title>
+<title>Consórcio x CDB x Imóvel — V3.12 · Cashback pós-compra</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.11 · Motor integrado testável</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.12 · Cashback pós-compra</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1123,6 +1123,12 @@ th:first-child,td:first-child{text-align:left}
         </div>
       </div>
 
+      <div class="field">
+        <label>Defasagem do recebimento do cashback</label>
+        <input id="cashbackDelayMonths" type="number" value="1" min="0" max="12" step="1">
+        <div class="small">Meses após a compra. Default = 1 porque a compra ocorre no fim do mês e o cashback é pago posteriormente ao registro/pagamento. Use 0 apenas como sensibilidade.</div>
+      </div>
+
       <div class="section">7. Venda da carta contemplada</div>
 
       <div class="field">
@@ -1552,7 +1558,8 @@ th:first-child,td:first-child{text-align:left}
             <div class="kpi-formula">ITBI + RGI/escritura/taxas + outros custos de compra.</div>
           </div>
           <div class="kpi"><div class="l">Base elegível do cashback</div><div class="v" id="kCashbackBase">—</div></div>
-          <div class="kpi"><div class="l">Cashback recebido na compra</div><div class="v" id="kCashbackCompra">—</div></div>
+          <div class="kpi"><div class="l">Cashback previsto</div><div class="v" id="kCashbackCompra">—</div></div>
+          <div class="kpi"><div class="l">Recebimento do cashback</div><div class="v" id="kCashbackRecebimento">—</div></div>
           <div class="kpi">
             <div class="l">Impacto econômico líquido da transação de compra</div>
             <div class="v" id="kImpactoLiquidoCompra">—</div>
@@ -2036,7 +2043,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.11';
+const SCENARIO_APP_VERSION='3.12';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -2860,6 +2867,7 @@ function collectScenarioConfig(){
     outros:Math.max(0,+$('outrosCompra').value||0),
     cashbackPct:Math.max(0,pct($('cashback').value)),
     cashbackBasePolicy:$('cashbackBasePolicy').value==='available' ? 'available' : 'principal',
+    cashbackDelayMonths:Math.max(0,Math.round(+$('cashbackDelayMonths').value||0)),
 
     rentInput:+$('aluguel').value||0,
     lockRent:$('aluguelTravado').checked,
@@ -2962,7 +2970,7 @@ function simulate(){
     cashLanceTotal,loanPrincipal,loanInitialPayment,totalLoanPayments,totalLoanInterest,totalLoanTrCorrection,loanTrAnnual,loanTrMonthly,ownCashLance,
     totalInsurancePayments,firstInsurancePayment,firstPostContInsurancePayment,firstFullInsurancePayment,
     firstPostContConsortiumPayment,firstPostContLoanPayment,firstPostContGrossConsortiumPayment,firstPostContYieldUsed,
-    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCashback,purchaseTransactionNet,
+    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCashback,purchaseCashbackReceiptMonth,purchaseTransactionNet,
     initialNetRent,initialPostCashFlow,firstFullConsortiumPayment,firstFullLoanPayment,firstFullNetRent,
     residualCredit,totalNetRent,
     redeemCredit,redeemConsortiumPayoff,redeemLanceLoanPayoff,redeemBridgeCost,redeemTaxCost,
@@ -3108,10 +3116,13 @@ if(loanBody){
   $('kCustosAquisicao').textContent=(purchased ? money(purchaseCostsGross) : '—');
   $('kCashbackBase').textContent=(purchased ? money(cashbackEligibleBase) : '—');
   $('kCashbackCompra').textContent=(purchased ? money(purchaseCashback) : '—');
+  $('kCashbackRecebimento').textContent=!purchased
+    ? '—'
+    : (purchaseCashbackReceiptMonth>N ? 'após horizonte' : `mês ${purchaseCashbackReceiptMonth}`);
   $('kImpactoLiquidoCompra').textContent=(purchased ? money(purchaseTransactionNet) : '—');
   $('kImpactoLiquidoCompraFormula').textContent=!purchased
     ? '—'
-    : `${money(complement)} de complemento + ${money(purchaseCostsGross)} de custos − ${money(purchaseCashback)} de cashback (recebido como caixa ao fim do mês)`;
+    : `${money(complement)} de complemento + ${money(purchaseCostsGross)} de custos − ${money(purchaseCashback)} de cashback nominal; o cashback entra no caixa no mês ${purchaseCashbackReceiptMonth>N?'posterior ao horizonte':purchaseCashbackReceiptMonth}`;
   $('kAlugLiq').textContent=(buy<N ? money(initialNetRent) : '—');
   $('kFluxoPos').textContent=(buy<N ? (initialPostCashFlow>=0 ? money(initialPostCashFlow) : 'sobra '+money(-initialPostCashFlow)) : '—');
 
@@ -3232,7 +3243,7 @@ if(loanBody){
     const detalhe=(embeddedLimitedCotas||[]).map(x=>`${x.id}: solicitado ${money(x.requested)}, efetivo ${money(x.effective)} (Lance Livre ${money(x.lance)})`).join('; ');
     warnings.push(`Em uma ou mais cotas, o embutido solicitado era maior que o próprio Lance Livre. O embutido foi limitado corretamente. ${detalhe}`);
   }
-  if(purchased && purchaseCashback>0) warnings.push(`O cashback de ${money(purchaseCashback)} é tratado como entrada separada no caixa da estratégia ao fim do mês da compra. Base elegível: ${money(cashbackEligibleBase)} (${cfg.cashbackBasePolicy==='principal'?'principal líquido pós-embutido, sem rendimentos acumulados':'todo crédito usado, incluindo rendimentos — sensibilidade não confirmada'}). Ele não reduz retroativamente as parcelas, o empréstimo ou os custos pagos naquele mesmo mês.`);
+  if(purchased && purchaseCashback>0) warnings.push(`O cashback de ${money(purchaseCashback)} entra no caixa no ${purchaseCashbackReceiptMonth>N?'período posterior ao horizonte modelado':`mês ${purchaseCashbackReceiptMonth}`}. Base elegível: ${money(cashbackEligibleBase)} (${cfg.cashbackBasePolicy==='principal'?'principal líquido pós-embutido, sem rendimentos acumulados':'todo crédito usado, incluindo rendimentos — sensibilidade não confirmada'}). Ele não reduz retroativamente as obrigações do mês da compra.`);
   if(purchased && cfg.cashbackBasePolicy==='available' && creditAtBuy>principalCreditAtBuy+0.01) warnings.push('A base de cashback está incluindo rendimentos financeiros acumulados da carta. Essa hipótese NÃO foi confirmada documentalmente e existe apenas como sensibilidade.');
   if(propertySold && !cfg.sellPropertyPayoff) warnings.push('Na venda do imóvel com substituição de garantia, o modelo presume que a Bamaq aceita outro imóvel como garantia e mantém o consórcio ativo. Essa aceitação precisa ser confirmada; o imóvel substituto não foi somado ao patrimônio da estratégia.');
   if(propertySold && propertySaleTopUp>0) warnings.push(`A venda exigiu ${money(propertySaleTopUp)} adicionais do seu bolso porque o valor líquido não foi suficiente para cobrir custos e quitação escolhida.`);
