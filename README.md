@@ -4,18 +4,32 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estado atual
 
-- **Aplicação:** V3.2 do simulador em `app/simulador.html`.
+- **Aplicação:** V3.2 do simulador em `index.html`, servido diretamente pelo GitHub Pages.
 - **Documentação canônica:** consolidada a partir da rodada `pre_respostas30`, com limpeza de inconsistências residuais e a divergência posterior sobre o histórico de lances.
 - **Histórico:** preservado pelo Git; não mantemos cópias versionadas redundantes na árvore atual.
 
 ## Estrutura
 
-- `app/simulador.html` — simulador standalone em HTML/JS.
+- `index.html` — simulador standalone em HTML/JS e entry point do GitHub Pages.
 - `docs/especificacao-modelo.md` — especificação canônica do modelo.
 - `docs/pendencias.md` — somente pendências e riscos ainda relevantes.
 - `docs/backlog-software.md` — backlog técnico e estado das mudanças.
 - `docs/backlog-perguntas-bamaq.md` — perguntas, respostas e reconciliações comerciais/documentais.
 - `docs/follow-up-auditorias.md` — trilha de auditorias e evidências.
+
+## GitHub Pages
+
+O projeto é um site estático puro, sem build:
+
+- entry point: `/index.html`;
+- processamento Jekyll desativado por `.nojekyll`;
+- documentação permanece em `/docs`.
+
+Para publicar, configure o GitHub Pages para servir a branch `main` a partir de `/(root)`.
+
+URL esperada após a publicação:
+
+`https://henriquecrang.github.io/cenarios-consorcio/`
 
 ## P0 antes de nova decisão econômica
 
