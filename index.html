@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.14 · Crédito residual explícito</title>
+<title>Consórcio x CDB x Imóvel — V3.15 · Lance Fixo e Livre</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.14 · Crédito residual explícito</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.15 · Lance Fixo e Livre</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -765,22 +765,42 @@ th:first-child,td:first-child{text-align:left}
         <div class="small">Nunca pode ser anterior à contemplação. O último ponto significa “após o horizonte”.</div>
       </div>
 
-      <div class="row">
-        <div class="field">
-          <label>Lance Livre total</label>
-          <input id="lanceTotal" type="number" value="70" step=".1" min="0" max="100">
-          <div class="small">% do saldo devedor da própria cota no mês da contemplação. Default analítico: 70% — hipótese de sensibilidade, não probabilidade de contemplação.</div>
-        </div>
-        <div class="field">
-          <label>Lance embutido</label>
-          <input id="lanceEmb" type="number" value="30" step=".5" min="0" max="30">
-          <div class="small">% da carta atualizada da própria cota — máximo de 30%</div>
+      <div class="field">
+        <label>Modalidade do lance</label>
+        <div class="lock-options" role="radiogroup" aria-label="Modalidade do lance">
+          <label class="radio-option">
+            <input type="radio" name="regraModalidadeLance" id="lanceLivreMode" value="free" checked>
+            <span>Lance Livre</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="regraModalidadeLance" id="lanceFixoMode" value="fixed">
+            <span>Lance Fixo</span>
+          </label>
         </div>
       </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Lance Livre</label>
+          <input id="lanceTotal" type="number" value="70" step=".1" min="0" max="100">
+          <div class="small">% do saldo devedor atualizado. Default analítico: 70%; usado apenas quando a modalidade é Livre.</div>
+        </div>
+        <div class="field">
+          <label>Lance Fixo</label>
+          <input id="lanceFixoPct" type="number" value="30" step=".1" min="0" max="100" disabled>
+          <div class="small">% da carta atualizada. 30% é a regra comercial informada para este produto.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Lance embutido</label>
+        <input id="lanceEmb" type="number" value="30" step=".5" min="0" max="30">
+        <div class="small">% da carta atualizada da própria cota — máximo de 30% e nunca acima do lance total efetivo.</div>
+      </div>
       <div class="assump">
-        <b>Regra do lance integrada:</b> em cada cota, o <b>Lance Livre</b> é calculado sobre o <b>saldo devedor daquela cota</b> no momento da contemplação.
-        O <b>lance embutido</b> é calculado separadamente sobre a <b>carta atualizada da própria cota</b>, limitado a 30% da carta e ao próprio valor total do lance.
-        A parte em dinheiro é a diferença entre o Lance Livre efetivo e o embutido efetivamente utilizado.
+        <b>Regra do lance integrada:</b> em cada cota, o <b>Lance Livre</b> usa o saldo devedor atualizado; o <b>Lance Fixo</b> usa a carta atualizada.
+        O <b>lance embutido</b> é sempre calculado separadamente sobre a carta atualizada, limitado a 30% da carta e ao próprio valor total do lance.
+        A parte em dinheiro é a diferença entre o lance efetivo da modalidade escolhida e o embutido efetivamente utilizado.
         <br><br>
         Exemplo reconciliado: saldo devedor de R$ 495.330, carta de R$ 400 mil, Lance Livre de 45% e embutido de 30% ⇒ lance total de R$ 222.898,50, R$ 120 mil embutidos e R$ 102.898,50 em dinheiro.
         <br><br>
@@ -2064,7 +2084,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.14';
+const SCENARIO_APP_VERSION='3.15';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
