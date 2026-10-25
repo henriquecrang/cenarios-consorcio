@@ -210,7 +210,7 @@ Fonte: respostas escritas de Michele Ramalho Coelho (QuintoAndar/Bamaq).
 Nível de evidência:
 - Resposta comercial escrita reduz incerteza, mas regras de alto impacto devem ser confrontadas com contrato/regulamento da Bamaq e, quando possível, com norma do Banco Central.
 - Nesta rodada também confrontamos as afirmações legais com fontes oficiais atuais do Banco Central e da Lei nº 11.795/2008.
-- O histórico de versões e auditorias permanece no Git e em `docs/follow-up-auditorias.md`. Este arquivo deve registrar prioritariamente o que ainda está aberto na V3.11; referências históricas só são mantidas quando explicam a origem de uma pendência.
+- O histórico de versões e auditorias permanece no Git e em `docs/follow-up-auditorias.md`. Este arquivo deve registrar prioritariamente o que ainda está aberto na V3.14; referências históricas só são mantidas quando explicam a origem de uma pendência.
 
 ============================================================
 0. ESTADO ATUAL DO SOFTWARE — V3.14
@@ -250,7 +250,7 @@ PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
 - módulos de seguro, cessão, resgate, encerramento e substituição de garantia ainda dependentes de regras documentais.
 
 ESTADO DE QUALIDADE:
-A V3.11 já passou pela auditoria posterior à V3.5 e pelas correções V3.6–V3.11. As regras críticas possuem testes automatizados, e as correções V3.12–V3.14 cobrem timing do cashback, taxa de transferência e crédito residual. O que permanece aberto está concentrado em premissas externas, documentação contratual e funcionalidades ainda não implementadas.
+A linha atual já passou pela auditoria posterior à V3.5 e pelas correções V3.6–V3.14. As regras críticas possuem testes automatizados, incluindo as correções de timing do cashback, taxa de transferência e crédito residual. O que permanece aberto está concentrado em premissas externas, documentação contratual e funcionalidades ainda não implementadas.
 
 ============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
@@ -317,7 +317,7 @@ Exemplo dado:
 - R$ 5 mil quitam a parcela;
 - R$ 5 mil permanecem acumulando no crédito.
 
-Estado atual da V3.11:
+Estado atual da V3.14:
 A matemática e a arquitetura multi-cota já coincidem com a regra comercial:
 - `yieldUsed_j = min(rendimento_j, parcela_j)`;
 - o rendimento usado reduz a obrigação de caixa da própria cota;
