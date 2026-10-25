@@ -1,6 +1,6 @@
 # Especificação canônica do modelo — Simulador Consórcio × CDB × Imóvel
 
-**Baseline de implementação atual:** V3.15  
+**Baseline de implementação atual:** V3.20  
 **Status:** especificação funcional e financeira canônica do comportamento esperado do simulador  
 **Documentos complementares:**  
 - `docs/pendencias.md` — premissas externas, regras contratuais e funcionalidades ainda abertas;  
