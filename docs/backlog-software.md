@@ -1,3 +1,27 @@
+### SW-087 — Crédito residual explícito
+
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.14  
+**Prioridade:** P1  
+**Tipo:** COMPRA / CRÉDITO RESIDUAL  
+**Origem:** limpeza canônica / issue #14
+
+**Implementado:**
+- residual bruto separado;
+- default não alocado e excluído do patrimônio comparável;
+- opção de uso em custos de aquisição;
+- teto configurável, default 10% do principal líquido;
+- residual aplicado reduz apenas custos pagos do bolso;
+- sobra não alocada permanece fora do patrimônio;
+- KPIs e warnings explícitos;
+- testes de integração.
+
+**Ainda pendente:**
+- amortização/quitação de prestações;
+- devolução em dinheiro;
+- mecânica exata por cota/ordem indireta.
+
+---
+
 ### SW-086 — Taxa de transferência por saldo devedor
 
 **Status:** IMPLEMENTADA — V3.13  
