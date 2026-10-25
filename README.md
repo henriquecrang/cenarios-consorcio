@@ -10,7 +10,10 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estrutura
 
-- `index.html` — simulador standalone em HTML/JS e entry point do GitHub Pages.
+- `index.html` — interface e orquestração do simulador; entry point do GitHub Pages.
+- `model-core.js` — núcleo financeiro puro compartilhado pelo navegador e pelos testes.
+- `tests/model-core.test.js` — regressões das regras críticas.
+- `.github/workflows/test.yml` — CI sem dependências externas; executa `npm test` a cada push/PR.
 - `docs/especificacao-modelo.md` — especificação canônica do modelo.
 - `docs/pendencias.md` — somente pendências e riscos ainda relevantes.
 - `docs/backlog-software.md` — backlog técnico e estado das mudanças.
@@ -33,11 +36,11 @@ URL esperada após a publicação:
 
 ## P0 antes de nova decisão econômica
 
-1. **Regressão:** proteger por testes a base do Lance Livre, o lance embutido e o cashback multi-cota.
+Os três P0s identificados após a investigação estão concluídos.
 
-Concluído:
 - **V3.3:** Lance Livre recalibrado — default analítico de 70%, presets históricos de 60,1%–73% e alertas quando o lance configurado fica abaixo do histórico observado.
 - **V3.4:** rendimento líquido-base da carta alterado para 80% do CDI; presets de rendimento passam a 70% / 80% / 90%, sem tratar 98%–105% bruto como retorno líquido.
+- **V3.5:** regras críticas extraídas para `model-core.js` e protegidas por regressões automatizadas de Lance Livre, embutido e cashback multi-cota.
 
 ## Governança de evidências
 
