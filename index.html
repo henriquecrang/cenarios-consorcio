@@ -2818,22 +2818,27 @@ function collectScenarioConfig(){
     return {
       id:quotaLabel(idx),
       credit0:Math.max(0,+creditEl?.value||0),
-      cont
+      cont,
+      useInPurchase:$(`cota${idx+1}UseCompra`)?.checked !== false
     };
   });
   syncSingleQuotaSlider();
 
   const credit0=cotas.reduce((a,c)=>a+c.credit0,0);
   const firstCont=Math.min(...cotas.map(c=>c.cont));
-  const cont=Math.max(...cotas.map(c=>c.cont)); // compatibilidade: "cont" = última contemplação
+  const cont=Math.max(...cotas.map(c=>c.cont)); // última contemplação entre todas as cotas
+  const purchaseCotas=cotas.filter(c=>c.useInPurchase);
+  const purchaseReadyCont=purchaseCotas.length ? Math.max(...purchaseCotas.map(c=>c.cont)) : N+1;
   $('credito').value=Math.round(credit0);
   $('mesCont').value=cont;
 
   $('mesImovel').max=N+1;
-  $('mesImovel').min=cont;
+  $('mesImovel').min=Math.min(N+1,purchaseReadyCont);
 
   const resgateAtivo=$('comResgate').checked;
-  let buyRaw=Math.min(N+1,Math.max(cont,+$('mesImovel').value||cont));
+  let buyRaw=purchaseReadyCont>N
+    ? N+1
+    : Math.min(N+1,Math.max(purchaseReadyCont,+$('mesImovel').value||purchaseReadyCont));
   $('mesImovel').value=buyRaw;
   const buy=resgateAtivo ? N+1 : buyRaw;
 
@@ -2871,7 +2876,7 @@ function collectScenarioConfig(){
   });
 
   const cfg={
-    credit0,N,cotas,firstCont,cont,buyRaw,buy,sellMonth,
+    credit0,N,cotas,firstCont,cont,purchaseReadyCont,buyRaw,buy,sellMonth,
     reduced:clamp(pct($('reduzida').value),0,1),
     adm:Math.max(0,pct($('adm').value)),
     reserva:Math.max(0,pct($('reserva').value)),
