@@ -1161,7 +1161,7 @@ Logo, em arquitetura multi-cota:
 
 e é proibido somar rendimentos de todas as cotas antes de distribuí-los pelas parcelas.
 
-Essa restrição é um invariante da futura arquitetura.
+Essa restrição é um invariante da arquitetura atual e é protegida por teste de integração.
 
 ## 21.3 Solicitação mensal
 
@@ -2942,12 +2942,13 @@ Especialmente sobre grandes rendimentos acumulados.
 
 ## 59.4 Remuneração da carta contemplada
 
-A futura modelagem deve separar:
-- CDI de referência;
+A modelagem atual separa:
+- CDI bruto de referência;
 - percentual líquido do CDI atribuído à carta;
 - remuneração por cota;
-- eventual variação temporal desse percentual;
 - retorno do benchmark CDB, que é independente.
+
+Continua futura apenas a possibilidade de variar temporalmente o CDI/percentual da carta ao longo do horizonte.
 
 Após a reconciliação de 29/09/2026:
 
@@ -3403,7 +3404,7 @@ O formato de persistência passa a `formatVersion = 2` e o estado financeiro a `
 
 Detalhamentos que cresceram com a arquitetura multi-cota são apresentados em cartões/sublinhas, sem exigir tabela horizontal larga.
 
-A V3.2 deve permanecer utilizável apenas com rolagem vertical nas larguras de tela suportadas.
+A versão atual deve permanecer utilizável apenas com rolagem vertical nas larguras de tela suportadas.
 
 Essa regra é de UX e não altera o motor financeiro.
 
@@ -3474,10 +3475,3 @@ Riscos restantes são majoritariamente:
 
 
 
-A V3.2 deriva da V2.54, mas houve mudança arquitetural substancial desde a última auditoria independente.
-
-Portanto:
-- as correções históricas da V2.54 continuam sendo requisitos de regressão;
-- as novas funcionalidades V2.55–V3.2 foram verificadas durante desenvolvimento;
-- elas ainda não devem ser descritas como “reauditadas independentemente”;
-- uma próxima reauditoria deve cobrir tanto a suíte histórica quanto invariantes multi-cota, tranches, persistência e matriz decisória.
