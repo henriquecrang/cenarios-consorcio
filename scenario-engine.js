@@ -68,6 +68,7 @@ function runScenario(cfg,overrides={}){
     id:c.id,
     credit0:Math.max(0,c.credit0||0),
     cont:clamp(overrides.cont ?? c.cont,1,N),
+    useInPurchase:c.useInPurchase!==false,
     loanTerms:{
       fundPct:clamp(c.loanTerms?.fundPct ?? cfg.emprestimoLancePct,0,1),
       rateMonthly:Math.max(0,c.loanTerms?.rateMonthly ?? cfg.emprestimoTaxaMes),
@@ -77,10 +78,16 @@ function runScenario(cfg,overrides={}){
     }
   }));
   const firstCont=Math.min(...scenarioCotas.map(c=>c.cont));
-  const cont=Math.max(...scenarioCotas.map(c=>c.cont)); // compatibilidade: última contemplação
+  const cont=Math.max(...scenarioCotas.map(c=>c.cont)); // última contemplação de todas as cotas
+  const purchaseScenarioCotas=scenarioCotas.filter(c=>c.useInPurchase);
+  const purchaseReadyCont=purchaseScenarioCotas.length
+    ? Math.max(...purchaseScenarioCotas.map(c=>c.cont))
+    : N+1;
 
   const resgateAtivo=cfg.resgateAtivo;
-  const buy=resgateAtivo ? N+1 : Math.min(N+1,Math.max(cont,cfg.buyRaw));
+  const buy=resgateAtivo || purchaseReadyCont>N
+    ? N+1
+    : Math.min(N+1,Math.max(purchaseReadyCont,cfg.buyRaw));
   const sellMonth=Math.min(N+1,Math.max(buy<=N?buy:N+1,cfg.sellMonth));
 
   const minRedeemForScenario=cont+6;
@@ -123,6 +130,7 @@ function runScenario(cfg,overrides={}){
       fullInstall,
       initialReduced:fullInstall*cfg.reduced,
       contemplated:false,
+      usedInPurchase:false,
       letterBalance:0,
       letterPrincipalAtCont:0,
       postInstall:0,
