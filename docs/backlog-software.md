@@ -2783,6 +2783,30 @@ Uma compra apenas. Cotas posteriores não quitam automaticamente obrigações an
 
 ---
 
+### SW-081 — Modalidade e percentuais de lance por cota
+
+**Status:** IMPLEMENTADA — V3.17  
+**Prioridade:** P0  
+**Tipo:** MOTOR / MULTI-COTA / LANCE  
+**Origem:** issue #17 + independência operacional das cotas
+
+**Implementado:**
+- modalidade Livre/Fixo por cota;
+- percentual de lance por cota;
+- embutido por cota;
+- campos globais como defaults copiáveis;
+- matriz com override homogêneo apenas para comparação;
+- persistência dinâmica;
+- warnings por cota;
+- regressão mista Fixo/Livre.
+
+**Critério de aceite:**  
+Cotas contempladas no mesmo mês podem usar bases/modalidades diferentes e os agregados reconciliam com a soma individual.
+
+**Versão:** V3.17.
+
+---
+
 ## Modelo de registro
 
 ### SW-001 — [Título curto]
