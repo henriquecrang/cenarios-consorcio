@@ -50,8 +50,9 @@ Cada cota mantém identidade própria para:
 - crédito/carta;
 - saldo devedor;
 - mês de contemplação;
-- lance;
-- embutido;
+- modalidade de lance;
+- percentual de lance;
+- percentual embutido;
 - rendimento;
 - parcela;
 - tranche bancária associada.
@@ -805,6 +806,76 @@ A série NÃO deve ser usada para:
 - mostrar “sem vencedor por Lance Livre” em junho, não 0%;
 - separar Fixo e Livre;
 - rotular “histórico de vencedores — não é probabilidade nem garantia”.
+
+---
+
+# 11A. Configuração de lance por cota — V3.17
+
+## 11A.1 Estado por cota
+
+Cada cota pode definir independentemente:
+
+- `lanceMode_j ∈ {free,fixed}`;
+- `bidPct_j`;
+- `embPct_j`.
+
+Os campos globais de Lance Livre, Lance Fixo e embutido são defaults de UX e podem ser copiados para todas as cotas; não substituem a configuração individual quando ela existe.
+
+## 11A.2 Lance Livre por cota
+
+Para cota `j` em modo Livre:
+
+`L_j = bidPct_j × D_j`
+
+onde `D_j` é o saldo devedor atualizado da própria cota na assembleia.
+
+## 11A.3 Lance Fixo por cota
+
+Para cota `j` em modo Fixo:
+
+`L_j = bidPct_j × C_j`
+
+onde `C_j` é a carta atualizada da própria cota.
+
+No preset comercial atual, 30% permanece como referência do Fixo, mas o campo é configurável para auditoria/cenários.
+
+## 11A.4 Embutido por cota
+
+Independentemente da modalidade:
+
+`L_emb,j = min(embPct_j × C_j, L_j)`
+
+com:
+
+`embPct_j ≤ 30%`
+
+e:
+
+`L_cash,j = max(0, L_j - L_emb,j)`
+
+## 11A.5 Agregação
+
+Os agregados da operação são apenas soma dos resultados individuais:
+
+`L_cash,total = Σ L_cash,j`
+
+Cada tranche de financiamento continua ligada à cota que gerou o lance.
+
+## 11A.6 Matriz
+
+A matriz comparativa pode aplicar modalidade/percentual uniformes às cotas como override de sensibilidade. Esse override:
+- não altera silenciosamente a configuração principal;
+- existe apenas para comparar cenários homogêneos.
+
+## 11A.7 Regressão mista
+
+Caso obrigatório:
+- cota A: Fixo 30%, embutido 30%;
+- cota B: Livre 70%, embutido 30%;
+- cota C: Livre 60%, embutido 20%;
+- cota D: Fixo 30%, embutido 10%.
+
+O motor deve usar carta como base nas cotas Fixo e saldo devedor nas cotas Livre, preservando cash lance e tranche por cota.
 
 ---
 
