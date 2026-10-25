@@ -34,7 +34,7 @@ Quando houver conflito entre:
 
 a divergência deve ser tratada como possível bug ou como necessidade de atualizar explicitamente esta especificação.
 
-Uma alteração intencional da regra econômica deve ser registrada também em `follow_up_auditorias_simulador_v3_2_pre_respostas17.md`.
+Uma alteração intencional da regra econômica deve ser registrada também em `docs/follow-up-auditorias.md`.
 
 ---
 
@@ -971,7 +971,7 @@ Se a indenização quitar a dívida em evento coberto, isso é um evento de segu
 
 ## 17.7 Requisito para próxima implementação
 
-Não substituir os modos genéricos da V2.54 por um “modo Bamaq” antes de obter:
+Não substituir os modos genéricos de sensibilidade por um “modo Bamaq” antes de obter:
 - seguradora/apólice/certificado;
 - taxa;
 - base;
@@ -1022,7 +1022,7 @@ O saldo inicial da carta contemplada após o lance é guardado também como prin
 
 Após a homologação, o crédito deve ser colocado à disposição do consorciado no prazo regulamentar e os recursos vinculados à contemplação permanecem aplicados até sua utilização.
 
-A V2.54 trabalha em resolução mensal e, por convenção, só começa a reconhecer rendimento no mês seguinte à contemplação. Essa é agora uma **simplificação conhecida**: a regra regulatória real prevê rendimento a partir da data em que o crédito é colocado à disposição, e não necessariamente apenas no mês-calendário seguinte.
+O motor trabalha em resolução mensal e, por convenção, só começa a reconhecer rendimento no mês seguinte à contemplação. Essa é uma **simplificação conhecida**: a regra regulatória real prevê rendimento a partir da data em que o crédito é colocado à disposição, e não necessariamente apenas no mês-calendário seguinte.
 
 ---
 
@@ -1040,22 +1040,26 @@ o crédito deve ser acrescido dos **rendimentos líquidos financeiros** das apli
 
 A remuneração NÃO deve ser conceitualmente modelada como “um percentual fixo do CDB benchmark”.
 
-## 19.2 Parâmetro-alvo
+## 19.2 Parâmetros implementados
 
-A próxima revisão deve separar:
+O motor separa:
 
-`i_CDI` = referência de mercado
+`i_CDI` = referência bruta de mercado;
 
-`p_carta` = rendimento líquido da aplicação expresso como fração do CDI
+`p_carta` = rendimento líquido final da carta expresso como fração do CDI;
 
-`i_carta = função(i_CDI, p_carta)`
+`i_carta = função(i_CDI, p_carta)`;
 
-O benchmark pode ter retorno próprio (`i_CDB_benchmark`) e não deve controlar a remuneração da carta.
+`i_CDB_benchmark` = retorno líquido independente do benchmark.
 
-Como `p_carta` pode variar no tempo, o motor futuro deve permitir:
-- taxa fixa de cenário; ou
-- trajetória temporal / série; ou
-- presets conservador/base/otimista.
+O benchmark não controla automaticamente `i_carta`.
+
+Estado atual:
+- taxa fixa de cenário para CDI e `p_carta`;
+- presets/sensibilidades conservador/base/otimista.
+
+Gap atual:
+- trajetória temporal/série de CDI e do percentual da carta ainda não está implementada.
 
 ## 19.3 Premissa-base líquida reconciliada
 
@@ -1167,11 +1171,11 @@ O uso do rendimento não é automático na operação real.
 Michele informou que:
 - o consorciado precisa solicitar o abatimento mensalmente pelo aplicativo.
 
-Portanto, o comportamento atual da V2.54 — aplicar o abatimento automaticamente em todo mês quando o modo está selecionado — representa o cenário:
+Portanto, o comportamento atual do simulador — aplicar o abatimento automaticamente em todo mês quando o modo está selecionado — representa o cenário:
 
 **“assumir que o consorciado faz corretamente a solicitação em todos os meses elegíveis”.**
 
-A interface futura deve deixar essa hipótese explícita.
+A interface deve manter essa hipótese explícita enquanto não houver modelagem de falhas/omissões na solicitação mensal.
 
 ## 21.4 Excedente
 
@@ -1291,7 +1295,7 @@ A semântica “R$ de hoje” versus “valor nominal futuro” continua pendent
 
 ## 23.5 Crédito residual
 
-A regra anterior da V2.54 — preservar a sobra como ativo vinculado, sem rendimento e sem destinação — está SUPERADA.
+A convenção anterior de preservar a sobra como ativo vinculado, sem rendimento e sem destinação, está SUPERADA como regra econômica definitiva.
 
 Quando:
 
@@ -1594,7 +1598,7 @@ Não substituir por 7 apenas com resposta comercial. Se for apresentado regulame
 
 ## 25.6 Convenção temporal do modelo mensal
 
-A V2.54 coloca o cashback no caixa ao fim do mesmo mês da compra.
+O motor atual coloca o cashback no caixa ao fim do mesmo mês da compra.
 
 Essa convenção está SUPERADA como especificação-alvo, porque:
 - a própria compra é modelada no fim do mês;
@@ -1986,7 +1990,7 @@ A base NÃO é:
 - valor da carta;
 - crédito atualizado.
 
-Isso substitui a fórmula legada da V2.54.
+Isso substitui a fórmula antiga baseada na oferta de compra.
 
 ## 31.4 Taxa de cadastro
 
@@ -2789,7 +2793,7 @@ Portanto, a aplicação específica deve permanecer como metadado/documentação
 
 # 56. Crédito residual
 
-A convenção antiga da V2.54 está revogada como especificação-alvo.
+A convenção antiga de congelar o residual está revogada como especificação-alvo.
 
 Depois da compra de bem com valor inferior ao crédito utilizado, a diferença NÃO deve ficar simplesmente congelada como ativo.
 
@@ -2809,9 +2813,9 @@ Pendências:
 - teto de despesas em operação multi-cota;
 - procedimento e timing da devolução em dinheiro.
 
-# 57. Múltiplas cotas — requisito da próxima arquitetura
+# 57. Múltiplas cotas — arquitetura atual e gaps residuais
 
-**Estrutura comercial agora também documentada em cotações individuais para a operação de R$ 1,37 milhão:**
+**Estrutura comercial documentada em cotações individuais para a operação de R$ 1,37 milhão e implementada no motor:**
 - Cota 1: R$ 400.000 — integral R$ 2.336,40 — reduzida R$ 1.167,60 — cashback R$ 40.000;
 - Cota 2: R$ 400.000 — integral R$ 2.336,40 — reduzida R$ 1.167,60 — cashback R$ 40.000;
 - Cota 3: R$ 370.000 — integral R$ 2.161,17 — reduzida R$ 1.080,03 — cashback R$ 37.000;
@@ -2834,7 +2838,7 @@ Totais exibidos/derivados:
 - é possível comprar com apenas parte das cotas contempladas + recursos próprios;
 - cotas futuras permanecem independentes e seu uso posterior precisa ser modelado separadamente.
 
-Uma futura versão multi-cota deve representar, para cada cota `j`:
+A arquitetura multi-cota representa os principais estados abaixo por cota `j`; itens ainda ausentes permanecem como gaps explícitos:
 
 - `C_j`;
 - `D_j`;
@@ -3076,39 +3080,18 @@ Toda mudança deve produzir:
 
 ---
 
-# 67. Baseline de qualidade da V2.54
+# 67. Qualidade e regressão
 
-A segunda auditoria da V2.53 encontrou:
+O histórico detalhado das auditorias antigas está preservado em `docs/follow-up-auditorias.md` e no Git.
 
-- 92 testes;
-- 81 OK;
-- 10 FALHA;
-- 1 A CONFIRMAR.
+Regra atual:
+- toda mudança econômica relevante atualiza esta especificação;
+- toda mudança que feche/abra uma incerteza atualiza `docs/pendencias.md`;
+- regras críticas recebem regressão automatizada;
+- `npm test` roda no GitHub Actions em push/PR;
+- navegador e testes de integração usam o mesmo `scenario-engine.js`.
 
-A V2.54 foi criada para corrigir especificamente:
-
-- B1;
-- B2;
-- B3;
-- B4;
-- B5;
-- Q06/B8;
-- B7.
-
-Essas correções são parte da especificação atual, mas permanecem **pendentes de reauditoria independente**.
-
-Até essa reauditoria, não devem ser descritas como “validadas pela segunda auditoria”.
-
----
-
-# 68. Meta para a próxima reauditoria
-
-A próxima suíte deve:
-
-- manter os 81 testes já aprovados;
-- converter os 10 testes que falharam na V2.53 em OK, quando cobertos pelas correções;
-- manter B6/P01 como “a confirmar” enquanto não houver evidência externa;
-- adicionar regressões específicas para quaisquer novos módulos.
+A situação atual de qualidade está sintetizada nas seções 79–80.
 
 ---
 
@@ -3120,7 +3103,7 @@ A próxima suíte deve:
 
 Arquivo:
 
-`especificacao_modelo_simulador.md`
+`docs/especificacao-modelo.md`
 
 ## Follow-up das auditorias
 
@@ -3136,7 +3119,7 @@ Arquivo:
 
 Arquivo:
 
-`pendencias_simulador_consorcio_v3_2_pre_respostas17.txt`
+`docs/pendencias.md`
 
 Os três documentos devem evoluir em conjunto, mas não devem duplicar integralmente a mesma função.
 
@@ -3418,7 +3401,8 @@ Continuam pendentes no produto ou na documentação externa:
 7. destino formal do crédito residual depois da compra;
 8. confirmação documental sobre rendimentos acumulados na base de cashback;
 9. módulos contratuais de seguro, cessão, resgate, encerramento e substituição de garantia;
-10. detalhes operacionais do pedido mensal de uso do rendimento para pagar parcela.
+10. detalhes operacionais do pedido mensal de uso do rendimento para pagar parcela;
+11. timing do cashback no motor mensal: hoje entra no fim do mês da compra; a regra documental indica recebimento posterior ao registro/pagamento.
 
 Esses gaps devem permanecer explícitos; o motor não deve preencher lacunas contratuais silenciosamente.
 
