@@ -1,3 +1,39 @@
+# Pendências canônicas — estado da linha V3.20
+
+Este arquivo contém também auditorias históricas de versões anteriores. Para saber o que ainda está aberto, prevalecem:
+1. este cabeçalho de estado;
+2. os blocos de auditoria mais recentes;
+3. o checklist residual ao final.
+
+## Estado estrutural já implementado
+
+- arquitetura multi-cota e tranches independentes;
+- Livre/Fixo com bases corretas;
+- modalidade, percentual e embutido por cota;
+- compra com subconjunto de cotas;
+- vínculo das cotas usadas à aquisição;
+- cashback conservador multi-cota e timing mensal posterior à compra;
+- residual não destinado excluído do patrimônio comparável;
+- taxa de transferência sobre saldo devedor por cota;
+- CDI bruto separado do CDB líquido;
+- matriz comparável e testes de integração;
+- reconciliação visual da cotação oficial;
+- guardrails operacionais de lance/rendimento;
+- resgate pós-180 dias com quitação prévia/ponte como default conservador.
+
+## Bloqueios externos ainda materiais
+
+- memória oficial para usar parcelas cotadas como override por cota;
+- regra Bamaq para compensação interna no resgate voluntário;
+- destinos contratuais completos do residual (amortização/devolução);
+- uso de cotas posteriores para quitar obrigações já vinculadas;
+- detalhes de encerramento/rateio do fundo de reserva;
+- fórmula de suficiência/substituição de garantia;
+- tratamento fiscal final de cashback, cessão e recebimento em espécie;
+- precisão diária de reajuste/cutoffs, se algum dia necessária.
+
+---
+
 ============================================================
 AUDITORIA V3.15 — LANCE FIXO × LANCE LIVRE
 ============================================================
