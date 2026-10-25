@@ -1598,18 +1598,26 @@ Não substituir por 7 apenas com resposta comercial. Se for apresentado regulame
 
 ## 25.6 Convenção temporal do modelo mensal
 
-O motor atual coloca o cashback no caixa ao fim do mesmo mês da compra.
+Desde a V3.12, o cashback possui defasagem mensal explícita.
 
-Essa convenção está SUPERADA como especificação-alvo, porque:
-- a própria compra é modelada no fim do mês;
-- o cashback só pode ocorrer depois do registro/pagamento ao vendedor.
+Default:
 
-Na próxima revisão mensal, o default deve ser:
-`mes_cashback = mes_compra + 1`
+`cashbackDelayMonths = 1`
 
-ou uma defasagem configurável que preserve a possibilidade de fechamento no início do mês.
+`mes_cashback = mes_compra + cashbackDelayMonths`
 
-O cashback começa a render somente depois de efetivamente recebido.
+Justificativa:
+- a compra é modelada no fim do mês;
+- o cashback depende de evento posterior de registro/pagamento;
+- portanto, o cenário-base não disponibiliza o benefício no mesmo fechamento mensal da compra.
+
+Sensibilidade:
+- `cashbackDelayMonths = 0` permite testar recebimento no mesmo mês;
+- esse não é o default.
+
+O cashback começa a render no caixa da estratégia somente depois de efetivamente recebido.
+
+O prazo documental exato em dias úteis (5 no regulamento disponível versus 7 na fala comercial) continua pendente, mas essa divergência não exige precisão diária no motor mensal.
 
 ## 25.7 Livre movimentação
 
@@ -3401,8 +3409,7 @@ Continuam pendentes no produto ou na documentação externa:
 7. destino formal do crédito residual depois da compra;
 8. confirmação documental sobre rendimentos acumulados na base de cashback;
 9. módulos contratuais de seguro, cessão, resgate, encerramento e substituição de garantia;
-10. detalhes operacionais do pedido mensal de uso do rendimento para pagar parcela;
-11. timing do cashback no motor mensal: hoje entra no fim do mês da compra; a regra documental indica recebimento posterior ao registro/pagamento.
+10. detalhes operacionais do pedido mensal de uso do rendimento para pagar parcela.
 
 Esses gaps devem permanecer explícitos; o motor não deve preencher lacunas contratuais silenciosamente.
 
