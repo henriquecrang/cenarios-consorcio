@@ -395,7 +395,7 @@ function runScenario(cfg,overrides={}){
     cotas.forEach(q=>{
       q.monthlyLetterYield=0;
       q.monthlyYieldUsedForInstallment=0;
-      if(q.contemplated && !purchased && !redeemed && !quotaSold && m>q.cont){
+      if(q.contemplated && !q.usedInPurchase && !redeemed && !quotaSold && m>q.cont){
         const y=q.letterBalance*cartaMonthly;
         q.monthlyLetterYield=y;
         q.totalLetterYieldAccrued += y;
@@ -478,8 +478,9 @@ function runScenario(cfg,overrides={}){
 
     if(buy<=N && m===buy && !redeemed && !quotaSold){
       purchased=true;
-      creditAtBuy=sumQ(q=>q.letterBalance);
-      principalCreditAtBuy=sumQ(q=>q.letterPrincipalAtCont);
+      const purchaseCotas=cotas.filter(q=>q.useInPurchase);
+      creditAtBuy=purchaseCotas.reduce((a,q)=>a+q.letterBalance,0);
+      principalCreditAtBuy=purchaseCotas.reduce((a,q)=>a+q.letterPrincipalAtCont,0);
 
       if(cfg.lockPropertyPrice) price=creditAtBuy;
       if(cfg.lockRent){rent0=price*cfg.rentPctOfProperty;currentRent=rent0;}
@@ -524,7 +525,10 @@ function runScenario(cfg,overrides={}){
 
       cashObrigacoes += complement+purchaseCostsOutOfPocket;
       propertyValue=price;
-      cotas.forEach(q=>{q.letterBalance=0;});
+      purchaseCotas.forEach(q=>{
+        q.usedInPurchase=true;
+        q.letterBalance=0;
+      });
     }
 
     if(purchased && purchaseCashback>0 && m===purchaseCashbackReceiptMonth){
