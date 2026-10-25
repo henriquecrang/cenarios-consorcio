@@ -174,6 +174,7 @@ function runScenario(cfg,overrides={}){
   let redeemAportesAte=0, redeemNetPosition=0;
 
   let quotaSaleCredit=0, quotaSaleDebt=0, quotaSaleLoan=0;
+  let quotaSaleDebtByQuota={}, quotaSaleTransferFeeByQuota={};
   let quotaSaleTransferFee=0, quotaSaleExtraCost=0, quotaSaleNetCash=0, quotaSaleTopUp=0;
 
   let totalYieldUsedForInstallments=0;
@@ -566,7 +567,12 @@ function runScenario(cfg,overrides={}){
       const extraPct=quotaSale.saleExtraCostPct ?? cfg.saleExtraCostPct;
       const payLoan=quotaSale.payLanceLoanOnSale ?? cfg.payLanceLoanOnQuotaSale;
 
-      quotaSaleTransferFee=Math.min(grossOffer*feePct,feeCap || Infinity);
+      quotaSaleDebtByQuota=Object.fromEntries(cotas.map(q=>[q.id,q.outstanding]));
+      quotaSaleTransferFeeByQuota=Object.fromEntries(cotas.map(q=>[
+        q.id,
+        Math.min(q.outstanding*feePct,feeCap || Infinity)
+      ]));
+      quotaSaleTransferFee=Object.values(quotaSaleTransferFeeByQuota).reduce((a,v)=>a+v,0);
       quotaSaleExtraCost=grossOffer*extraPct;
       let proceeds=grossOffer-quotaSaleTransferFee-quotaSaleExtraCost;
       if(payLoan){
@@ -790,7 +796,8 @@ function runScenario(cfg,overrides={}){
     propertySaleConsortiumPayoff,propertySaleLoanPayoff,propertySaleNetCash,propertySaleTopUp,
     finalPropertyMarketValue,finalPropertyNetRealization,finalPropertyExitCosts,finalPropertyExitTax,
 
-    quotaSaleCredit,quotaSaleDebt,quotaSaleLoan,quotaSaleTransferFee,quotaSaleExtraCost,quotaSaleNetCash,quotaSaleTopUp,
+    quotaSaleCredit,quotaSaleDebt,quotaSaleLoan,quotaSaleDebtByQuota,quotaSaleTransferFeeByQuota,
+    quotaSaleTransferFee,quotaSaleExtraCost,quotaSaleNetCash,quotaSaleTopUp,
 
     finalSettlement,cdbBal,strategyCash,cumulativeExternal,realContributionsToday,externalCashFlowsReal,
     totalStrategyToday,benchmarkToday,realGainStrategy,realGainBenchmark,annualizedStrategyReal,annualizedBenchmarkReal,
