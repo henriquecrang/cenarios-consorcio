@@ -4,15 +4,17 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estado atual
 
-- **Aplicação:** V3.2 do simulador em `index.html`, servido diretamente pelo GitHub Pages.
+- **Aplicação:** V3.11 em `index.html`, servida diretamente pelo GitHub Pages.
 - **Documentação canônica:** consolidada a partir da rodada `pre_respostas30`, com limpeza de inconsistências residuais e a divergência posterior sobre o histórico de lances.
 - **Histórico:** preservado pelo Git; não mantemos cópias versionadas redundantes na árvore atual.
 
 ## Estrutura
 
 - `index.html` — interface e orquestração do simulador; entry point do GitHub Pages.
-- `model-core.js` — núcleo financeiro puro compartilhado pelo navegador e pelos testes.
-- `tests/model-core.test.js` — regressões das regras críticas.
+- `model-core.js` — regras financeiras puras de baixo nível.
+- `scenario-engine.js` — motor completo `runScenario`, sem dependência do DOM e compartilhado pelo navegador e pelos testes.
+- `tests/model-core.test.js` — regressões unitárias das regras críticas.
+- `tests/scenario-engine.test.js` — regressões de integração da operação multi-cota.
 - `.github/workflows/test.yml` — CI sem dependências externas; executa `npm test` a cada push/PR.
 - `docs/especificacao-modelo.md` — especificação canônica do modelo.
 - `docs/pendencias.md` — somente pendências e riscos ainda relevantes.
@@ -34,23 +36,20 @@ URL esperada após a publicação:
 
 `https://henriquecrang.github.io/cenarios-consorcio/`
 
-## Prioridades após auditoria da V3.5
+## Estado após a auditoria da V3.5
 
-Os três P0s originais foram concluídos nas V3.3–V3.5, mas a auditoria independente da V3.5 abriu novos itens materiais:
+As issues #5–#10 abertas pela auditoria foram concluídas nas versões V3.6–V3.11:
 
-- **#5 — comparabilidade da matriz:** a linha Atual e as alternativas podem usar políticas de compra diferentes e, com preço travado na carta, comprar imóveis de valores diferentes.
-- **#9 — CDI bruto × CDB líquido:** o default ainda usa 11,5% para ambos, apesar de serem parâmetros econômicos distintos.
-- **#10 — migração de presets:** cenários salvos em versões antigas podem restaurar silenciosamente Lance Livre/rendimento obsoletos.
+- **V3.6 / #5:** matriz economicamente comparável com política comum de compra e preço;
+- **V3.7 / #9:** CDI bruto separado do benchmark CDB líquido;
+- **V3.8 / #10:** presets antigos recebem alerta/migração explícita;
+- **V3.9 / #6:** sensibilidades de financiamento do lance em 0% / 50% / 100%;
+- **V3.10 / #7:** cashback conservador exclui rendimentos acumulados da base por default;
+- **V3.11 / #8:** motor completo extraído para `scenario-engine.js` e protegido por testes de integração.
 
-P1s relevantes:
-- **#6:** sensibilidade explícita de financiamento do lance;
-- **#7:** separar rendimento acumulado da base de cashback;
-- **#8:** testes de integração do motor multi-cota.
+A documentação canônica foi saneada na **#11** para descrever V3.11 linearmente; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
 
-Correções já concluídas:
-- **V3.3:** Lance Livre recalibrado — default analítico de 70%, presets históricos de 60,1%–73% e alertas quando o lance configurado fica abaixo do histórico observado.
-- **V3.4:** rendimento líquido-base da carta alterado para 80% do CDI; presets de rendimento passam a 70% / 80% / 90%.
-- **V3.5:** regras críticas extraídas para `model-core.js` e regressões unitárias de Lance Livre, embutido e cashback.
+Os gaps ainda reais ficam concentrados em `docs/pendencias.md` e em novas issues de implementação quando necessário.
 
 ## Governança de evidências
 
