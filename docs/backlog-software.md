@@ -1,3 +1,20 @@
+### SW-082 — Sensibilidade explícita de financiamento do lance
+
+**Status:** IMPLEMENTADA — V3.9  
+**Prioridade:** P1 CONCLUÍDA  
+**Tipo:** SENSIBILIDADE / FINANCIAMENTO  
+**Origem:** auditoria V3.5 / issue #6
+
+**Implementado:**
+- linhas 0% / 50% / 100% financiado;
+- demais premissas herdadas da Base comparável;
+- mesmo motor e mesma política comum de compra/preço.
+
+**Objetivo:**
+Isolar o custo da alavancagem do lance.
+
+---
+
 ### SW-081 — Migração segura de presets antigos
 
 **Status:** IMPLEMENTADA — V3.8  
