@@ -1546,6 +1546,33 @@ Para múltiplas cotas usadas em um único imóvel:
 
 Não calcular a exceção cota por cota.
 
+### 25.4.4 Base elegível do cashback e rendimentos acumulados
+
+A V3.10 separa:
+- crédito principal líquido pós-embutido;
+- rendimentos financeiros acumulados;
+- crédito total disponível na compra;
+- base elegível de cashback.
+
+Política-base conservadora:
+
+`base_cashback = min(preco_imovel, credito_disponivel, principal_liquido_pos_embutido)`
+
+Essa política **exclui rendimentos acumulados** da base promocional.
+
+Sensibilidade alternativa, não confirmada documentalmente:
+
+`base_cashback = min(preco_imovel, credito_disponivel)`
+
+Essa alternativa inclui rendimentos acumulados e deve permanecer claramente rotulada como hipótese.
+
+No cenário canônico:
+- principal líquido pós-embutido = R$959.000;
+- mesmo que o crédito disponível tenha crescido acima disso por rendimentos;
+- cashback conservador = 10% × R$959.000 = R$95.900.
+
+A política escolhida deve ser persistida junto ao cenário.
+
 ### 25.4.3 Guardrail documental
 
 A regra acima está comercialmente confirmada para esta proposta. Se o contrato/regulamento final estabelecer tratamento diferente, reabrir a regra antes da implementação definitiva.
