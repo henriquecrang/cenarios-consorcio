@@ -14,7 +14,9 @@ function makeConfig({
   lockPropertyPrice=false,
   cdiAnnual=0.1365,
   cartaPctCdi=0.80,
-  cashbackBasePolicy='principal'
+  cashbackBasePolicy='principal',
+  residualCreditPolicy='unallocated',
+  residualExpenseCapPct=0.10
 }={}){
   const credits=[400000,400000,370000,200000];
   const loanTerms={fundPct:financedPct,rateMonthly:0.0155,trAnnual:0,term:120,system:'price'};
@@ -84,6 +86,9 @@ function makeConfig({
     outros:0,
     cashbackPct:0.10,
     cashbackBasePolicy,
+    cashbackDelayMonths:1,
+    residualCreditPolicy,
+    residualExpenseCapPct,
 
     rentInput:5500,
     lockRent:true,
@@ -194,6 +199,40 @@ function makeConfig({
       assert.ok(used<=inst+0.01,`cota ${q.id}, mês ${h.m}: abatimento excedeu parcela própria`);
     }
   }
+}
+
+// Residual sem política explícita é rastreado, mas não vira ativo comparável.
+{
+  const r=runScenario(makeConfig({
+    conts:[4,8,12,16],
+    lancePct:0.69,
+    buyRaw:16,
+    price:1000000,
+    residualCreditPolicy:'unallocated'
+  }));
+  assert.ok(r.residualGross>0);
+  close(r.residualUnallocated,r.residualGross);
+  close(r.residualAppliedToCosts,0);
+  close(r.residualComparableAsset,0);
+}
+
+// Política de custos: usa o residual para reduzir desembolso de aquisição,
+// respeitando o teto configurado, e deixa eventual sobra como não alocada.
+{
+  const r=runScenario(makeConfig({
+    conts:[4,8,12,16],
+    lancePct:0.69,
+    buyRaw:16,
+    price:950000,
+    residualCreditPolicy:'costs',
+    residualExpenseCapPct:0.10
+  }));
+  const cap=r.principalCreditAtBuy*0.10;
+  const expected=Math.min(r.residualGross,r.purchaseCostsGross,cap);
+  close(r.residualAppliedToCosts,expected);
+  close(r.purchaseCostsOutOfPocket,r.purchaseCostsGross-expected);
+  close(r.residualUnallocated,r.residualGross-expected);
+  close(r.residualComparableAsset,0);
 }
 
 // A sensibilidade inclusiva pode usar rendimentos, mas é explicitamente distinta.
