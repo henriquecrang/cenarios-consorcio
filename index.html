@@ -766,7 +766,7 @@ th:first-child,td:first-child{text-align:left}
       </div>
 
       <div class="field">
-        <label>Modalidade do lance</label>
+        <label>Configuração padrão de lance</label>
         <div class="lock-options" role="radiogroup" aria-label="Modalidade do lance">
           <label class="radio-option">
             <input type="radio" name="regraModalidadeLance" id="lanceLivreMode" value="free" checked>
@@ -2715,7 +2715,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceTotal','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -2794,6 +2794,15 @@ $('copyBidTerms').addEventListener('click',()=>{
   copyGlobalBidTermsToQuotaInputs();
   simulate();
 });
+
+function syncGlobalBidDefaultsUI(){
+  const fixed=$('lanceFixoMode').checked;
+  $('lanceTotal').disabled=fixed;
+  $('lanceFixoPct').disabled=!fixed;
+}
+$('lanceLivreMode').addEventListener('input',()=>{syncGlobalBidDefaultsUI();simulate();});
+$('lanceFixoMode').addEventListener('input',()=>{syncGlobalBidDefaultsUI();simulate();});
+syncGlobalBidDefaultsUI();
 
 function syncLoanTermsUI(cfg){
   const loanOn=cfg ? cfg.usarEmprestimoLance : $('comEmprestimoLance').checked;
@@ -3332,23 +3341,26 @@ if(loanBody){
 
   const warning=$('warning');
   const warnings=[];
-  const lancePctDisplayed=cfg.lancePct*100;
-  if(cfg.lanceMode==='free'){
-    if(lancePctDisplayed<60.14){
-      warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está abaixo do menor vencedor documentado nas atas disponíveis do Grupo 4012 (60,14%). Nos meses recentes com vencedor, os pisos ficaram entre 68,91% e 72,73%. Histórico não é garantia de resultado.`);
-    }else if(lancePctDisplayed<68.9081){
-      warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está acima do menor vencedor histórico documentado, mas abaixo do menor piso observado entre julho e setembro (68,91%). Histórico não é garantia de resultado.`);
-    }
-  }else{
-    warnings.push(`Lance Fixo configurado em ${(cfg.fixedLancePct*100).toFixed(1).replace('.',',')}% da carta atualizada. O histórico de 60%–73% exibido para Lance Livre NÃO se aplica a esta modalidade.`);
+  const freeBidCotas=cfg.cotas.filter(q=>q.lanceMode==='free');
+  const fixedBidCotas=cfg.cotas.filter(q=>q.lanceMode==='fixed');
+  const freeBelowHistorical=freeBidCotas.filter(q=>q.bidPct*100<60.14);
+  const freeBelowRecent=freeBidCotas.filter(q=>q.bidPct*100>=60.14 && q.bidPct*100<68.9081);
+  if(freeBelowHistorical.length){
+    warnings.push(`Lance Livre abaixo do menor vencedor documentado (60,14%) em: ${freeBelowHistorical.map(q=>`${q.id} ${(q.bidPct*100).toFixed(1).replace('.',',')}%`).join(', ')}. Histórico não é garantia de resultado.`);
+  }
+  if(freeBelowRecent.length){
+    warnings.push(`Lance Livre acima do mínimo histórico, mas abaixo do menor piso de julho–setembro (68,91%) em: ${freeBelowRecent.map(q=>`${q.id} ${(q.bidPct*100).toFixed(1).replace('.',',')}%`).join(', ')}. Histórico não é garantia de resultado.`);
+  }
+  if(fixedBidCotas.length){
+    warnings.push(`Lance Fixo em ${fixedBidCotas.map(q=>`${q.id} ${(q.bidPct*100).toFixed(1).replace('.',',')}%`).join(', ')} da carta atualizada. O histórico de 60%–73% do Lance Livre não se aplica a essas cotas.`);
   }
   const contemplationCoincidesWithAdjustment = cont>=cfg.firstAdj && (cont-cfg.firstAdj)%12===0;
   if(contemplationCoincidesWithAdjustment) warnings.push(cfg.adjustmentBeforeContemplation
     ? 'A contemplação cai em um mês de reajuste. Pela convenção selecionada, o reajuste ocorre antes da contemplação e aumenta o crédito usado no lance/liberação.'
     : 'A contemplação cai em um mês de reajuste. Pela convenção selecionada, a contemplação usa o crédito anterior ao reajuste; depois, o reajuste do mês incide apenas sobre o saldo devedor remanescente.');
-  if(lanceWasLimitedByOutstanding) warnings.push(`O Lance Livre informado equivalia a ${money(requestedLanceAtCont)}, mas o saldo devedor disponível para amortização nas contemplações era ${money(effectiveLanceAtCont)}. O simulador limitou o lance efetivamente aplicado; nenhum excesso foi desembolsado.`);
+  if(lanceWasLimitedByOutstanding) warnings.push(`O lance informado equivalia a ${money(requestedLanceAtCont)}, mas o saldo devedor disponível para amortização nas contemplações era ${money(effectiveLanceAtCont)}. O simulador limitou o lance efetivamente aplicado; nenhum excesso foi desembolsado.`);
   if(embeddedWasLimitedByTotal){
-    const detalhe=(embeddedLimitedCotas||[]).map(x=>`${x.id}: solicitado ${money(x.requested)}, efetivo ${money(x.effective)} (Lance Livre ${money(x.lance)})`).join('; ');
+    const detalhe=(embeddedLimitedCotas||[]).map(x=>`${x.id}: solicitado ${money(x.requested)}, efetivo ${money(x.effective)} (lance efetivo ${money(x.lance)})`).join('; ');
     warnings.push(`Em uma ou mais cotas, o embutido solicitado era maior que o próprio Lance Livre. O embutido foi limitado corretamente. ${detalhe}`);
   }
   if(purchased && purchaseCashback>0) warnings.push(`O cashback de ${money(purchaseCashback)} entra no caixa no ${purchaseCashbackReceiptMonth>N?'período posterior ao horizonte modelado':`mês ${purchaseCashbackReceiptMonth}`}. Base elegível: ${money(cashbackEligibleBase)} (${cfg.cashbackBasePolicy==='principal'?'principal líquido pós-embutido, sem rendimentos acumulados':'todo crédito usado, incluindo rendimentos — sensibilidade não confirmada'}). Ele não reduz retroativamente as obrigações do mês da compra.`);
