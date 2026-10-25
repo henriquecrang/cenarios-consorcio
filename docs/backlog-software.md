@@ -1,88 +1,10 @@
-# Backlog de possíveis mudanças no software — Simulador Consórcio × CDB × Imóvel
+# Backlog de software — Simulador Consórcio × CDB × Imóvel
 
-**Criado em:** 28/09/2026  
-**Baseline atual:** V3.2  
-**Baseline auditada histórica:** V2.54  
-**Objetivo:** registrar mudanças de software potencialmente necessárias a partir de novas evidências operacionais, contratuais ou comerciais recebidas da QuintoAndar/Bamaq.
+**Estado canônico da documentação:** pós-rodada `pre_respostas30`  
+**Baseline funcional do app:** V3.2  
+**Regra de leitura:** itens marcados como “implementados” descrevem a V3.2; itens “prontos/candidatos” ainda não foram aplicados ao HTML atual.
 
-## Regra de uso
-
-Uma resposta da vendedora **não deve alterar automaticamente o simulador**.
-
-Antes de promover um item deste backlog para implementação, classificar a evidência como:
-
-- `INFORMAÇÃO COMERCIAL NÃO CONFIRMADA`
-- `CONFIRMAÇÃO OPERACIONAL`
-- `DOCUMENTO/REGULAMENTO`
-- `DECISÃO INTERNA DE MODELAGEM`
-
-Mudanças que alterem fórmulas, cronologia ou significado econômico devem também:
-1. atualizar `especificacao_modelo_simulador.md`;
-2. registrar a decisão no `follow_up_auditorias_simulador.md`;
-3. atualizar/remover a pendência correspondente;
-4. ganhar teste de regressão.
-
-## Status possíveis
-
-- `CANDIDATA`
-- `AGUARDANDO CONFIRMAÇÃO`
-- `PRONTA PARA ESPECIFICAR`
-- `APROVADA PARA IMPLEMENTAÇÃO`
-- `IMPLEMENTADA`
-- `REAUDITADA`
-- `DESCARTADA`
-
-## Tipo
-
-- `REGRA FINANCEIRA`
-- `CRONOLOGIA`
-- `MÚLTIPLAS COTAS`
-- `UX / EXPLICAÇÃO`
-- `NOVO INPUT`
-- `NOVO OUTPUT / KPI`
-- `VALIDAÇÃO / WARNING`
-- `TESTE`
-- `DOCUMENTAÇÃO`
-
-## Prioridade
-
-- `ALTA` — muda materialmente o resultado, a arquitetura ou pode induzir decisão errada;
-- `MÉDIA` — melhora fidelidade do modelo;
-- `BAIXA` — UX, clareza ou conveniência.
-
----
-
-# Itens
-
-
-## Reconciliação de status com a linha principal V3.2 — 29/09/2026
-
-As entradas SW-001–SW-070 foram criadas quando a baseline era V2.54. O texto histórico de cada ticket é preservado, mas os status abaixo refletem o software atual.
-
-Já incorporados de forma material:
-- SW-001 — motor multi-cota; desde V3.2 generalizado para 1–50 cotas;
-- SW-002 — CDI/carta separado do CDB benchmark;
-- SW-004 — remuneração da carta como input/sensibilidade;
-- SW-006 — bases diferentes para Livre e embutido;
-- SW-013 — proibição de pooling;
-- SW-015 — parcialmente: rendimento aferido/usado por cota já aparece;
-- SW-061 — parcialmente: composição 400/400/370/200 existe, mas não há override completo da cotação oficial;
-- SW-064 — parcialmente: há resumo e detalhe multi-cota, mas não um card de reconciliação exata da proposta.
-
-Parcial importante:
-- SW-005 — o motor está correto para **Lance Livre**, mas ainda não há modalidade explícita **Fixo × Livre**.
-
-Continuam sem implementação contratual definitiva, entre outros:
-- SW-018 compra com subconjunto de cotas;
-- SW-060 assembleias anteriores;
-- SW-062 override da parcela oficial;
-- SW-063 cashback por cota conforme regra promocional definitiva;
-- SW-067 calendário real do aniversário do grupo;
-- SW-068 início posterior do seguro por cota;
-- SW-069 metadados formais de validade/trava;
-- SW-070 separação explícita entre tabela comercial e reajuste contratual.
-
-Novas features implementadas depois do backlog original são registradas em SW-071–SW-075 ao final deste documento.
+> Antes de usar a V3.2 para uma nova decisão econômica, tratar como P0: (1) recalibrar o Lance Livre/defaults com o histórico real; (2) alterar a premissa-base líquida da carta de 98% para ~80% do CDI; (3) adicionar regressões para Lance Livre, embutido e cashback multi-cota.
 
 ### SW-001 — Motor multi-cota com preset real de 4 cotas
 
@@ -125,45 +47,41 @@ próxima versão estrutural após fechamento das principais respostas
 
 ### SW-002 — Separar “% do CDI da carta” de “% do CDB benchmark”
 
-**Status:** IMPLEMENTADA — V2.58
+**Status:** IMPLEMENTADA — V2.58; PREMISSA-BASE AGORA RECONCILIADA  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / NOVO INPUT  
-**Origem:** resposta de Michele em 28/09/2026  
-**Nível da evidência:** INFORMAÇÃO COMERCIAL NÃO CONFIRMADA DOCUMENTALMENTE
+**Origem:** respostas de Michele em 28–29/09/2026 + verificação do fundo informado  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL + VERIFICAÇÃO EXTERNA DO FUNDO
 
-**Comportamento atual da V2.54:**  
-A carta rende um percentual do retorno líquido configurado para o CDB benchmark (`cartaPctCdb`).
+**Estrutura confirmada:**  
+A carta NÃO rende uma fração do CDB benchmark do usuário.
 
-**Nova informação:**  
-Michele esclareceu que a carta recebe o rendimento líquido efetivo das aplicações do grupo e que a referência em % do CDI é apenas uma forma de expressar esse desempenho, não uma taxa garantida. A Resolução BCB nº 285/2023 confirma que o crédito recebe rendimentos líquidos financeiros. A faixa comercial ainda precisa ser reconciliada (98%–105% versus 80%–105%).
-
-**Possível mudança:**  
 Separar:
-- CDI de referência;
-- retorno do benchmark CDB;
-- percentual do CDI da carta.
+- `i_CDI` = CDI de referência;
+- `p_carta` = fração líquida do CDI creditada à carta;
+- `i_CDB_benchmark` = retorno do investimento alternativo.
 
-Em versão multi-cota, permitir percentual por cota ou regra comum de grupo.
+**Nova calibração comercial:**  
+- camada bruta da aplicação: aproximadamente 98%–105% do CDI;
+- camada líquida para projeção da carta: aproximadamente **80% do CDI**.
 
-**Impacto esperado:**  
-- Motor: potencialmente alto.  
-- Interface: novos campos/presets.  
-- Métricas: sensibilidade R1 deve ser reinterpretada.  
-- Testes: regressão do cenário atual + cenários 98%, 100%, 105% CDI.  
-- Documentação: atualizar fórmula da seção 5 quando a regra estiver confirmada.
+**Decisão futura:**  
+O default da carta deve migrar para:
+`p_carta = 0.80`
 
-**Dependências / dúvidas antes de implementar:**  
-- critério da faixa 98%–105%;
-- se percentual é fixo ou variável;
-- definição de “líquido”;
-- periodicidade;
-- eventual diferença por cota.
+sem tributação/haircut adicional sobre o mesmo rendimento.
+
+**Fundo informado:**  
+Itaú Premium RF Referenciado DI — CNPJ 03.184.233/0001-80.
 
 **Critério de aceite:**  
-A remuneração da carta deixa de depender indevidamente do retorno arbitrário escolhido para o benchmark.
+- benchmark CDB não controla a carta;
+- 80% aparece como premissa líquida editável;
+- 98%–105% não é apresentado como faixa líquida;
+- nenhum imposto é aplicado duas vezes.
 
 **Versão-alvo:**  
-a definir após resposta formal
+próxima revisão do simulador.
 
 ---
 
@@ -204,162 +122,184 @@ junto com SW-001
 
 ---
 
-### SW-004 — Preservar remuneração da carta como sensibilidade variável, não taxa fixa garantida
+### SW-004 — Recalibrar sensibilidade da remuneração líquida da carta
 
-**Status:** IMPLEMENTADA — V2.61 (INPUT + SENSIBILIDADE NA MATRIZ)
+**Status:** IMPLEMENTADA PARCIALMENTE — INPUT/MATRIZ EXISTEM; DEFAULT E PRESETS PRECISAM SER RECALIBRADOS  
 **Prioridade:** MÉDIA  
 **Tipo:** UX / EXPLICAÇÃO / SENSIBILIDADE  
-**Origem:** faixa 98%–105% do CDI informada por Michele  
-**Nível da evidência:** INFORMAÇÃO COMERCIAL NÃO CONFIRMADA DOCUMENTALMENTE
+**Origem:** esclarecimento de Michele em 29/09/2026  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL
 
-**Comportamento atual da V2.54:**  
-Default pontual de 98%.
+**Comportamento atual:**  
+A sensibilidade foi criada quando 98% era tratado como possível percentual líquido da carta.
 
-**Possível mudança:**  
-Depois de separar CDI da carta e CDB benchmark, permitir cenários/presets de percentual do CDI e eventualmente uma trajetória temporal. Enquanto a faixa estiver contraditória, não escolher silenciosamente 98% como verdade nem apresentar 105% como promessa.
+**Nova informação:**  
+- 98%–105% = camada bruta das aplicações;
+- 80% = orientação de projeção para o retorno líquido da carta.
+
+**Mudança futura:**  
+- default/base: 80% do CDI;
+- manter campo manual;
+- rever presets e matriz para que não usem 98%/100%/105% como se fossem rendimento líquido;
+- explicar que 80% é premissa prudencial/comercial, não garantia.
 
 **Impacto esperado:**  
-- Motor: baixo se o indexador já estiver separado.  
-- Interface: melhora transparência.  
-- Testes: verificar monotonicidade do Δ com a remuneração.
-
-**Dependências / dúvidas antes de implementar:**  
-SW-002 e esclarecimento da faixa.
+Material nos resultados de cenários com longa permanência do crédito contemplado aplicado.
 
 **Critério de aceite:**  
-O usuário consegue enxergar a faixa informada sem o software fingir conhecer a taxa futura.
+A interface deixa claro:
+- “80% do CDI — retorno líquido projetado da carta”;
+- “editável / não garantido”;
+- ausência de novo IR sobre esse rendimento no cenário-base.
 
 **Versão-alvo:**  
-após SW-002
-
+próxima revisão.
 
 ---
 
 ### SW-005 — Modelar modalidade de lance: Fixo × Livre
 
-**Status:** PARCIALMENTE IMPLEMENTADA — LANCE LIVRE CORRETO; SELETOR FIXO × LIVRE AINDA PENDENTE
+**Status:** REGRA DO LIVRE CONFIRMADA; IMPLEMENTAÇÃO ATUAL DEVE SER PRESERVADA/VALIDADA  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / MÚLTIPLAS COTAS  
-**Origem:** resposta de Michele em 28/09/2026  
-**Nível da evidência:** CONFIRMAÇÃO OPERACIONAL / COMERCIAL ESCRITA
+**Origem:** resposta direta de Michele em 29/09/2026  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL INEQUÍVOCA
 
-**Comportamento atual da V2.54:**  
-O lance total é sempre calculado como percentual da carta atualizada.
-
-**Nova informação:**  
+**Regra confirmada:**  
 - Fixo 30% → base carta atualizada;
-- Livre → base saldo devedor;
-- embutido → até 30% da carta atualizada.
+- Livre → base saldo devedor atualizado da cota na data da assembleia;
+- embutido → carta atualizada.
 
-**Possível mudança:**  
-Adicionar `tipoLance` por cota e calcular a base conforme a modalidade.
+No Livre:
 
-**Impacto esperado:**  
-- Motor: alto; muda lance, capital próprio, dívida, crédito disponível e break-even.  
-- Interface: seletor Fixo/Livre e explicação da base.  
-- Métricas: todos os KPIs de lance e pós-contemplação.  
-- Testes: casos com bases distintas e múltiplas cotas.  
-- Documentação: atualizar seção 11 da especificação.
+`lanceLivre = pctLivre × saldoDevedorNaAssembleia`
 
-**Dependências / dúvidas antes de implementar:**  
-- faixa/mínimo do Livre;
-- critério de desempate;
-- momento exato do saldo-base.
+**Ranking confirmado:**  
+O sistema ordena as cotas pelo `pctLivre` em ordem decrescente e contempla até esgotar o Fundo Comum.
+
+**Memória inconsistente:**  
+O exemplo de R$225 mil para saldo R$495.330 e 45% não reproduz a regra confirmada. Não adaptar o motor para esse print.
+
+**Mudança necessária:**  
+Não é uma mudança conceitual na fórmula atual; é:
+- consolidar a regra;
+- remover status de incerteza;
+- adicionar testes de regressão com saldo diferente da carta;
+- separar ranking percentual de valor nominal de lance.
 
 **Critério de aceite:**  
-Fixo e Livre reproduzem memórias oficiais independentes e nenhum percentual é aplicado à base errada.
+- 45% sobre R$495.330 = R$222.898,50;
+- ranking depende do percentual, não do valor nominal;
+- nenhum teste tenta reproduzir R$225 mil daquele print.
 
 **Versão-alvo:**  
-próxima versão estrutural
+próxima revisão/teste do simulador.
 
 ---
 
 ### SW-006 — Calcular embutido e dinheiro com bases diferentes
 
-**Status:** IMPLEMENTADA — V2.58
+**Status:** IMPLEMENTADA CONCEITUALMENTE — REGRA AGORA CONFIRMADA  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA  
-**Origem:** exemplo de 45% Livre + 10% embutido  
-**Nível da evidência:** CONFIRMAÇÃO COMERCIAL ESCRITA, CÁLCULO EXATO A CONFIRMAR
+**Origem:** resposta direta de Michele em 29/09/2026  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL INEQUÍVOCA
 
-**Comportamento atual da V2.54:**  
-Lance total e embutido usam a carta como base, permitindo derivar dinheiro pela diferença simples.
+**Regra confirmada:**
 
-**Nova informação:**  
-No Lance Livre, total usa saldo devedor e embutido usa carta.
+`lanceTotal = pctLivre × saldoDevedorNaAssembleia`
 
-**Possível mudança:**  
-Usar valores monetários:
-`lanceTotal = pctLivre × saldo`
 `embutido = pctEmb × carta`
+
 `dinheiro = max(0, lanceTotal - embutido)`
 
-**Impacto esperado:**  
-Alto para necessidade de caixa e eventual empréstimo do lance.
+**Caso de regressão:**
+- saldo = R$495.330;
+- Livre = 45%;
+- carta = R$400.000;
+- embutido = 30%.
 
-**Dependências / dúvidas antes de implementar:**  
-Confirmar exatamente a memória de R$ 180 mil do exemplo.
+Esperado:
+- lance total = R$222.898,50;
+- embutido = R$120.000;
+- dinheiro = R$102.898,50.
+
+**Decisão:**  
+A memória que mostrava R$105 mil próprios é descartada como referência matemática.
 
 **Critério de aceite:**  
-O software nunca interpreta “45%-10%=35% da carta” quando as bases são diferentes.
+A implementação reproduz o caso acima e mantém as bases separadas.
 
 **Versão-alvo:**  
-junto com SW-005
+próxima bateria de testes/revisão.
 
 ---
 
 ### SW-007 — Reconciliar contagem de parcelas pós-contemplação
 
-**Status:** AGUARDANDO CONFIRMAÇÃO  
+**Status:** DESCARTADA COMO MUDANÇA DE MOTOR — MEMÓRIA NUMÉRICA CONFIRMA 210 MESES  
 **Prioridade:** ALTA  
 **Tipo:** CRONOLOGIA / REGRA FINANCEIRA  
-**Origem:** memória comercial: contemplação na 4ª parcela → nova parcela por 209 meses  
-**Nível da evidência:** INFORMAÇÃO COMERCIAL COM POSSÍVEL ARREDONDAMENTO/CONVENÇÃO NÃO EXPLICADA
+**Origem:** memória comercial de 29/09/2026  
+**Nível da evidência:** MEMÓRIA NUMÉRICA COM RÓTULO INTERNO INCONSISTENTE
 
-**Comportamento atual da V2.54:**  
-`P_pos = saldo / (N - mesCont)`, o que daria 210 meses restantes para N=214 e contemplação no mês 4.
+**Comportamento da V3.2:**  
+`P_pos = saldo / (N - mesCont)`
 
-**Possível mudança:**  
-Nenhuma ainda. Primeiro identificar a cronologia oficial.
+Para N=214 e contemplação após a 4ª parcela:
+`214 - 4 = 210`.
 
-**Dependências / dúvidas antes de implementar:**  
-- por que 209 meses;
-- se a parcela da contemplação já foi paga;
-- se existe parcela inicial/adesão fora dos 214;
-- momento do recálculo.
+**Nova evidência:**  
+A memória mostra:
+- saldo final = R$ 270.330;
+- rótulo “209 meses”;
+- nova parcela = R$ 1.287.
+
+Mas:
+- `270.330 / 209 = R$ 1.293,44`;
+- `270.330 / 210 = R$ 1.287,29`.
+
+Logo, o valor monetário da própria memória confirma a divisão por **210 meses**.
+
+**Decisão:**  
+Não alterar o motor para 209. Tratar “209 meses” como provável erro de rótulo até prova documental em contrário.
 
 **Critério de aceite:**  
-A simulação reproduz exatamente uma memória oficial da Bamaq sem ajuste ad hoc.
+Teste de regressão: com saldo R$ 270.330 e 210 meses, a parcela deve ficar aproximadamente R$ 1.287,29 antes de arredondamentos de apresentação.
 
 **Versão-alvo:**  
-a definir após confirmação
+nenhuma mudança financeira; apenas documentação/teste
 
 ---
 
 ### SW-008 — Opção de destino da amortização do lance
 
-**Status:** AGUARDANDO CONFIRMAÇÃO  
+**Status:** PRONTA PARA ESPECIFICAR  
 **Prioridade:** MÉDIA  
 **Tipo:** REGRA FINANCEIRA / NOVO INPUT  
-**Origem:** Michele descreveu redução do valor da parcela após o lance  
-**Nível da evidência:** INFORMAÇÃO COMERCIAL PARCIAL
+**Origem:** áudio de Michele em 29/09/2026  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL
 
-**Comportamento atual da V2.54:**  
-O lance reduz saldo e a parcela pós-contemplação é recalculada mantendo o horizonte.
+**Nova informação:**  
+Michele afirmou que o lance pode amortizar:
+- o valor da parcela; OU
+- o prazo.
 
 **Possível mudança:**  
-Se o contrato permitir alternativas, oferecer:
-- reduzir parcela;
-- reduzir prazo / ordem inversa.
+Oferecer por cota:
+- `reduzirParcela` — recalcular parcela mantendo o horizonte;
+- `reduzirPrazo` — manter a lógica de parcela aplicável e antecipar término conforme regra contratual a detalhar.
 
-**Dependências / dúvidas antes de implementar:**  
-Confirmar quais opções existem no Grupo 4012.
+**Dependências / dúvidas antes da implementação final:**  
+- como exatamente a redução de prazo é operacionalizada;
+- se a escolha é feita no momento do lance;
+- se pode variar por cota.
 
 **Critério de aceite:**  
-Cada opção reproduz a forma oficial de amortização.
+Os dois modos ficam explícitos e nenhum deles é inferido silenciosamente.
 
 **Versão-alvo:**  
-a definir
+próxima revisão após detalhar a mecânica do modo “reduzir prazo”
 
 ---
 
@@ -947,38 +887,55 @@ após confirmação
 
 ### SW-028 — Implementar regra geral + exceção promocional do cashback
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** PRONTA PARA ESPECIFICAR PARA O PRESET ATUAL  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / MÚLTIPLAS COTAS  
-**Origem:** Regulamento da Campanha QuintoAndar/Bamaq, itens 4.1.3 e 4.1.3.1  
-**Nível da evidência:** DOCUMENTO/REGULAMENTO
+**Origem:** Regulamento da Campanha + respostas específicas de Michele em 29/09/2026  
+**Nível da evidência:** DOCUMENTO + CONFIRMAÇÃO COMERCIAL DIRETA DO CASO MULTI-COTA
 
-**Comportamento atual da V2.54:**  
-`cashback = 10% × credito_usado`
+**Regra confirmada para a proposta atual:**  
+Em compra de um único imóvel com múltiplas cotas, a análise é agregada.
 
-**Nova regra:**  
-- regra geral: 10% do crédito liberado/utilizado na aquisição;
-- exceção pós-16/06/2026: quando imóvel >= crédito contratado, base passa a ser crédito total contratado/disposto na cota.
+`creditoNominalOperacao = soma(cotas.creditoNominal)`
 
-**Possível mudança:**  
-Manter por cota:
-- crédito contratado;
-- crédito atualizado;
-- crédito líquido após embutido;
-- crédito liberado;
-- crédito efetivamente utilizado;
-- base de cashback resultante.
+Após embutido:
 
-Em multi-cota, aplicar regra conforme critério a confirmar em QN-030.
+`creditoLiquidoFaturado = soma(cotas.creditoLiquidoEfetivamenteLiberado)`
 
-**Impacto esperado:**  
-Pode aumentar significativamente cashback em operações com embutido/complemento próprio.
+Cashback:
+
+`cashback = 10% × creditoLiquidoFaturado`
+
+Caso atual:
+- nominal = R$1,37 milhão;
+- embutido = R$411 mil;
+- líquido faturado = R$959 mil;
+- cashback = R$95,9 mil.
+
+**Importante:**  
+Não aplicar a exceção cota por cota neste preset.
+
+**Mudança futura necessária:**  
+Preservar por cota:
+- crédito nominal;
+- embutido;
+- crédito líquido;
+- valor efetivamente faturado.
+
+No nível da operação:
+- soma nominal;
+- valor do imóvel;
+- crédito líquido total faturado;
+- cashback final.
 
 **Critério de aceite:**  
-Casos geral e excepcional reproduzem exatamente exemplos documentais.
+O cenário 1,37M nominal + 30% embutido deve retornar exatamente R$95.900 de cashback.
+
+**Guardrail:**  
+Se contrato/regulamento final trouxer regra divergente, reabrir antes de release.
 
 **Versão-alvo:**  
-próxima revisão estrutural
+próxima revisão do simulador.
 
 ---
 
@@ -1083,13 +1040,13 @@ Adicionar metadata de campanha:
 Quando simulação usar cashback, exibir warning se a adesão não estiver confirmada dentro da vigência.
 
 **Dependências:**  
-Confirmar se houve prorrogação após 30/09/2026.
+O marco da proposta analisada foi comercialmente esclarecido: contrato emitido/homologado, aceite eletrônico e primeira parcela paga dentro do prazo. Como 30/09/2026 é histórico, esta issue passa a ser apenas uma regra genérica de elegibilidade por campanha.
 
 **Critério de aceite:**  
 Cashback não aparece como benefício disponível para uma operação inelegível.
 
 **Versão-alvo:**  
-após QN-034
+futura revisão de UX/metadata; não é P0 do motor
 
 ---
 
@@ -1897,34 +1854,36 @@ regressão da próxima revisão
 
 ### SW-060 — Suportar eventual ajuste de assembleias anteriores apenas se confirmado
 
-**Status:** AGUARDANDO CONFIRMAÇÃO  
-**Prioridade:** ALTA  
+**Status:** DESCARTADA PARA A PROPOSTA ATUAL — REABRIR SOMENTE SE DOCUMENTO FORMAL CONTRADISSER  
+**Prioridade:** ALTA COMO GUARDA DE REGRESSÃO / SEM IMPLEMENTAÇÃO ATUAL  
 **Tipo:** REGRA FINANCEIRA / CONTEMPLAÇÃO / GRUPO EM ANDAMENTO  
-**Origem:** conflito entre Regulamento Bamaq 2025 e resposta comercial  
-**Nível da evidência:** DOCUMENTO GERAL EM CONFLITO COM PROPOSTA COMERCIAL
+**Origem:** conflito entre Regulamento Bamaq 2025 e resposta comercial específica  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL ESCRITA ESPECÍFICA PARA AS 4 COTAS + RESSALVA DOCUMENTAL
 
-**Possível regra futura, se QN-055 confirmar aplicabilidade:**
+**Situação após 29/09/2026:**  
+Michele afirmou expressamente que, para as quatro cotas novas do Grupo 4012/QuintoAndar:
+- não existe nem existirá cobrança retroativa por assembleias anteriores;
+- não haverá dedução dessas parcelas no crédito contemplado;
+- as cotas são novas de lançamento/abertura de vagas, não cotas canceladas assumidas de terceiro;
+- saldo e parcelas nascem do crédito contratado + administração + fundo de reserva e são distribuídos no prazo remanescente.
 
-Ao contemplar uma cota que entrou em grupo em andamento:
-`ajusteAnterior = valorFormalDasAssembleiasAnteriores`
+**Decisão de software:**  
+NÃO implementar `ajusteAnterior` no preset nem no cenário-base desta proposta.
 
-O ajuste deve ter destino explícito:
-- pagamento em dinheiro; ou
-- dedução do crédito contemplado.
+A antiga regra candidata permanece documentada apenas como guardrail: se contrato, Regulamento 2026 ou documento específico futuro comprovar que existe cobrança/dedução para esse produto, o item deve ser reaberto e o ajuste deve ser modelado como evento explícito na contemplação — nunca silenciosamente incorporado ao saldo.
 
-Nunca somar silenciosamente ao saldo nem duplicar o 25% já distribuído pelas 214 parcelas.
+**Dependências residuais:**  
+- conferência do contrato/proposta final;
+- reconciliação formal do Regulamento 2025 com a regra específica alegada para cotas novas de lançamento/abertura de vagas.
 
-**Dependências:**  
-QN-055 e QN-056.
+**Impacto esperado atual:**  
+Nenhum no motor: a regra correta para o preset permanece **sem retroativos**.
 
-**Impacto esperado:**  
-Potencialmente alto para contemplação precoce, crédito líquido, lance e aportes.
-
-**Critério de aceite:**  
-Com a regra desativada, reproduz a proposta atual sem retroativos. Com a regra ativada, reproduz memória oficial da Bamaq sem dupla cobrança.
+**Critério de aceite atual:**  
+O preset da proposta reproduz 214 parcelas e o crédito contemplado não sofre dedução por assembleias anteriores. Um eventual futuro modo de ajuste só pode existir mediante evidência documental explícita.
 
 **Versão-alvo:**  
-somente após confirmação formal
+nenhuma enquanto não houver evidência formal contraditória
 
 ---
 
@@ -2065,63 +2024,68 @@ junto com SW-023/SW-025
 
 ### SW-066 — Parametrizar prazo operacional do pagamento do lance
 
-**Status:** AGUARDANDO CONFIRMAÇÃO  
+**Status:** PRONTA PARA ESPECIFICAR — 2 DIAS ÚTEIS CONFIRMADOS COMERCIALMENTE E ALINHADOS À ATA  
 **Prioridade:** BAIXA  
 **Tipo:** CRONOLOGIA / LIQUIDEZ  
-**Origem:** conflito 3 dias × 2º dia útil  
-**Nível da evidência:** COMERCIAL EM CONFLITO COM ATA
+**Origem:** resposta de Michele em 29/09/2026 + ata do Grupo 4012 já analisada  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL COERENTE COM DOCUMENTO DO GRUPO
 
-**Possível mudança:**  
-Metadado:
-`prazoPagamentoLanceDiasUteis`
+**Regra operacional:**  
+`prazoPagamentoLanceDiasUteis = 2`
 
-Não afeta o motor mensal padrão, mas pode alimentar:
+Michele também usou a expressão “48 horas”, mas a referência operacional deve ser “até dois dias úteis / segundo dia útil”, porque 48 horas corridas não são equivalentes quando há fim de semana ou feriado.
+
+**Uso futuro:**  
+Não altera o motor mensal padrão, mas pode alimentar:
 - warning de liquidez;
 - calendário operacional;
 - eventual financiamento ponte.
 
-**Dependência:**  
-QN-060.
-
 **Critério de aceite:**  
-O software não apresenta um prazo operacional não confirmado como fato.
+A interface informa “até o 2º dia útil” e não “3 dias”.
 
 **Versão-alvo:**  
-após confirmação
+próxima revisão de UX/cronologia operacional
 
 ---
 
 ### SW-067 — Reajuste anual pelo calendário/aniversário do grupo
 
-**Status:** PRONTA PARA ESPECIFICAR, COM DATA EXATA PENDENTE  
+**Status:** PRONTA PARA ESPECIFICAR — MÊS DO PRIMEIRO REAJUSTE CONFIRMADO  
 **Prioridade:** ALTA  
 **Tipo:** CRONOLOGIA / GRUPO EM ANDAMENTO / MÚLTIPLAS COTAS  
-**Origem:** áudio de Michele em 28/09/2026  
-**Nível da evidência:** CONFIRMAÇÃO COMERCIAL
+**Origem:** respostas de Michele em 28–29/09/2026  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL ESCRITA
 
-**Comportamento atual da V2.54:**  
-O reajuste anual é essencialmente tratado por intervalos relativos ao início da simulação.
+**Comportamento atual da V3.2:**  
+O motor ainda não usa o calendário contratual real do Grupo 4012 para posicionar o primeiro reajuste.
 
-**Nova regra:**  
-O reajuste ocorre no aniversário do grupo.
+**Nova regra/evidência:**  
+- o reajuste anual ocorre no calendário de aniversário aplicável ao grupo/cota;
+- para a proposta atual, a próxima assembleia do dia 18 NÃO dispara o reajuste anual;
+- o primeiro reajuste das novas cotas será em **abril de 2027**, cerca de sete meses após a entrada;
+- a “virada da tabela” mensal é evento comercial distinto.
 
 A arquitetura deve suportar:
-- `dataBaseReajusteGrupo`;
+- `dataBaseReajusteGrupo` ou, na resolução mensal atual, `mesAniversarioGrupo`;
 - `mesEntradaCota`;
-- primeira ocorrência do aniversário após a entrada;
-- calendário comum de reajuste para cotas do mesmo grupo.
+- primeira ocorrência do aniversário aplicável após a entrada;
+- calendário comum de reajuste para cotas do mesmo grupo;
+- override/preset da proposta atual com primeiro reajuste em abril/2027.
 
 **Impacto esperado:**  
-Pode ser material se a cota entrar pouco antes do aniversário e sofrer reajuste quase imediatamente.
+Material: impede que o simulador aplique 3% cedo demais na próxima assembleia ou tarde demais após 12 meses completos da adesão.
 
 **Dependências:**  
-QN-061 / QN-063.
+- QN-061 resolvida;
+- QN-063 só permanece relevante para o dia exato caso haja futura resolução diária;
+- QN-020 continua necessária para a ordem reajuste × contemplação quando coincidirem no mesmo mês.
 
 **Critério de aceite:**  
-Uma cota aderida poucos dias antes do aniversário pode receber seu primeiro reajuste sem esperar 12 meses, caso essa seja a regra confirmada.
+No preset desta proposta, uma cota contratada agora mantém o calendário sem reajuste anual até março/2027 e aplica o primeiro evento anual em abril/2027, sem associá-lo à assembleia mensal do dia 18.
 
 **Versão-alvo:**  
-próxima arquitetura multi-cota
+próxima revisão estrutural, após a rodada documental e antes da nova auditoria.
 
 ---
 
@@ -2157,57 +2121,87 @@ próxima revisão após arquitetura multi-cota
 
 ### SW-069 — Metadados de cotação, validade e “trava” comercial
 
-**Status:** CANDIDATA  
+**Status:** PRONTA PARA ESPECIFICAR — MARCO OPERACIONAL CONFIRMADO COMERCIALMENTE  
 **Prioridade:** MÉDIA  
 **Tipo:** UX / RASTREABILIDADE / VALIDAÇÃO  
-**Origem:** cotação válida até 30/09/2026 + proposta de alocação/emissão para garantir condições  
-**Nível da evidência:** COTAÇÃO + CONFIRMAÇÃO COMERCIAL
+**Origem:** cotação válida até 30/09/2026 + resposta específica de Michele em 29/09/2026  
+**Nível da evidência:** COTAÇÃO + CONFIRMAÇÃO COMERCIAL DIRETA
 
-**Possível mudança:**  
-No preset/projeto, registrar:
+**Fluxo confirmado:**  
+`documentos → contrato emitido/homologado → e-mail → aceite eletrônico → primeira parcela paga`
+
+Com aceite e primeira parcela:
+- entrada no plano;
+- alocação de grupo/cota;
+- acesso ao aplicativo;
+- participação nas assembleias;
+- preservação da condição comercial/cashback, segundo Michele.
+
+**Regra de estado sugerida:**
+
+`condicaoComercialTravada = contratoEmitido && aceiteEletronico && primeiraParcelaPaga`
+
+Deadline do preset:
+`30/09/2026`
+
+**Metadados futuros:**
 - data da cotação;
 - validade;
-- data de emissão;
-- data de assinatura;
-- data do primeiro pagamento;
-- data de alocação;
-- versão/tabela comercial.
+- data de envio de documentos;
+- emissão/homologação;
+- aceite eletrônico;
+- primeiro pagamento;
+- grupo;
+- cota;
+- acesso ao app;
+- status de efetivação.
 
-Exibir warning quando a simulação estiver baseada em uma cotação expirada ou ainda não formalizada.
+**Cronologia adicional:**  
+Segunda parcela informada para 15/11/2026.
+
+**Guardrail:**  
+Não marcar condição como travada apenas com emissão do contrato. Conferir contrato final antes de tornar o preset definitivo.
 
 **Critério de aceite:**  
-O usuário distingue “condição simulada” de “condição efetivamente garantida contratualmente”.
+A interface consegue distinguir:
+- cotação válida;
+- contrato emitido;
+- contrato aceito;
+- primeira parcela paga;
+- adesão efetivada.
 
 **Versão-alvo:**  
-após definição do fluxo de contratação
+próxima revisão de rastreabilidade/UX.
 
 ---
 
 ### SW-070 — Não confundir mudança da tabela comercial com reajuste contratual
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** PRONTA PARA ESPECIFICAR — REGRA CONFIRMADA COMERCIALMENTE  
 **Prioridade:** MÉDIA  
 **Tipo:** ARQUITETURA / CRONOLOGIA / DOCUMENTAÇÃO  
-**Origem:** frase “tabela vai virar” + reajuste no aniversário do grupo  
-**Nível da evidência:** NECESSIDADE DE MODELAGEM
+**Origem:** respostas de Michele sobre “virada da tabela” e reajuste anual  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL ESCRITA
 
-**Regra:**  
+**Regra confirmada:**  
 Manter eventos separados:
-- `mudancaTabelaNovasAdesoes`;
+- `mudancaTabelaNovasAdesoes` / fechamento comercial mensal;
 - `reajusteAnualCotaAtiva`.
 
-A mudança da tabela para novos clientes não deve alterar automaticamente uma cota já formalizada, e o reajuste anual não deve ser tratado como expiração da cotação.
+Michele esclareceu que são “dois eventos completamente diferentes”: a tabela comercial fecha antes da assembleia (por volta do dia 12) para novas entradas, enquanto o reajuste contratual de 3% ocorre uma vez por ano. Para a proposta atual, o próximo dia 18 não aplica os 3%; o primeiro reajuste será em abril/2027.
+
+A mudança da tabela para novos clientes NÃO deve alterar automaticamente uma cota já formalizada, e o reajuste anual NÃO deve ser tratado como expiração da cotação ou fechamento mensal da tabela.
 
 **Dependências:**  
-QN-061/QN-062.
+Nenhuma para a separação conceitual. QN-062 foi respondida comercialmente: a condição é efetivada após emissão do contrato, aceite eletrônico e pagamento da primeira parcela dentro do prazo.
 
 **Critério de aceite:**  
-O motor consegue representar as duas datas sem dupla aplicação ou supressão de 3%.
+O motor/estado consegue representar as duas datas sem dupla aplicação ou supressão de 3%, e o preset atual não aplica reajuste anual na próxima assembleia mensal.
 
 **Versão-alvo:**  
-próxima revisão estrutural
----
+próxima revisão estrutural.
 
+---
 
 ### SW-071 — Financiamento do lance em múltiplas datas / tranches
 
@@ -2331,6 +2325,121 @@ Presets antigos de quatro cotas devem continuar compatíveis.
 
 **Critério de aceite:**  
 Cenários com 1, 4 ou N cotas podem ser salvos, carregados, exportados e importados sem perda de estado.
+
+---
+
+
+### SW-076 — Camada opcional de calibração por histórico real de lances
+
+**Status:** CANDIDATA — NÃO IMPLEMENTAR NESTA RODADA  
+**Prioridade:** MÉDIA  
+**Tipo:** ANÁLISE / SENSIBILIDADE / EVIDÊNCIA EMPÍRICA  
+**Origem:** atas 001–006 do Grupo 4012 + resposta de Michele sobre sigilo dos lances  
+**Nível da evidência:** DOCUMENTOS OFICIAIS DOS RESULTADOS; SEM DENOMINADOR DE TODAS AS OFERTAS
+
+**Histórico verificado:**  
+- abr: 60,1400%;
+- mai: 60,9867%;
+- jun: nenhum vencedor por Lance Livre; Lance Fixo vencedor a 30%;
+- jul: 73,0000% / 72,7300%;
+- ago: 70,6877% / 70,5508% / 69,5200% / 68,9081%;
+- set: 73,0000% / 72,0000% / 72,0000% / 72,0000%.
+
+**Modelagem de dados recomendada:**  
+Por assembleia:
+- `data`;
+- `vencedoresLivre[]`;
+- `vencedorFixoPct`;
+- `qtdVencedoresLivre`;
+- `qtdCotasAptas`;
+- `saldoAssembleia`.
+
+Para junho:
+- `vencedoresLivre = []`;
+- `qtdVencedoresLivre = 0`;
+- NÃO armazenar `0%` como lance vencedor.
+
+**Limitação confirmada:**  
+O total de ofertas é sigiloso/inacessível ao cliente.
+
+**Guardrails obrigatórios:**  
+- NÃO calcular probabilidade;
+- NÃO calcular “% de sucesso”;
+- NÃO inferir distribuição dos perdedores;
+- NÃO misturar Fixo 30% com Livre;
+- não converter mês sem vencedor em lance de 0%;
+- rotular claramente o histórico como descritivo.
+
+**Critério de aceite:**  
+O histórico melhora interpretação sem produzir estatística inexistente.
+
+**Versão-alvo:**  
+futura, se útil para UX.
+
+---
+
+### SW-077 — Calendário operacional da assembleia: dia 18 com ajuste para dia útil
+
+**Status:** CANDIDATA — NÃO IMPLEMENTAR NESTA RODADA  
+**Prioridade:** BAIXA  
+**Tipo:** CRONOLOGIA OPERACIONAL / UX  
+**Origem:** resposta de Michele em 29/09/2026 + histórico de atas do Grupo 4012  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL COERENTE COM DADOS DO GRUPO
+
+**Regra informada:**  
+- assembleia regular: dia 18;
+- se 18 não for dia útil, deslocar para dia útil seguinte;
+- outubro/2026: 19/10 porque 18/10 é domingo.
+
+**Validação empírica:**  
+Julho/2026 teve assembleia em 20/07; 18/07/2026 caiu em sábado.
+
+**Possível mudança futura:**  
+Adicionar:
+- `diaBaseAssembleia = 18`;
+- calendário de feriados/fins de semana apenas em modo operacional diário;
+- próxima data estimada de assembleia;
+- prazo limite de pagamento do lance em 2 dias úteis após o evento aplicável.
+
+**Impacto:**  
+Nenhum no motor mensal padrão. Útil para planejamento de liquidez, lances e checklist contratual.
+
+**Guardrail:**  
+Não vincular essa data ao reajuste anual de 3%.
+
+**Versão-alvo:**  
+somente quando houver cronologia diária/operacional.
+
+---
+
+
+### SW-078 — Limites de carta do produto QuintoAndar
+
+**Status:** CANDIDATA — NÃO IMPLEMENTAR NESTA RODADA  
+**Prioridade:** BAIXA  
+**Tipo:** PRESET / VALIDAÇÃO DE INPUT / UX  
+**Origem:** resposta de Michele em 29/09/2026  
+**Nível da evidência:** CONFIRMAÇÃO COMERCIAL
+
+**Regra informada:**  
+No produto QuintoAndar:
+- carta mínima = R$200 mil;
+- carta máxima = R$400 mil.
+
+**Possível mudança futura:**  
+No preset QuintoAndar:
+- validar `200000 <= carta <= 400000`;
+- ao informar necessidade agregada acima de R$400 mil, sugerir múltiplas cotas;
+- para R$1,37 milhão, indicar mínimo estrutural de 4 cotas.
+
+**Guardrail:**  
+Não exibir afirmações como “mais cotas aumentam a probabilidade de contemplação” sem modelagem probabilística sustentada por dados.
+
+**Impacto:**  
+Nenhum na matemática atual; melhora consistência do preset e evita cenários impossíveis dentro do produto.
+
+**Versão-alvo:**  
+futura revisão de UX/presets.
 
 ---
 
