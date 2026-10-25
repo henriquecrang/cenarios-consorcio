@@ -263,7 +263,7 @@ IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
 - política anti-pooling verificada mês a mês por cota.
 
 PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
-- override das parcelas oficiais cotadas;
+- eventual override das parcelas oficiais cotadas continua pendente; a V3.18 já exibe reconciliação sem alterar os fluxos;
 - trajetória temporal de CDI/CDB para horizontes longos;
 - dia exato e ordem do reajuste quando coincide com contemplação;
 - reconciliação documental da ausência de retroativos para entrada no grupo em andamento;
@@ -318,6 +318,28 @@ Implementado:
 
 Pendência removida:
 O motor não exige mais que todas as cotas usem a mesma estratégia de lance.
+
+============================================================
+AUDITORIA V3.18 — RECONCILIAÇÃO DA COTAÇÃO COMERCIAL
+============================================================
+
+Issue #18: RESOLVIDA QUANTO À AUDITORIA VISUAL; OVERRIDE FINANCEIRO CONTINUA DELIBERADAMENTE PENDENTE.
+
+Implementado:
+- painel único compara cotação e motor;
+- crédito nominal: R$1,37 milhão;
+- parcela reduzida cotada: R$3.999,03;
+- parcela integral cotada: R$8.002,17;
+- cashback nominal cotado: R$137 mil;
+- cashback efetivo do cenário aparece separadamente;
+- diferenças de parcela são mostradas em R$ e % com centavos;
+- prazo e composição permanecem rastreáveis.
+
+Decisão de modelagem:
+Os valores cotados NÃO substituem o motor. Ainda não existe regra documental suficiente para alocar a diferença de parcela por cota e preservar contemplações escalonadas.
+
+Pendência residual:
+Só implementar override de fluxo se recebermos memória oficial/contratual que permita reproduzir a composição por cota sem arbitrar distribuição.
 
 ============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
