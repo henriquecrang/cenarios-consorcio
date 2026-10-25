@@ -1,3 +1,27 @@
+### SW-083 — Base de cashback separada de rendimentos acumulados
+
+**Status:** IMPLEMENTADA — V3.10  
+**Prioridade:** P1 CONCLUÍDA  
+**Tipo:** REGRA FINANCEIRA / CASHBACK  
+**Origem:** auditoria V3.5 / issue #7
+
+**Implementado:**
+- `resolveCashbackBase()` no núcleo testável;
+- default conservador exclui rendimentos acumulados;
+- sensibilidade opcional inclui todo crédito usado;
+- KPI da base elegível;
+- alerta explícito para hipótese não confirmada;
+- testes unitários para principal vs. crédito total disponível.
+
+**Caso protegido:**
+- preço R$1.000.000;
+- crédito disponível R$1.012.017,72;
+- principal líquido R$959.000;
+- base conservadora R$959.000;
+- cashback R$95.900.
+
+---
+
 ### SW-082 — Sensibilidade explícita de financiamento do lance
 
 **Status:** IMPLEMENTADA — V3.9  
