@@ -3218,15 +3218,42 @@ Quando cotas contemplam no mesmo mês e usam termos idênticos, a soma das tranc
 
 # 76. Painel decisório / matriz de cenários
 
-A V3.2 inclui uma matriz que reutiliza o mesmo motor financeiro para comparar cenários sem substituir a simulação principal.
+A V3.6 reutiliza o mesmo motor financeiro para comparar cenários sem substituir a simulação principal.
 
 A matriz permite variar:
 - mês de contemplação de cada cota;
 - Lance Livre;
-- percentual do CDI da carta;
+- percentual líquido do CDI atribuído à carta;
 - percentual do dinheiro do lance financiado.
 
-Outputs incluem:
+## 76.1 Invariante de comparabilidade
+
+A matriz possui uma política própria, comum a todas as linhas, para evitar comparação entre estratégias/ativos diferentes.
+
+Por default:
+- compra no mês da última contemplação de cada linha;
+- imóvel-alvo fixo em R$1.000.000;
+- o preço do ativo NÃO varia com o crédito acumulado.
+
+Alternativas explícitas:
+- herdar o mês de compra da simulação principal;
+- não comprar no horizonte;
+- usar todo o crédito disponível como preço do imóvel.
+
+A linha antes chamada “Atual” passa a ser **Base comparável**: preserva contemplação/lance/rendimento/financiamento da configuração principal, mas obedece à mesma política comum de compra e preço da matriz.
+
+## 76.2 Persistência
+
+A política da matriz é persistida junto ao cenário:
+- `purchasePolicy`;
+- `pricePolicy`;
+- `propertyPrice`.
+
+Estados antigos com `buyAtLastCont` são migrados de forma compatível para `last` ou `main`.
+
+## 76.3 Outputs
+
+Incluem:
 - Δ contra CDB;
 - patrimônio final;
 - aportes próprios nominais;
@@ -3236,6 +3263,7 @@ Outputs incluem:
 - principal financiado;
 - pico da dívida bancária;
 - mês da compra;
+- preço do imóvel;
 - complemento de caixa na compra;
 - cashback.
 
