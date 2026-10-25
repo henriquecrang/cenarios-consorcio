@@ -879,6 +879,24 @@ O motor deve usar carta como base nas cotas Fixo e saldo devedor nas cotas Livre
 
 ---
 
+# 11B. Guardrail operacional do pagamento do lance — V3.19
+
+Para a proposta/grupo analisado, a referência operacional registrada é:
+
+`prazoPagamentoLance = 2 dias úteis`
+
+A expressão comercial “48 horas” não deve ser convertida em 48 horas corridas.
+
+A V3.19:
+- exibe esse prazo como aviso de liquidez;
+- NÃO cria calendário diário;
+- NÃO desloca fluxo mensal;
+- NÃO presume tolerância além do segundo dia útil.
+
+Se futuramente houver motor diário/calendário, feriados e finais de semana deverão ser considerados explicitamente.
+
+---
+
 # 12. Empréstimo para financiar o lance
 
 O empréstimo pode financiar uma fração da parte em dinheiro do lance.
