@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.13 · Transferência por saldo</title>
+<title>Consórcio x CDB x Imóvel — V3.14 · Crédito residual explícito</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.13 · Transferência por saldo</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.14 · Crédito residual explícito</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1129,6 +1129,23 @@ th:first-child,td:first-child{text-align:left}
         <div class="small">Meses após a compra. Default = 1 porque a compra ocorre no fim do mês e o cashback é pago posteriormente ao registro/pagamento. Use 0 apenas como sensibilidade.</div>
       </div>
 
+      <div class="field">
+        <label>Destino do crédito residual após a compra</label>
+        <select id="residualCreditPolicy">
+          <option value="unallocated" selected>Não assumir destinação — excluir do patrimônio comparável</option>
+          <option value="costs">Usar em custos de aquisição, até o teto abaixo</option>
+        </select>
+        <div class="small">
+          O default conservador rastreia o residual, mas não o conta como ativo livre. Amortização do consórcio e devolução em dinheiro continuam fora do motor até fecharmos a mecânica contratual específica.
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Teto para residual em despesas vinculadas</label>
+        <input id="residualExpenseCapPct" type="number" value="10" min="0" max="100" step=".5">
+        <div class="small">% do principal líquido disponível na compra. Default de 10% como limite regulatório de referência; a base exata em operação multi-cota continua pendente.</div>
+      </div>
+
       <div class="section">7. Venda da carta contemplada</div>
 
       <div class="field">
@@ -1571,7 +1588,9 @@ th:first-child,td:first-child{text-align:left}
             <div class="v" id="kFluxoPos">—</div>
             <div class="kpi-formula" id="kFluxoFormula">—</div>
           </div>
-          <div class="kpi"><div class="l">Crédito não usado na compra</div><div class="v" id="kResidual">—</div></div>
+          <div class="kpi"><div class="l">Residual bruto após a compra</div><div class="v" id="kResidualBruto">—</div></div>
+          <div class="kpi"><div class="l">Residual usado em custos</div><div class="v" id="kResidualCustos">—</div></div>
+          <div class="kpi"><div class="l">Residual sem destinação</div><div class="v" id="kResidual">—</div></div>
         </div>
       </div>
 
@@ -1844,7 +1863,9 @@ th:first-child,td:first-child{text-align:left}
             <tr><td>Aportes próprios acumulados em valores de hoje</td><td id="tAportesHoje">—</td></tr>
             <tr><td>Total de aluguel líquido recebido</td><td id="tAluguelTotal">—</td></tr>
             <tr><td>Custos de aquisição — brutos</td><td id="tCustosCompra">—</td></tr>
-            <tr><td>Crédito não usado na compra</td><td id="tExcessoCredito">—</td></tr>
+            <tr><td>Custos de aquisição — do bolso</td><td id="tCustosCompraBolso">—</td></tr>
+            <tr><td>Residual aplicado em custos</td><td id="tResidualCustos">—</td></tr>
+            <tr><td>Residual sem destinação — não contado no patrimônio comparável</td><td id="tExcessoCredito">—</td></tr>
             <tr><td>Aportes acumulados do seu bolso</td><td id="tAportes">—</td></tr>
           </tbody>
         </table>
@@ -1865,7 +1886,7 @@ th:first-child,td:first-child{text-align:left}
       <div id="warning" class="warn"></div>
 
       <div class="note">
-        <b>Estado atual V3.11:</b> o simulador usa arquitetura multi-cota, Lance Livre sobre saldo devedor, embutido sobre a carta, rendimentos isolados por cota, tranches bancárias independentes, matriz economicamente comparável, CDI bruto separado do CDB líquido, cashback conservador sem rendimentos acumulados por default, presets versionados e motor financeiro compartilhado com a suíte de integração. O histórico detalhado das versões anteriores permanece no Git e em <code>docs/follow-up-auditorias.md</code>.
+        <b>Estado atual V3.14:</b> o simulador usa arquitetura multi-cota, Lance Livre sobre saldo devedor, embutido sobre a carta, rendimentos isolados por cota, tranches bancárias independentes, matriz economicamente comparável, CDI bruto separado do CDB líquido, cashback conservador sem rendimentos acumulados por default, presets versionados e motor financeiro compartilhado com a suíte de integração. O histórico detalhado das versões anteriores permanece no Git e em <code>docs/follow-up-auditorias.md</code>.
       </div>
     </div>
   </div>
@@ -2043,7 +2064,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.13';
+const SCENARIO_APP_VERSION='3.14';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -2868,6 +2889,8 @@ function collectScenarioConfig(){
     cashbackPct:Math.max(0,pct($('cashback').value)),
     cashbackBasePolicy:$('cashbackBasePolicy').value==='available' ? 'available' : 'principal',
     cashbackDelayMonths:Math.max(0,Math.round(+$('cashbackDelayMonths').value||0)),
+    residualCreditPolicy:$('residualCreditPolicy').value==='costs' ? 'costs' : 'unallocated',
+    residualExpenseCapPct:Math.max(0,pct($('residualExpenseCapPct').value)),
 
     rentInput:+$('aluguel').value||0,
     lockRent:$('aluguelTravado').checked,
@@ -2970,9 +2993,10 @@ function simulate(){
     cashLanceTotal,loanPrincipal,loanInitialPayment,totalLoanPayments,totalLoanInterest,totalLoanTrCorrection,loanTrAnnual,loanTrMonthly,ownCashLance,
     totalInsurancePayments,firstInsurancePayment,firstPostContInsurancePayment,firstFullInsurancePayment,
     firstPostContConsortiumPayment,firstPostContLoanPayment,firstPostContGrossConsortiumPayment,firstPostContYieldUsed,
-    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCashback,purchaseCashbackReceiptMonth,purchaseTransactionNet,
+    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCostsOutOfPocket,
+    purchaseCashback,purchaseCashbackReceiptMonth,purchaseTransactionNet,
     initialNetRent,initialPostCashFlow,firstFullConsortiumPayment,firstFullLoanPayment,firstFullNetRent,
-    residualCredit,totalNetRent,
+    residualCredit,residualGross,residualAppliedToCosts,residualUnallocated,residualComparableAsset,totalNetRent,
     redeemCredit,redeemConsortiumPayoff,redeemLanceLoanPayoff,redeemBridgeCost,redeemTaxCost,
     redeemNetCash,redeemTopUp,redeemAportesAte,redeemNetPosition,
     propertySalePrice,propertySaleBrokerage,propertySaleTax,propertySaleOtherCosts,propertySaleTotalCosts,
@@ -3122,7 +3146,7 @@ if(loanBody){
   $('kImpactoLiquidoCompra').textContent=(purchased ? money(purchaseTransactionNet) : '—');
   $('kImpactoLiquidoCompraFormula').textContent=!purchased
     ? '—'
-    : `${money(complement)} de complemento + ${money(purchaseCostsGross)} de custos − ${money(purchaseCashback)} de cashback nominal; o cashback entra no caixa no mês ${purchaseCashbackReceiptMonth>N?'posterior ao horizonte':purchaseCashbackReceiptMonth}`;
+    : `${money(complement)} de complemento + ${money(purchaseCostsOutOfPocket)} de custos do bolso (de ${money(purchaseCostsGross)} brutos) − ${money(purchaseCashback)} de cashback nominal; o cashback entra no caixa no mês ${purchaseCashbackReceiptMonth>N?'posterior ao horizonte':purchaseCashbackReceiptMonth}`;
   $('kAlugLiq').textContent=(buy<N ? money(initialNetRent) : '—');
   $('kFluxoPos').textContent=(buy<N ? (initialPostCashFlow>=0 ? money(initialPostCashFlow) : 'sobra '+money(-initialPostCashFlow)) : '—');
 
@@ -3217,12 +3241,16 @@ if(loanBody){
 
   $('kFlowAportes').textContent=money(cumulativeExternal);
   $('kFlowCdb').textContent=money(last.cdb);
-  const transactionOwnCash=Math.max(0,complement+purchaseCostsGross);
+  const transactionOwnCash=Math.max(0,complement+purchaseCostsOutOfPocket);
   $('kAportesCompra').textContent=(purchased ? money(transactionOwnCash) : '—');
-  $('kResidual').textContent=(purchased ? money(residualCredit) : '—');
+  $('kResidualBruto').textContent=(purchased ? money(residualGross) : '—');
+  $('kResidualCustos').textContent=(purchased ? money(residualAppliedToCosts) : '—');
+  $('kResidual').textContent=(purchased ? money(residualUnallocated) : '—');
   $('tAluguelTotal').textContent=money(totalNetRent);
   $('tCustosCompra').textContent=(purchased ? money(purchaseCostsGross) : '—');
-  $('tExcessoCredito').textContent=(purchased ? money(residualCredit) : '—');
+  $('tCustosCompraBolso').textContent=(purchased ? money(purchaseCostsOutOfPocket) : '—');
+  $('tResidualCustos').textContent=(purchased ? money(residualAppliedToCosts) : '—');
+  $('tExcessoCredito').textContent=(purchased ? money(residualUnallocated) : '—');
   $('tAportes').textContent=money(cumulativeExternal);
   $('tAportesHoje').textContent=money(realContributionsToday);
 
@@ -3245,6 +3273,8 @@ if(loanBody){
   }
   if(purchased && purchaseCashback>0) warnings.push(`O cashback de ${money(purchaseCashback)} entra no caixa no ${purchaseCashbackReceiptMonth>N?'período posterior ao horizonte modelado':`mês ${purchaseCashbackReceiptMonth}`}. Base elegível: ${money(cashbackEligibleBase)} (${cfg.cashbackBasePolicy==='principal'?'principal líquido pós-embutido, sem rendimentos acumulados':'todo crédito usado, incluindo rendimentos — sensibilidade não confirmada'}). Ele não reduz retroativamente as obrigações do mês da compra.`);
   if(purchased && cfg.cashbackBasePolicy==='available' && creditAtBuy>principalCreditAtBuy+0.01) warnings.push('A base de cashback está incluindo rendimentos financeiros acumulados da carta. Essa hipótese NÃO foi confirmada documentalmente e existe apenas como sensibilidade.');
+  if(purchased && residualUnallocated>0) warnings.push(`Há ${money(residualUnallocated)} de crédito residual sem destinação definida. Por prudência, esse valor NÃO é contado no patrimônio comparável. Escolha “usar em custos de aquisição” se quiser modelar essa destinação; amortização/devolução continuam pendentes de mecânica contratual.`);
+  if(purchased && residualAppliedToCosts>0) warnings.push(`${money(residualAppliedToCosts)} do crédito residual foram usados para reduzir os custos de aquisição pagos do bolso. O teto aplicado foi ${(cfg.residualExpenseCapPct*100).toFixed(1).replace('.',',')}% do principal líquido disponível.`);
   if(propertySold && !cfg.sellPropertyPayoff) warnings.push('Na venda do imóvel com substituição de garantia, o modelo presume que a Bamaq aceita outro imóvel como garantia e mantém o consórcio ativo. Essa aceitação precisa ser confirmada; o imóvel substituto não foi somado ao patrimônio da estratégia.');
   if(propertySold && propertySaleTopUp>0) warnings.push(`A venda exigiu ${money(propertySaleTopUp)} adicionais do seu bolso porque o valor líquido não foi suficiente para cobrir custos e quitação escolhida.`);
   if(propertySold && cfg.sellerCapitalGainTaxPct>0) warnings.push('O IR da venda do imóvel é uma aproximação de sensibilidade. A base simplificada considera preço de compra + custos de aquisição configurados; isenções, benfeitorias, atualização fiscal e regras do GCAP não estão modeladas.');
