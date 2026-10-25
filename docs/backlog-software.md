@@ -2300,7 +2300,7 @@ junto com SW-023/SW-025
 
 ### SW-066 — Parametrizar prazo operacional do pagamento do lance
 
-**Status:** PRONTA PARA ESPECIFICAR — 2 DIAS ÚTEIS CONFIRMADOS COMERCIALMENTE E ALINHADOS À ATA  
+**Status:** IMPLEMENTADA NA CAMADA DE UX — V3.19  
 **Prioridade:** BAIXA  
 **Tipo:** CRONOLOGIA / LIQUIDEZ  
 **Origem:** resposta de Michele em 29/09/2026 + ata do Grupo 4012 já analisada  
@@ -2825,6 +2825,23 @@ Cotas contempladas no mesmo mês podem usar bases/modalidades diferentes e os ag
 O override de parcela permanece bloqueado até existir regra/documento suficiente para decomposição por cota.
 
 **Versão:** V3.18.
+
+---
+
+### SW-083 — Guardrail de solicitação mensal do rendimento
+
+**Status:** IMPLEMENTADA — V3.19  
+**Prioridade:** P2  
+**Tipo:** UX / OPERAÇÃO  
+**Origem:** issue #19
+
+**Implementado:**  
+O modo de usar rendimento na parcela explicita que o abatimento real exige solicitação mensal pelo app e que o simulador assume execução correta todos os meses.
+
+**Sem alteração financeira:**  
+A regra econômica por cota permanece a mesma.
+
+**Versão:** V3.19.
 
 ---
 
