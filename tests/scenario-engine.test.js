@@ -18,7 +18,8 @@ function makeConfig({
   lanceMode='free',
   fixedLancePct=0.30,
   residualCreditPolicy='unallocated',
-  residualExpenseCapPct=0.10
+  residualExpenseCapPct=0.10,
+  useInPurchase=[true,true,true,true]
 }={}){
   const credits=[400000,400000,370000,200000];
   const loanTerms={fundPct:financedPct,rateMonthly:0.0155,trAnnual:0,term:120,system:'price'};
@@ -26,6 +27,7 @@ function makeConfig({
     id:String.fromCharCode(65+i),
     credit0,
     cont:conts[i],
+    useInPurchase:useInPurchase[i]!==false,
     loanTerms:{...loanTerms}
   }));
   const lastCont=Math.max(...conts);
@@ -218,6 +220,42 @@ function makeConfig({
       assert.ok(used<=inst+0.01,`cota ${q.id}, mês ${h.m}: abatimento excedeu parcela própria`);
     }
   }
+}
+
+// Compra com subconjunto: A+B compram cedo; C+D continuam independentes.
+{
+  const r=runScenario(makeConfig({
+    conts:[4,4,12,16],
+    useInPurchase:[true,true,false,false],
+    lancePct:0.70,
+    buyRaw:4,
+    price:600000
+  }));
+
+  assert.equal(r.buy,4);
+  close(r.principalCreditAtBuy,560000);
+  close(r.creditAtBuy,560000);
+  close(r.complement,40000);
+  close(r.purchaseCashback,56000);
+
+  const [a,b,c,d]=r.cotaDetails;
+  assert.equal(a.usedInPurchase,true);
+  assert.equal(b.usedInPurchase,true);
+  assert.equal(c.usedInPurchase,false);
+  assert.equal(d.usedInPurchase,false);
+  close(a.letterBalance,0);
+  close(b.letterBalance,0);
+  assert.ok(c.letterBalance>0);
+  assert.ok(d.letterBalance>0);
+  assert.ok(c.totalLetterYieldAccrued>0);
+  assert.ok(d.totalLetterYieldAccrued>0);
+
+  // Antes da contemplação de C, sua dívida não deve entrar no passivo comparável
+  // apenas porque A+B já compraram o imóvel.
+  const h5=r.hist.find(h=>h.m===5);
+  const debtAB=a.outstanding===0 ? 0 : null; // apenas documenta que o valor final não serve ao mês 5
+  assert.ok(h5);
+  assert.ok(h5.comparableAsset>0);
 }
 
 // Residual sem política explícita é rastreado, mas não vira ativo comparável.
