@@ -1,4 +1,27 @@
 ============================================================
+AUDITORIA V3.8 — PRESETS DE VERSÕES ANTIGAS
+============================================================
+
+Issue #10: RESOLVIDA.
+
+Risco identificado:
+Presets antigos podiam carregar silenciosamente 30% de Lance Livre, 98% de Carta/CDI ou 11,5% de CDI e parecer equivalentes aos defaults reconciliados das versões atuais.
+
+Implementado na V3.8:
+- `appVersion` ausente passa a ser tratado como `legacy`, não como versão atual;
+- `formatVersion` = 2;
+- `stateVersion` = 2;
+- banner explícito para preset com antigo default reconhecido;
+- ação “Manter como está”;
+- ação “Criar cópia migrada”;
+- o original nunca é alterado;
+- valores customizados não são migrados automaticamente;
+- migração também cobre a política antiga da matriz.
+
+Pendência removida:
+Presets antigos deixam de poder mascarar silenciosamente as premissas atualizadas.
+
+============================================================
 AUDITORIA V3.7 — CDI BRUTO × CDB LÍQUIDO
 ============================================================
 
