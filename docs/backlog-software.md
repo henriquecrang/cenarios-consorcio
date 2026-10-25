@@ -173,10 +173,10 @@ O motor ainda não possui curva temporal de CDI. Para horizontes longos, testar 
 # Backlog de possíveis mudanças no software — Simulador Consórcio × CDB × Imóvel
 
 **Criado em:** 28/09/2026  
-**Baseline atual:** V3.11  
+**Baseline atual:** V3.14  
 **Objetivo:** registrar mudanças de software, decisões implementadas e gaps ainda relevantes.
 
-**Estado canônico da documentação:** V3.11, após auditoria e correções V3.6–V3.11.
+**Estado canônico da documentação:** V3.14, após auditoria e correções V3.6–V3.14.
 
 > Os tickets antigos preservam contexto histórico de implementação. Para o estado funcional vigente, prevalecem os status mais recentes, a especificação canônica e as seções SW-080 em diante.
 
@@ -230,7 +230,7 @@ Mudanças que alterem fórmulas, cronologia ou significado econômico devem tamb
 # Itens
 
 
-## Reconciliação com a linha atual V3.11
+## Reconciliação com a linha atual V3.14
 
 Os tickets SW-001 em diante foram criados ao longo de várias versões. O corpo histórico de cada ticket é preservado para rastreabilidade; o **status mais recente** e a especificação V3.11 descrevem o software vigente.
 
