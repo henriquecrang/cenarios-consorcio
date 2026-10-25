@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.16 · Compra com subconjunto de cotas</title>
+<title>Consórcio x CDB x Imóvel — V3.17 · Lance individual por cota</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.16 · Compra com subconjunto de cotas</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.17 · Lance individual por cota</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -687,7 +687,7 @@ th:first-child,td:first-child{text-align:left}
   <label>Cotas da proposta</label>
   <div class="quota-detail-wrap">
     <table class="quota-setup" id="quotaConfigTable">
-      <thead><tr><th>Cota</th><th>Crédito inicial</th><th class="quota-cont-head">Mês da contemplação</th><th>Usar nesta compra</th></tr></thead>
+      <thead><tr><th>Cota</th><th>Crédito inicial</th><th class="quota-cont-head">Mês da contemplação</th><th>Usar nesta compra</th><th>Modalidade</th><th>Lance %</th><th>Embutido %</th></tr></thead>
       <tbody id="quotaConfigBody"></tbody>
     </table>
   </div>
@@ -805,7 +805,10 @@ th:first-child,td:first-child{text-align:left}
         Exemplo reconciliado: saldo devedor de R$ 495.330, carta de R$ 400 mil, Lance Livre de 45% e embutido de 30% ⇒ lance total de R$ 222.898,50, R$ 120 mil embutidos e R$ 102.898,50 em dinheiro.
         <br><br>
         <b>Histórico oficial do Grupo 4012:</b> menor Lance Livre vencedor documentado = 60,14%; nos meses recentes com vencedor, os pisos ficaram entre 68,91% e 72,73%, com máximos de 73%. Junho não teve vencedor por Lance Livre. Esse histórico serve apenas como calibração descritiva — não é probabilidade nem garantia de contemplação.
+        <br><br>
+        <b>Multi-cota:</b> os campos acima funcionam como configuração padrão. Cada cota pode ter modalidade, percentual e embutido próprios na tabela de cotas.
       </div>
+      <button type="button" id="copyBidTerms" class="preset-btn">Copiar configuração de lance para todas as cotas</button>
 
       <div class="section">2. Empréstimo para o lance</div>
 
@@ -1952,7 +1955,10 @@ function snapshotQuotaStructure(){
     return {
       credit:$(`cota${i+1}Credito`)?.value ?? '0',
       cont:$(`cota${i+1}Cont`)?.value ?? '12',
-      useInPurchase:$(`cota${i+1}UseCompra`)?.checked !== false
+      useInPurchase:$(`cota${i+1}UseCompra`)?.checked !== false,
+      lanceMode:$(`cota${i+1}LanceMode`)?.value ?? ($('lanceFixoMode')?.checked ? 'fixed' : 'free'),
+      bidPct:$(`cota${i+1}LancePct`)?.value ?? ($('lanceFixoMode')?.checked ? $('lanceFixoPct')?.value : $('lanceTotal')?.value),
+      embPct:$(`cota${i+1}EmbPct`)?.value ?? $('lanceEmb')?.value
     };
   });
   const loans=rows.map((row,i)=>{
@@ -1997,12 +2003,21 @@ function renderQuotaStructure({count=null,credits=null,conts=null,loanTerms=null
       : (prevQ.cont!==undefined ? prevQ.cont : (DEFAULT_QUOTA_CONTS[i] ?? 12));
     const cont=Math.min(N,Math.max(1,+contRaw||1));
     const useInPurchase=prevQ.useInPurchase!==undefined ? !!prevQ.useInPurchase : true;
+    const globalBidMode=$('lanceFixoMode')?.checked ? 'fixed' : 'free';
+    const globalBidPct=globalBidMode==='fixed' ? ($('lanceFixoPct')?.value ?? '30') : ($('lanceTotal')?.value ?? '70');
+    const globalEmbPct=$('lanceEmb')?.value ?? '30';
+    const bidMode=prevQ.lanceMode || globalBidMode;
+    const bidPct=prevQ.bidPct ?? globalBidPct;
+    const embPct=prevQ.embPct ?? globalEmbPct;
 
     quotaRows.push(`<tr data-quota-index="${i}">
       <td>${label}</td>
       <td><input class="quota-credit-input" id="cota${i+1}Credito" type="number" value="${credit}" step="10000" min="0"></td>
       <td class="quota-cont-cell"><input class="quota-cont-input" id="cota${i+1}Cont" type="number" value="${cont}" step="1" min="1" max="${N}"></td>
       <td><label class="decision-check"><input id="cota${i+1}UseCompra" type="checkbox" ${useInPurchase?'checked':''}> sim</label></td>
+      <td><select id="cota${i+1}LanceMode"><option value="free"${bidMode==='free'?' selected':''}>Livre</option><option value="fixed"${bidMode==='fixed'?' selected':''}>Fixo</option></select></td>
+      <td><input id="cota${i+1}LancePct" type="number" value="${bidPct}" step=".1" min="0" max="100"></td>
+      <td><input id="cota${i+1}EmbPct" type="number" value="${embPct}" step=".5" min="0" max="30"></td>
     </tr>`);
 
     const prevL=previous.loans[i] || {};
@@ -2060,7 +2075,7 @@ function dynamicQuotaControlIds(){
   const n=getQuotaCount();
   for(let i=0;i<n;i++){
     const label=quotaLabel(i);
-    ids.push(`cota${i+1}Credito`,`cota${i+1}Cont`,`cota${i+1}UseCompra`);
+    ids.push(`cota${i+1}Credito`,`cota${i+1}Cont`,`cota${i+1}UseCompra`,`cota${i+1}LanceMode`,`cota${i+1}LancePct`,`cota${i+1}EmbPct`);
     ids.push(`emp${label}_pct`,`emp${label}_rate`,`emp${label}_tr`,`emp${label}_term`,`emp${label}_system`);
   }
   return ids;
@@ -2088,7 +2103,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.16';
+const SCENARIO_APP_VERSION='3.17';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -2683,6 +2698,7 @@ function initScenarioManager(){
   document.addEventListener('change',dirtyHandler,true);
   $('presetCotas')?.addEventListener('click',()=>setTimeout(scenarioMarkDirty,0));
   $('copyLoanTerms')?.addEventListener('click',()=>setTimeout(scenarioMarkDirty,0));
+  $('copyBidTerms')?.addEventListener('click',()=>setTimeout(scenarioMarkDirty,0));
   $('decisionResetPresets')?.addEventListener('click',()=>setTimeout(scenarioMarkDirty,0));
 
   const lastId=localStorage.getItem(SCENARIO_LAST_SELECTED_KEY);
@@ -2763,6 +2779,22 @@ $('copyLoanTerms').addEventListener('click',()=>{
   simulate();
 });
 
+function copyGlobalBidTermsToQuotaInputs(){
+  const mode=$('lanceFixoMode').checked ? 'fixed' : 'free';
+  const bidPct=mode==='fixed' ? $('lanceFixoPct').value : $('lanceTotal').value;
+  const embPct=$('lanceEmb').value;
+  for(let i=0;i<getQuotaCount();i++){
+    $(`cota${i+1}LanceMode`).value=mode;
+    $(`cota${i+1}LancePct`).value=bidPct;
+    $(`cota${i+1}EmbPct`).value=embPct;
+  }
+}
+
+$('copyBidTerms').addEventListener('click',()=>{
+  copyGlobalBidTermsToQuotaInputs();
+  simulate();
+});
+
 function syncLoanTermsUI(cfg){
   const loanOn=cfg ? cfg.usarEmprestimoLance : $('comEmprestimoLance').checked;
   const custom=cfg ? cfg.emprestimoTermosPorCota : $('emprestimoTermosPorCota').checked;
@@ -2819,7 +2851,10 @@ function collectScenarioConfig(){
       id:quotaLabel(idx),
       credit0:Math.max(0,+creditEl?.value||0),
       cont,
-      useInPurchase:$(`cota${idx+1}UseCompra`)?.checked !== false
+      useInPurchase:$(`cota${idx+1}UseCompra`)?.checked !== false,
+      lanceMode:$(`cota${idx+1}LanceMode`)?.value==='fixed' ? 'fixed' : 'free',
+      bidPct:clamp(pct($(`cota${idx+1}LancePct`)?.value ?? 0),0,1),
+      embPct:clamp(pct($(`cota${idx+1}EmbPct`)?.value ?? 0),0,0.30)
     };
   });
   syncSingleQuotaSlider();
@@ -3545,6 +3580,8 @@ function makeDecisionCandidate(baseCfg,spec){
   const cotas=baseCfg.cotas.map((q,i)=>({
     ...q,
     cont:spec.conts[i] ?? q.cont,
+    lanceMode:spec.lanceMode || q.lanceMode || baseCfg.lanceMode || 'free',
+    bidPct:spec.lancePct,
     loanTerms:{
       ...q.loanTerms,
       fundPct:spec.finPct
