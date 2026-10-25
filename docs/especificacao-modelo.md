@@ -2769,6 +2769,70 @@ A inclusão de rendimentos acumulados na base existe apenas como sensibilidade n
 | Corretagem na venda | 5% |
 | IR simplificado sobre ganho | 15% |
 
+# 51A. Reconciliação com a cotação comercial — V3.18
+
+## 51A.1 Objetivo
+
+A cotação comercial é uma fonte de auditoria da proposta, não uma substituição silenciosa da fórmula do motor.
+
+Metadados da proposta analisada:
+
+- crédito nominal: **R$1.370.000**;
+- parcela reduzida agregada: **R$3.999,03**;
+- parcela integral agregada: **R$8.002,17**;
+- cashback nominal exibido: **R$137.000**;
+- prazo restante: **214 meses**;
+- composição: **400k + 400k + 370k + 200k**.
+
+## 51A.2 Valor calculado pelo motor
+
+O motor continua calculando a parcela teórica a partir de:
+- crédito;
+- taxa administrativa;
+- fundo de reserva;
+- prazo;
+- percentual reduzido.
+
+Para os defaults atuais:
+
+`Parcela_integral_teorica = 1.370.000 × (1 + 0,24 + 0,01) / 214`
+
+e:
+
+`Parcela_reduzida_teorica = Parcela_integral_teorica × 50%`
+
+A interface exibe:
+- valor cotado;
+- valor do motor;
+- diferença em reais;
+- diferença percentual.
+
+## 51A.3 Não-override
+
+A V3.18 NÃO usa R$3.999,03 ou R$8.002,17 para alterar os fluxos mensais.
+
+Motivo:
+ainda não existe evidência suficiente para distribuir a pequena diferença comercial entre as cotas e preservar corretamente cenários com contemplações em meses diferentes.
+
+Portanto:
+- cotação = evidência/reconciliação;
+- motor = fluxo financeiro canônico;
+- eventual override futuro exige regra explícita por cota ou memória oficial compatível.
+
+## 51A.4 Cashback
+
+O painel distingue:
+- **R$137 mil** = cashback nominal exibido na cotação;
+- cashback efetivo do cenário = calculado pela política de base de cashback vigente no motor.
+
+No cenário canônico com 30% embutido nas quatro cotas e compra usando R$959 mil de principal líquido:
+
+`Cashback_efetivo = R$95.900`
+
+O painel não deve confundir esses dois valores.
+
+---
+
 # 52. Defaults que são sensibilidades, não fatos
 
 Não tratar como “regra real” sem documentação ou cenário explícito:
