@@ -33,11 +33,11 @@ URL esperada após a publicação:
 
 ## P0 antes de nova decisão econômica
 
-1. **Rendimento da carta:** alterar a premissa-base líquida de 98% para aproximadamente 80% do CDI.
-2. **Regressão:** proteger por testes a base do Lance Livre, o lance embutido e o cashback multi-cota.
+1. **Regressão:** proteger por testes a base do Lance Livre, o lance embutido e o cashback multi-cota.
 
-Concluído na V3.3:
-- Lance Livre recalibrado: default analítico de 70%, presets históricos de 60,1%–73% e alertas quando o lance configurado fica abaixo do histórico observado.
+Concluído:
+- **V3.3:** Lance Livre recalibrado — default analítico de 70%, presets históricos de 60,1%–73% e alertas quando o lance configurado fica abaixo do histórico observado.
+- **V3.4:** rendimento líquido-base da carta alterado para 80% do CDI; presets de rendimento passam a 70% / 80% / 90%, sem tratar 98%–105% bruto como retorno líquido.
 
 ## Governança de evidências
 
