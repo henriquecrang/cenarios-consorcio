@@ -421,6 +421,27 @@ Pendência externa:
 Confirmar se a Bamaq admite compensação interna da própria carta no resgate voluntário. Até lá, ela não deve ser cenário-base.
 
 ============================================================
+AUDITORIA V3.21 — SUBSTITUIÇÃO DE GARANTIA
+============================================================
+
+Issue #22: RESOLVIDA NA CAMADA DE GATE/CONTABILIZAÇÃO.
+
+Implementado:
+- venda com manutenção do consórcio só ocorre se a garantia substituta for explicitamente marcada como aprovada;
+- default = não aprovada;
+- sem aprovação, a venda é bloqueada e gera warning;
+- custo de substituição é input manual, default R$0;
+- custo entra na venda quando a substituição é aprovada;
+- garantia externa continua fora do patrimônio da estratégia;
+- testes de integração cobrem cenário bloqueado e aprovado.
+
+Não implementado por falta de regra confirmada:
+- fórmula de suficiência/valor mínimo do novo imóvel;
+- custos reais;
+- prazo de análise;
+- requisitos documentais completos.
+
+============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
 ============================================================
 
