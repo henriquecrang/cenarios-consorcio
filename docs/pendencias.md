@@ -40,8 +40,8 @@ IMPLEMENTADO NA LINHA PRINCIPAL V3.2:
 PENDÊNCIAS DE MODELAGEM QUE CONTINUAM ABERTAS MESMO NA V3.2:
 - o software modela corretamente o Lance Livre, mas ainda não possui seletor explícito para alternar Livre × Fixo; portanto SW-005 continua apenas parcialmente resolvida;
 - compra com subconjunto de cotas contempladas ainda não está implementada: a compra continua condicionada à última contemplação;
-- cashback multi-cota foi comercialmente reconciliado: no cenário de R$1,37 milhão com 30% embutido, a base é o crédito líquido faturado de R$959 mil e o cashback é R$95,9 mil; a V3.2 já calcula cashback como percentual do crédito usado, faltando proteger esse comportamento por regressão;
-- o primeiro reajuste desta proposta foi comercialmente fixado em abril/2027; o dia exato e a ordem reajuste × contemplação no mês coincidente continuam sem formalização/implementação diária;
+- cashback ainda não incorpora definitivamente a regra promocional nominal versus crédito líquido pós-embutido;
+- calendário real do aniversário do grupo e primeiro reajuste de 3% continuam sem implementação contratual definitiva;
 - eventual cobrança/dedução ligada às assembleias anteriores à adesão continua não implementada; resposta comercial escrita de 29/09/2026 afirma especificamente que ela NÃO existe para as quatro cotas novas do Grupo 4012/QuintoAndar, restando apenas reconciliação documental/contratual com o Regulamento Geral 2025;
 - valores oficiais de parcela reduzida/integral da cotação ainda não são usados como override; por isso a proposta pode aparecer como aproximadamente R$4.001 em vez de R$3.999,03;
 - regras de resgate, encerramento, cessão, garantia, seguro contratual e residual continuam com as pendências históricas registradas neste arquivo.
@@ -247,7 +247,7 @@ Como obter:
 
 1.5. Índice/regra de reajuste do consórcio
 Status após resposta escrita de 29/09/2026:
-REGRA ECONÔMICA, DISTINÇÃO ENTRE TABELA COMERCIAL E REAJUSTE ANUAL, MÊS DO PRIMEIRO REAJUSTE E MARCO OPERACIONAL DA ADESÃO RESPONDIDOS COMERCIALMENTE. RESTAM A ORDEM REAJUSTE × CONTEMPLAÇÃO NO MÊS COINCIDENTE, O DIA EXATO DO REAJUSTE SE PRECISARMOS DE RESOLUÇÃO DIÁRIA E A MEMÓRIA OFICIAL DO RECÁLCULO PÓS-CONTEMPLAÇÃO.
+REGRA ECONÔMICA, DISTINÇÃO ENTRE TABELA COMERCIAL E REAJUSTE ANUAL E MÊS DO PRIMEIRO REAJUSTE RESPONDIDOS COMERCIALMENTE. RESTAM O MARCO FORMAL EXATO DA “TRAVA”, A ORDEM REAJUSTE × CONTEMPLAÇÃO NO MÊS COINCIDENTE E A MEMÓRIA OFICIAL DO RECÁLCULO PÓS-CONTEMPLAÇÃO.
 
 Michele já havia confirmado:
 - o reajuste é FIXO em 3% ao ano;
@@ -283,14 +283,12 @@ Pontos que deixam de estar abertos:
 - as assembleias regulares são operacionalmente referenciadas ao dia 18 e, quando o dia 18 não é útil, são deslocadas para dia útil; para outubro/2026 Michele informou 19/10 porque 18/10 cai em domingo. O histórico de julho/2026 também é coerente com esse deslocamento, pois a assembleia ocorreu em 20/07.
 
 Pontos ainda não respondidos:
+- qual ato formal caracteriza que o cliente “entrou” e efetivamente travou a tabela: emissão, assinatura, primeiro pagamento, alocação da cota ou outro marco;
 - dia exato de abril/2027 em que o reajuste é processado, caso no futuro precisemos de precisão diária;
 - ordem exata se reajuste e contemplação coincidirem no mesmo mês;
 - memória oficial do recálculo da parcela pós-contemplação.
 
-Marco operacional já encerrado:
-- para a proposta analisada, a vendedora informou emissão/homologação do contrato → aceite eletrônico → pagamento da primeira parcela dentro do prazo comercial; a alocação da cota ocorre como consequência.
-
-Como obter o que resta:
+Como obter:
 - manter QN-063 aberta somente quanto ao dia exato, se essa precisão se tornar necessária;
 - confirmar ordem reajuste × contemplação;
 - pedir exemplo oficial de um reajuste pós-contemplação.
@@ -1247,22 +1245,26 @@ Como obter:
 Status após resposta final de 29/09/2026:
 A REGRA MULTI-COTA FOI RECONCILIADA COMERCIALMENTE PARA O CENÁRIO ATUAL.
 
-As cotações exibem cashback nominal total de R$137 mil, mas a vendedora esclareceu que, quando várias cartas são usadas em um único imóvel, a operação é analisada de forma agregada.
+As cotações exibem cashback nominal:
+- R$ 400 mil → R$ 40 mil;
+- R$ 400 mil → R$ 40 mil;
+- R$ 370 mil → R$ 37 mil;
+- R$ 200 mil → R$ 20 mil;
+- total destacado = R$ 137 mil.
 
-No cenário:
-- crédito nominal agregado = R$1,37 milhão;
-- 30% de lance embutido = R$411 mil;
-- crédito líquido efetivamente faturado/liberado = R$959 mil;
-- cashback = 10% × R$959 mil = R$95,9 mil.
+Entretanto, Michele agora respondeu especificamente que, usando 30% de lance embutido nas quatro cotas:
+- crédito líquido = R$ 959 mil;
+- cashback = R$ 95,9 mil.
 
-Portanto, R$137 mil não deve ser tratado como benefício fixo quando o embutido reduz o crédito efetivamente faturado.
+Portanto, os R$137 mil das propostas não devem ser tratados como benefício fixo independente do embutido.
 
 8.0. Interpretação agregada da exceção do regulamento
 
 Segundo a resposta comercial final:
 - a comparação imóvel × crédito contratado é feita sobre a operação agregada, e não cota por cota;
 - no exemplo, R$1 milhão de imóvel < R$1,37 milhão de crédito nominal agregado;
-- a base efetiva do cashback passa a ser o crédito líquido faturado/liberado de R$959 mil.
+- com 30% de embutido, a base efetiva do cashback é o crédito líquido faturado/liberado de R$959 mil;
+- cashback do cenário = R$95,9 mil.
 
 A antiga bifurcação R$95,9 mil versus R$137 mil fica encerrada comercialmente para este cenário. Reabrir apenas se contrato/regulamento final trouxer regra divergente.
 
@@ -1286,6 +1288,7 @@ Conclusão:
 Impacto na V2.54:
 O modelo ainda não deve ser alterado nesta etapa. Quando for revisado, cashback deve ocorrer após a compra/registro, e não antes.
 
+8.2. Livre movimentação
 8.2. Livre movimentação
 
 Confirmado pelo Regulamento, item 4.1.4:
@@ -1320,53 +1323,27 @@ Até confirmação:
 Status após resposta específica de 29/09/2026:
 MARCO OPERACIONAL COMERCIALMENTE RESOLVIDO.
 
-O Regulamento/cotações indicam prazo até 30/09/2026.
-Michele agora esclareceu o fluxo necessário para efetivar a entrada dentro dessa condição:
+Fluxo informado para efetivar a entrada dentro da condição atual:
+1. emissão/homologação do contrato;
+2. recebimento por e-mail;
+3. aceite eletrônico;
+4. pagamento da primeira parcela até 30/09.
 
-1. documentação/cadastro;
-2. emissão ou homologação do contrato pela administradora;
-3. recebimento do contrato por e-mail;
-4. aceite eletrônico pelo cliente;
-5. pagamento da primeira parcela até 30/09.
-
-Segundo ela, após aceite + primeira parcela:
-- o cliente já entra no plano;
+Após aceite + pagamento, segundo a vendedora:
+- o cliente entra no plano;
 - grupo e número de cota são alocados;
-- passa a ter acesso ao aplicativo;
-- fica apto a participar da assembleia seguinte;
-- preserva a condição de cashback dentro do prazo comercial atual.
+- acesso ao aplicativo é liberado;
+- passa a participar das assembleias.
 
-Regra operacional para esta proposta:
+Regra operacional registrada:
 `adesao_operacional = contrato_emitido AND aceite_eletronico AND primeira_parcela_paga`
 
-Deadline:
-`30/09/2026`
-
-Cronologia informada:
-- primeira parcela: deve ser paga até 30/09 para efetivar a entrada;
-- segunda parcela: 15/11/2026.
-
-A emissão isolada do contrato não deve ser tratada como suficiente.
-
-Ressalva:
-Essa é confirmação comercial. Antes do aceite, conferir no contrato:
-- identificação das quatro cotas;
-- valores nominais;
-- parcelas;
-- prazo;
-- taxa de administração;
-- fundo de reserva;
-- cashback/campanha;
-- reajuste;
-- grupo;
-- demais condições relevantes.
+A emissão isolada do contrato não deve ser tratada como suficiente. Conferir o contrato final antes do aceite e pagamento.
 
 Estado:
 - validade comercial até 30/09: CONFIRMADA;
-- prorrogação: NÃO INFORMADA;
 - marco operacional de adesão/lock: RESPONDIDO COMERCIALMENTE;
 - segunda parcela em 15/11: INFORMADA COMERCIALMENTE.
-
 
 ============================================================
 9. PRIORIDADE BAIXA — PREMISSAS FISCAIS DO ALUGUEL [A18]
@@ -1651,7 +1628,7 @@ Exibir uma explicação contextual, por exemplo:
 A investigação revelou divergências materiais entre afirmações comerciais e documentos oficiais.
 
 Caso mais relevante:
-- em mensagem anterior, a vendedora afirmou que, até a 6ª assembleia, o Lance Livre teria variado “em média entre 45% e 66%”;
+- em mensagem anterior, a vendedora afirmou que, até a 6ª assembleia, o Lance Livre teria “variado a média entre 45% e 66%”;
 - as atas oficiais 001–006 mostram vencedores de Lance Livre em 60,14%, 60,99%, nenhum em junho, 72,73%–73% em julho, 68,91%–70,69% em agosto e 72%–73% em setembro;
 - após ser confrontada com as atas, a explicação mudou para “média didática” e para uma referência aproximada de ~65%.
 
@@ -1666,8 +1643,8 @@ Hierarquia de fontes para o projeto:
 
 Regra de governança:
 - afirmação comercial conflitante com fonte oficial NÃO vira premissa canônica;
-- se uma resposta comercial for a única fonte disponível, ela deve permanecer rotulada como comercial e sujeita a reabertura;
-- discrepâncias relevantes devem ser preservadas na trilha de auditoria.
+- resposta comercial sem confirmação documental permanece rotulada como comercial;
+- discrepâncias relevantes ficam preservadas na trilha de auditoria.
 
 ============================================================
 13. CHECKLIST RESIDUAL — SOMENTE QUESTÕES AINDA ABERTAS
