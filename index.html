@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.4 · Premissas comerciais reconciliadas</title>
+<title>Consórcio x CDB x Imóvel — V3.5 · Núcleo financeiro testável</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -605,7 +605,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.4 · Premissas comerciais reconciliadas</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.5 · Núcleo financeiro testável</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1813,6 +1813,7 @@ th:first-child,td:first-child{text-align:left}
   </div>
 </div>
 
+<script src="model-core.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 
@@ -1983,7 +1984,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=1;
-const SCENARIO_APP_VERSION='3.4';
+const SCENARIO_APP_VERSION='3.5';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -2495,33 +2496,8 @@ function initScenarioManager(){
   }
 }
 
-function resolveEffectiveLance(credit,outstanding,lancePct,embPct){
-  // Regra comercial confirmada para a proposta:
-  // - Lance Livre: percentual do saldo devedor da cota.
-  // - Lance embutido: percentual da carta atualizada, limitado a 30% da carta
-  //   e, em reais, nunca superior ao lance total efetivamente ofertado.
-  const safeLancePct=clamp(lancePct,0,1);
-  const safeEmbPct=clamp(embPct,0,0.30);
-  const safeOutstanding=Math.max(0,outstanding);
-  const safeCredit=Math.max(0,credit);
+const {resolveEffectiveLance,calculateCashback}=window.ConsorcioModel;
 
-  const requestedTotal=safeOutstanding*safeLancePct;
-  const effectiveTotal=Math.min(requestedTotal,safeOutstanding);
-
-  const requestedEmbedded=safeCredit*safeEmbPct;
-  const embedded=Math.min(requestedEmbedded,effectiveTotal);
-  const cash=Math.max(0,effectiveTotal-embedded);
-
-  return {
-    requestedTotal,
-    effectiveTotal,
-    requestedEmbedded,
-    embedded,
-    cash,
-    limitedByOutstanding: effectiveTotal+0.005<requestedTotal,
-    embeddedLimitedByTotal: embedded+0.005<requestedEmbedded
-  };
-}
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
 const inputs = ['prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceTotal','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
@@ -3306,7 +3282,7 @@ function runScenario(cfg,overrides={}){
       complement=Math.max(0,price-creditAtBuy);
 
       purchaseCostsGross=price*cfg.itbi+rgi+cfg.outros;
-      purchaseCashback=creditUsed*cfg.cashbackPct;
+      purchaseCashback=calculateCashback(creditUsed,cfg.cashbackPct);
       purchaseTransactionNet=complement+purchaseCostsGross-purchaseCashback;
 
       cashObrigacoes += complement+purchaseCostsGross;
