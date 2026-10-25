@@ -646,7 +646,7 @@ th:first-child,td:first-child{text-align:left}
   </div>
 
   <div class="note" style="margin:-8px 0 18px">
-    <b>V3.2:</b> mantém os seis P0, o gerenciador de cenários e o layout vertical da V3.1, e passa a aceitar <b>quantidade configurável de cotas</b>. Um consórcio pode ter uma única cota ou várias; quando há <b>1 cota</b>, o controle de contemplação volta a ser um <b>slider</b>. Presets antigos de quatro cotas continuam compatíveis com o mesmo localStorage e com a importação/exportação em JSON.
+    <b>V3.11:</b> arquitetura multi-cota com motor financeiro compartilhado e testado. A matriz usa comparação econômica consistente por default, o CDI bruto é separado do benchmark CDB líquido, o cashback conservador exclui rendimentos acumulados e presets antigos recebem aviso/migração explícita. Cenários continuam editáveis e não representam promessa de contemplação ou retorno.
   </div>
 
   <div class="grid">
@@ -2942,14 +2942,9 @@ function collectScenarioConfig(){
 }
 
 /*
- * Motor financeiro único da V2.48.
- *
- * Todos os painéis — simulação principal, break-even e análise de venda da
- * carta — passam por esta função. "overrides" só altera o cenário:
- *   cont, lancePct
- *   quotaSale: {month,grossOffer,payLanceLoanOnSale,saleFeePct,saleFeeCap,saleExtraCostPct}
- *
- * O motor não lê nem escreve no DOM.
+ * O motor financeiro canônico está em scenario-engine.js e não acessa o DOM.
+ * Este arquivo coleta configurações da interface, chama runScenario() e
+ * renderiza os resultados. Navegador e testes de integração usam o mesmo motor.
  */
 
 
