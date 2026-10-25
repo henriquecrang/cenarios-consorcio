@@ -1,6 +1,6 @@
 # Especificação canônica do modelo — Simulador Consórcio × CDB × Imóvel
 
-**Baseline de implementação atual:** V3.11  
+**Baseline de implementação atual:** V3.14  
 **Status:** especificação funcional e financeira canônica do comportamento esperado do simulador  
 **Documentos complementares:**  
 - `docs/pendencias.md` — premissas externas, regras contratuais e funcionalidades ainda abertas;  
@@ -2549,7 +2549,7 @@ Isso vale especialmente para:
 
 ---
 
-# 51. Defaults atuais — V3.11
+# 51. Defaults atuais — V3.14
 
 Os defaults abaixo descrevem a configuração atual do simulador. Eles são **premissas de cenário**, não recomendações financeiras nem garantias contratuais.
 
@@ -3164,7 +3164,7 @@ E uma limitação estrutural deve ser apresentada ao usuário antes que o result
 
 ---
 
-# PARTE XI — ARQUITETURA DE IMPLEMENTAÇÃO ATUAL — V3.11
+# PARTE XI — ARQUITETURA DE IMPLEMENTAÇÃO ATUAL — V3.14
 
 # 71. Arquitetura de cotas
 
@@ -3448,9 +3448,9 @@ O histórico mensal do motor expõe, para auditoria/teste:
 - rendimento por cota;
 - rendimento usado por cota.
 
-# 80. Estado de qualidade atual — V3.11
+# 80. Estado de qualidade atual — V3.14
 
-A linha atual já passou pela auditoria independente posterior à V3.5 e pelas correções V3.6–V3.11.
+A linha atual já passou pela auditoria independente posterior à V3.5 e pelas correções V3.6–V3.14.
 
 Estado:
 - fórmulas críticas de Lance Livre/embutido/cashback possuem testes unitários;
