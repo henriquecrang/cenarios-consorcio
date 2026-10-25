@@ -1573,7 +1573,7 @@ junto com SW-035
 
 ### SW-041 — Tornar substituição de garantia um modo real de venda
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.21 EXIGE APROVAÇÃO E CUSTO; REQUISITOS OBJETIVOS AINDA PENDENTES  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / NOVO INPUT / UX  
 **Origem:** resposta de Michele + Central de Ajuda + Regulamento Bamaq 2026  
@@ -1602,7 +1602,7 @@ próxima revisão estrutural
 
 ### SW-042 — Modelar garantia externa sem somá-la ao patrimônio da estratégia
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA — GARANTIA EXTERNA NÃO ENTRA NO PATRIMÔNIO; V3.21 REFORÇA O GATE  
 **Prioridade:** ALTA  
 **Tipo:** ARQUITETURA / PATRIMÔNIO / RISCO  
 **Origem:** substituição por imóvel já pertencente ao consorciado  
@@ -2856,6 +2856,24 @@ A regra econômica por cota permanece a mesma.
 A compensação direta da própria carta com a dívida permanece disponível somente como sensibilidade e gera warning explícito; a quitação prévia via ponte é o default conservador ao ativar resgate.
 
 **Versão:** V3.20.
+
+---
+
+### SW-085 — Gate de aprovação da garantia substituta
+
+**Status:** IMPLEMENTADA — V3.21  
+**Prioridade:** P1  
+**Tipo:** MOTOR / UX / GARANTIA  
+**Origem:** issue #22
+
+**Implementado:**
+- aprovação explícita obrigatória para executar venda com troca de garantia;
+- custo manual de substituição;
+- warning quando aprovação não existe;
+- garantia externa fora do patrimônio;
+- regressões de integração.
+
+**Versão:** V3.21.
 
 ---
 
