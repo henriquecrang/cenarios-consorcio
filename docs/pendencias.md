@@ -1,4 +1,32 @@
 ============================================================
+AUDITORIA V3.11 — TESTES DE INTEGRAÇÃO
+============================================================
+
+Issue #8: RESOLVIDA.
+
+Mudança arquitetural:
+- `runScenario` saiu do HTML e passou para `scenario-engine.js`;
+- navegador e testes usam o mesmo motor;
+- não existe cópia paralela da lógica crítica no teste.
+
+Casos cobertos:
+- multi-cota 400/400/370/200;
+- R$959 mil de principal líquido antes do primeiro reajuste;
+- R$95,9 mil de cashback conservador;
+- reajuste antes da contemplação no mês 12;
+- contemplações escalonadas;
+- base de cashback principal vs. disponível;
+- financiamento por cota;
+- 210 meses remanescentes no caso mês 4;
+- vedação de pooling comprovada mês a mês por cota.
+
+CI:
+O GitHub Actions executa unitários + integração em cada push/PR.
+
+Pendência removida:
+O motor multi-cota deixa de depender apenas de validação manual/desenvolvimento para seus invariantes principais.
+
+============================================================
 AUDITORIA V3.10 — BASE DO CASHBACK
 ============================================================
 
