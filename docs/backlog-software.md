@@ -432,7 +432,7 @@ próxima revisão.
 
 ### SW-005 — Modelar modalidade de lance: Fixo × Livre
 
-**Status:** REGRA DO LIVRE CONFIRMADA; IMPLEMENTAÇÃO ATUAL DEVE SER PRESERVADA/VALIDADA  
+**Status:** IMPLEMENTADA — V3.15; GENERALIZADA POR COTA NA V3.17  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / MÚLTIPLAS COTAS  
 **Origem:** resposta direta de Michele em 29/09/2026  
@@ -873,7 +873,7 @@ a definir após resposta
 
 ### SW-018 — Compra com subconjunto de cotas contempladas + recursos próprios
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA — V3.16  
 **Prioridade:** ALTA  
 **Tipo:** MÚLTIPLAS COTAS / REGRA FINANCEIRA  
 **Origem:** resposta de Michele + Regulamento Geral Bamaq  
@@ -908,7 +908,7 @@ junto com SW-001
 
 ### SW-019 — Registrar vínculo entre cotas e imóvel/garantia
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA PARA A AQUISIÇÃO — V3.16; CICLO DE SUBSTITUIÇÃO DE GARANTIA CONTINUA EM SW-041  
 **Prioridade:** ALTA  
 **Tipo:** MÚLTIPLAS COTAS / ARQUITETURA  
 **Origem:** combinação de várias cartas + cotas posteriores independentes  
@@ -1018,7 +1018,7 @@ depois de QN-022/QN-023
 
 ### SW-023 — Substituir “crédito residual congelado” por destino configurável
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.14: CUSTOS OU NÃO RECONHECIDO; DEMAIS DESTINOS AGUARDAM REGRA  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / NOVO INPUT  
 **Origem:** Resolução BCB nº 285/2023 + Regulamento Geral Bamaq + resposta de Michele  
@@ -1160,7 +1160,7 @@ após confirmação
 
 ### SW-028 — Implementar regra geral + exceção promocional do cashback
 
-**Status:** PRONTA PARA ESPECIFICAR PARA O PRESET ATUAL  
+**Status:** IMPLEMENTADA PARA O CENÁRIO ATUAL — V3.10/V3.12  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / MÚLTIPLAS COTAS  
 **Origem:** Regulamento da Campanha + respostas específicas de Michele em 29/09/2026  
@@ -1325,7 +1325,7 @@ futura revisão de UX/metadata; não é P0 do motor
 
 ### SW-033 — Separar resgate pós-180 dias de encerramento do grupo
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA PARCIALMENTE — RESGATE VOLUNTÁRIO MODELADO; ENCERRAMENTO DO GRUPO CONTINUA SEPARADO/PENDENTE  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / CRONOLOGIA  
 **Origem:** resposta de Michele + Resolução BCB nº 285/2023 + Regulamento Bamaq  
@@ -1361,7 +1361,7 @@ próxima revisão
 
 ### SW-034 — Fonte de quitação antes do resgate em dinheiro
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.20 USA PONTE COMO DEFAULT EXPLÍCITO; OUTRAS FONTES PODEM SER ADICIONADAS SE NECESSÁRIO  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / NOVO INPUT  
 **Origem:** quitação prévia confirmada  
@@ -1744,7 +1744,7 @@ após SW-041/SW-044
 
 ### SW-047 — Corrigir base da taxa de transferência para saldo devedor
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA — V3.13  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA  
 **Origem:** Regulamento Geral Bamaq 2026, art. 13, XIV  
@@ -1869,7 +1869,7 @@ após confirmação de SLA
 
 ### SW-051 — Não quitar novamente o saldo consorcial na cessão
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA — V3.13  
 **Prioridade:** ALTA  
 **Tipo:** REGRA FINANCEIRA / INVARIANTE  
 **Origem:** natureza jurídica da transferência de direitos e obrigações  
@@ -2327,7 +2327,7 @@ próxima revisão de UX/cronologia operacional
 
 ### SW-067 — Reajuste anual pelo calendário/aniversário do grupo
 
-**Status:** PRONTA PARA ESPECIFICAR — MÊS DO PRIMEIRO REAJUSTE CONFIRMADO  
+**Status:** IMPLEMENTADA NA RESOLUÇÃO MENSAL — PRIMEIRO REAJUSTE NO MÊS 7; DIA EXATO CONTINUA FORA DO ESCOPO  
 **Prioridade:** ALTA  
 **Tipo:** CRONOLOGIA / GRUPO EM ANDAMENTO / MÚLTIPLAS COTAS  
 **Origem:** respostas de Michele em 28–29/09/2026  
