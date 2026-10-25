@@ -269,7 +269,6 @@ Principais capacidades atuais:
 
 Gaps principais ainda abertos:
 - Lance Fixo × Livre como modalidade explícita;
-- compra com subconjunto de cotas;
 - override das parcelas oficiais;
 - trajetória temporal de CDI/CDB;
 - timing do cashback posterior ao registro/pagamento;
@@ -2758,6 +2757,29 @@ futura revisão de UX/presets.
 A aplicação e os testes usam as mesmas funções de núcleo; não há duplicação dessas fórmulas críticas.
 
 **Versão:** V3.5.
+
+---
+
+### SW-080 — Compra com subconjunto de cotas
+
+**Status:** IMPLEMENTADA — V3.16  
+**Prioridade:** P1  
+**Tipo:** MOTOR / MULTI-COTA / UX  
+**Origem:** issue #16 + regra comercial/regulatória de combinação parcial de créditos
+
+**Implementado:**
+- `useInPurchase` por cota;
+- compra liberada quando todas as cotas selecionadas estiverem contempladas;
+- somente cotas selecionadas são consumidas na compra;
+- cotas não selecionadas continuam independentes;
+- patrimônio/passivo comparável reconciliado após compra parcial;
+- matriz herda a seleção;
+- persistência e testes de integração.
+
+**Guardrail:**  
+Uma compra apenas. Cotas posteriores não quitam automaticamente obrigações anteriores e não geram segunda compra.
+
+**Versão:** V3.16.
 
 ---
 
