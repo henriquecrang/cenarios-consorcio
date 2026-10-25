@@ -3485,10 +3485,14 @@ function readDecisionRow(row,cfg){
   const key=row.dataset.decisionRow;
   if(key==='current') return {key,current:true};
 
-  const inputs=[...row.querySelectorAll('input[data-decision-field]')];
+  const inputs=[...row.querySelectorAll('[data-decision-field]')];
   const byField={cont:[]};
   inputs.forEach(el=>{
     const field=el.dataset.decisionField;
+    if(field==='mode'){
+      byField.mode=el.value==='fixed'?'fixed':'free';
+      return;
+    }
     const value=+el.value||0;
     if(field==='cont') byField.cont.push(clamp(Math.round(value),1,cfg.N));
     else byField[field]=value;
@@ -3498,6 +3502,7 @@ function readDecisionRow(row,cfg){
     key,
     current:false,
     conts:byField.cont.slice(0,cfg.cotas.length),
+    lanceMode:byField.mode || cfg.lanceMode || 'free',
     lancePct:clamp((byField.lance||0)/100,0,1),
     yieldPct:Math.max(0,(byField.yield||0)/100),
     finPct:clamp((byField.fin||0)/100,0,1)
@@ -3537,7 +3542,9 @@ function makeDecisionCandidate(baseCfg,spec){
     cotas,
     firstCont:Math.min(...cotas.map(q=>q.cont)),
     cont:lastCont,
-    lancePct:spec.lancePct,
+    lanceMode:spec.lanceMode || baseCfg.lanceMode || 'free',
+    lancePct:spec.lanceMode==='fixed' ? baseCfg.lancePct : spec.lancePct,
+    fixedLancePct:spec.lanceMode==='fixed' ? spec.lancePct : baseCfg.fixedLancePct,
     cartaPctCdi:spec.yieldPct,
     usarEmprestimoLance:spec.finPct>0
   };
@@ -3596,7 +3603,8 @@ function drawDecisionMatrix(){
     key:'current',
     current:true,
     conts:cfg.cotas.map(c=>c.cont),
-    lancePct:cfg.lancePct,
+    lanceMode:cfg.lanceMode || 'free',
+    lancePct:(cfg.lanceMode==='fixed' ? cfg.fixedLancePct : cfg.lancePct),
     yieldPct:cfg.cartaPctCdi,
     finPct:currentFin
   };
@@ -3624,7 +3632,8 @@ function drawDecisionMatrix(){
     const spans=[...currentRow.querySelectorAll('.decision-input-readonly')];
     const currentValues=[
       ...cfg.cotas.map(c=>({v:c.cont,kind:'cont'})),
-      {v:cfg.lancePct*100,kind:'pct'},
+      {v:cfg.lanceMode==='fixed'?'Fixo':'Livre',kind:'mode'},
+      {v:(cfg.lanceMode==='fixed'?cfg.fixedLancePct:cfg.lancePct)*100,kind:'pct'},
       {v:cfg.cartaPctCdi*100,kind:'pct'},
       {v:decisionMainFinancePct(cfg,baseResult),kind:'pct'}
     ];
@@ -3633,7 +3642,7 @@ function drawDecisionMatrix(){
       if(!item) return;
       span.textContent=item.kind==='cont'
         ? String(Math.round(item.v))
-        : `${item.v.toFixed(1).replace('.',',')}%`;
+        : (item.kind==='mode' ? item.v : `${item.v.toFixed(1).replace('.',',')}%`);
     });
   }
 
