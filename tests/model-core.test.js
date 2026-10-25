@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {resolveEffectiveLance,calculateCashback}=require('../model-core.js');
+const {resolveEffectiveLance,resolveCashbackBase,calculateCashback}=require('../model-core.js');
 
 function close(actual,expected,tolerance=0.005){
   assert.ok(Math.abs(actual-expected)<=tolerance,`expected ${expected}, got ${actual}`);
@@ -30,6 +30,19 @@ function close(actual,expected,tolerance=0.005){
 {
   close(calculateCashback(959000,0.10),95900);
 }
+
+// Base conservadora: rendimentos acumulados não aumentam o cashback.
+{
+  close(resolveCashbackBase(1000000,1012017.72,959000,'principal'),959000);
+  close(calculateCashback(resolveCashbackBase(1000000,1012017.72,959000,'principal'),0.10),95900);
+}
+
+// Sensibilidade explícita: incluir todo crédito usado, inclusive rendimentos.
+{
+  close(resolveCashbackBase(1000000,1012017.72,959000,'available'),1000000);
+  close(calculateCashback(resolveCashbackBase(1000000,1012017.72,959000,'available'),0.10),100000);
+}
+
 
 // Guardrails básicos.
 {
