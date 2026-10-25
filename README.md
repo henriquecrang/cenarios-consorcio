@@ -34,13 +34,23 @@ URL esperada após a publicação:
 
 `https://henriquecrang.github.io/cenarios-consorcio/`
 
-## P0 antes de nova decisão econômica
+## Prioridades após auditoria da V3.5
 
-Os três P0s identificados após a investigação estão concluídos.
+Os três P0s originais foram concluídos nas V3.3–V3.5, mas a auditoria independente da V3.5 abriu novos itens materiais:
 
+- **#5 — comparabilidade da matriz:** a linha Atual e as alternativas podem usar políticas de compra diferentes e, com preço travado na carta, comprar imóveis de valores diferentes.
+- **#9 — CDI bruto × CDB líquido:** o default ainda usa 11,5% para ambos, apesar de serem parâmetros econômicos distintos.
+- **#10 — migração de presets:** cenários salvos em versões antigas podem restaurar silenciosamente Lance Livre/rendimento obsoletos.
+
+P1s relevantes:
+- **#6:** sensibilidade explícita de financiamento do lance;
+- **#7:** separar rendimento acumulado da base de cashback;
+- **#8:** testes de integração do motor multi-cota.
+
+Correções já concluídas:
 - **V3.3:** Lance Livre recalibrado — default analítico de 70%, presets históricos de 60,1%–73% e alertas quando o lance configurado fica abaixo do histórico observado.
-- **V3.4:** rendimento líquido-base da carta alterado para 80% do CDI; presets de rendimento passam a 70% / 80% / 90%, sem tratar 98%–105% bruto como retorno líquido.
-- **V3.5:** regras críticas extraídas para `model-core.js` e protegidas por regressões automatizadas de Lance Livre, embutido e cashback multi-cota.
+- **V3.4:** rendimento líquido-base da carta alterado para 80% do CDI; presets de rendimento passam a 70% / 80% / 90%.
+- **V3.5:** regras críticas extraídas para `model-core.js` e regressões unitárias de Lance Livre, embutido e cashback.
 
 ## Governança de evidências
 
