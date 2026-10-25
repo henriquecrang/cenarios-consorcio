@@ -122,6 +122,9 @@ function makeConfig({
   close(r.principalCreditAtBuy,959000);
   close(r.cashbackEligibleBase,959000);
   close(r.purchaseCashback,95900);
+  assert.equal(r.purchaseCashbackReceiptMonth,5);
+  close(r.hist.find(h=>h.m===4).purchaseCashbackReceived,0);
+  close(r.hist.find(h=>h.m===5).purchaseCashbackReceived,95900);
   close(r.cotaDetails[0].letterPrincipalAtCont,280000);
   close(r.totalLetterYieldAccrued,0);
 
@@ -132,6 +135,16 @@ function makeConfig({
   const debtBeforeBid=initialDebt-reducedInstallment*4;
   const debtAfterBid=debtBeforeBid-q.effectiveLanceAtCont;
   close(q.postInstall,debtAfterBid/(214-4));
+}
+
+
+// Sensibilidade de timing: delay 0 permite receber no mesmo mês, mas não é default.
+{
+  const cfg=makeConfig();
+  cfg.cashbackDelayMonths=0;
+  const r=runScenario(cfg);
+  assert.equal(r.purchaseCashbackReceiptMonth,4);
+  close(r.hist.find(h=>h.m===4).purchaseCashbackReceived,95900);
 }
 
 // Primeiro reajuste no mês 7 deve afetar cartas que contemplam no mês 12.
