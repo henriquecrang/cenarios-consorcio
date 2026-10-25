@@ -15,6 +15,8 @@ function makeConfig({
   cdiAnnual=0.1365,
   cartaPctCdi=0.80,
   cashbackBasePolicy='principal',
+  lanceMode='free',
+  fixedLancePct=0.30,
   residualCreditPolicy='unallocated',
   residualExpenseCapPct=0.10
 }={}){
@@ -45,7 +47,9 @@ function makeConfig({
     firstAdj:7,
     adjustmentBeforeContemplation:true,
 
+    lanceMode,
     lancePct,
+    fixedLancePct,
     embMaxPct:0.30,
 
     usarEmprestimoLance:financedPct>0,
@@ -150,6 +154,21 @@ function makeConfig({
   const r=runScenario(cfg);
   assert.equal(r.purchaseCashbackReceiptMonth,4);
   close(r.hist.find(h=>h.m===4).purchaseCashbackReceived,95900);
+}
+
+// Lance Fixo usa 30% da carta atualizada e pode ser integralmente embutido.
+{
+  const r=runScenario(makeConfig({
+    conts:[4,4,4,4],
+    lanceMode:'fixed',
+    fixedLancePct:0.30,
+    lancePct:0.73,
+    buyRaw:4
+  }));
+  close(r.cotaDetails[0].requestedLanceAtCont,120000);
+  close(r.cotaDetails[0].embeddedLanceAtCont,120000);
+  close(r.cotaDetails[0].cashLanceAtCont,0);
+  close(r.cashLanceTotal,0);
 }
 
 // Primeiro reajuste no mês 7 deve afetar cartas que contemplam no mês 12.
