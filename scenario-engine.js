@@ -162,7 +162,8 @@ function runScenario(cfg,overrides={}){
   const initialReduced=sumQ(q=>q.initialReduced);
 
   let purchased=false, redeemed=false, propertySold=false, quotaSold=false;
-  let propertyValue=0, residualCredit=0;
+  let propertyValue=0;
+  let residualCredit=0, residualGross=0, residualAppliedToCosts=0, residualUnallocated=0, residualComparableAsset=0;
 
   let propertySalePrice=0, propertySaleBrokerage=0, propertySaleTax=0, propertySaleOtherCosts=0;
   let propertySaleTotalCosts=0, propertySaleConsortiumPayoff=0, propertySaleLoanPayoff=0;
@@ -187,7 +188,8 @@ function runScenario(cfg,overrides={}){
   const externalCashFlowsReal=[0];
 
   let postInstall=0, creditAtBuy=0, principalCreditAtBuy=0, complement=0;
-  let purchaseCostsGross=0, cashbackEligibleBase=0, purchaseCashback=0, purchaseCashbackReceiptMonth=N+1, purchaseTransactionNet=0;
+  let purchaseCostsGross=0, purchaseCostsOutOfPocket=0;
+  let cashbackEligibleBase=0, purchaseCashback=0, purchaseCashbackReceiptMonth=N+1, purchaseTransactionNet=0;
   let initialNetRent=0, initialPostCashFlow=0;
   let finalSettlement=0;
   let firstFullConsortiumPayment=0, firstFullLoanPayment=0, firstFullNetRent=0;
@@ -482,10 +484,26 @@ function runScenario(cfg,overrides={}){
       fixedOwnerAtPurchase=fixedOwner;
 
       const creditUsed=Math.min(price,creditAtBuy);
-      residualCredit=Math.max(0,creditAtBuy-price);
+      residualGross=Math.max(0,creditAtBuy-price);
       complement=Math.max(0,price-creditAtBuy);
 
       purchaseCostsGross=price*cfg.itbi+rgi+cfg.outros;
+      residualAppliedToCosts=0;
+      residualUnallocated=residualGross;
+      residualComparableAsset=0;
+
+      if(cfg.residualCreditPolicy==='costs' && residualGross>0){
+        const residualCostCap=Math.max(0,principalCreditAtBuy*(cfg.residualExpenseCapPct ?? 0.10));
+        residualAppliedToCosts=Math.min(residualGross,purchaseCostsGross,residualCostCap);
+        residualUnallocated=Math.max(0,residualGross-residualAppliedToCosts);
+      }
+
+      // Compatibilidade de output: residualCredit representa o valor ainda sem
+      // destinação após aplicações explícitas. Ele NÃO é automaticamente ativo
+      // comparável; residualComparableAsset controla o reconhecimento patrimonial.
+      residualCredit=residualUnallocated;
+      purchaseCostsOutOfPocket=Math.max(0,purchaseCostsGross-residualAppliedToCosts);
+
       cashbackEligibleBase=resolveCashbackBase(
         price,
         creditAtBuy,
@@ -494,9 +512,9 @@ function runScenario(cfg,overrides={}){
       );
       purchaseCashback=calculateCashback(cashbackEligibleBase,cfg.cashbackPct);
       purchaseCashbackReceiptMonth=Math.min(N+1,buy+Math.max(0,Math.round(cfg.cashbackDelayMonths ?? 1)));
-      purchaseTransactionNet=complement+purchaseCostsGross-purchaseCashback;
+      purchaseTransactionNet=complement+purchaseCostsOutOfPocket-purchaseCashback;
 
-      cashObrigacoes += complement+purchaseCostsGross;
+      cashObrigacoes += complement+purchaseCostsOutOfPocket;
       propertyValue=price;
       cotas.forEach(q=>{q.letterBalance=0;});
     }
@@ -637,17 +655,17 @@ function runScenario(cfg,overrides={}){
       grossAsset=aggregateLetterBalance;
       comparableAsset=aggregateLetterBalance;
     }else if(propertySold){
-      grossAsset=residualCredit;
-      comparableAsset=residualCredit;
+      grossAsset=residualComparableAsset;
+      comparableAsset=residualComparableAsset;
     }else{
-      grossAsset=propertyValue+residualCredit;
+      grossAsset=propertyValue+residualComparableAsset;
       const hypotheticalBrokerage=propertyValue*cfg.sellerBrokeragePct;
       const hypotheticalOtherCosts=cfg.sellerOtherCosts;
       const simplifiedTaxBasis=price+purchaseCostsGross;
       const hypotheticalGain=Math.max(0,propertyValue-simplifiedTaxBasis);
       const hypotheticalTax=hypotheticalGain*cfg.sellerCapitalGainTaxPct;
       propertyNetRealizationThisMonth=Math.max(0,propertyValue-hypotheticalBrokerage-hypotheticalOtherCosts-hypotheticalTax);
-      comparableAsset=propertyNetRealizationThisMonth+residualCredit;
+      comparableAsset=propertyNetRealizationThisMonth+residualComparableAsset;
       if(m===N){
         finalPropertyMarketValue=propertyValue;
         finalPropertyNetRealization=propertyNetRealizationThisMonth;
@@ -772,7 +790,7 @@ function runScenario(cfg,overrides={}){
 
     contemplated,allContemplated,purchased,redeemed,propertySold,quotaSold,
     credit,outstanding,fullInstall,initialReduced,postInstall,
-    letterBalance,letterPrincipalAtCont,propertyValue,residualCredit,
+    letterBalance,letterPrincipalAtCont,propertyValue,residualCredit,residualGross,residualAppliedToCosts,residualUnallocated,residualComparableAsset,
     price,rgi,rent0,currentRent,fixedOwner,lastFixedOwner,
     priceAtPurchase,rentAtPurchase,rgiAtPurchase,fixedOwnerAtPurchase,
 
@@ -786,7 +804,8 @@ function runScenario(cfg,overrides={}){
     totalYieldUsedForInstallments,totalLetterYieldAccrued,firstYieldUsedForInstallment,firstGrossLetterYield,
     firstPostContConsortiumPayment,firstPostContLoanPayment,firstPostContGrossConsortiumPayment,firstPostContYieldUsed,
 
-    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCashback,purchaseCashbackReceiptMonth,purchaseTransactionNet,
+    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCostsOutOfPocket,
+    purchaseCashback,purchaseCashbackReceiptMonth,purchaseTransactionNet,
     initialNetRent,initialPostCashFlow,firstFullConsortiumPayment,firstFullLoanPayment,firstFullNetRent,totalNetRent,
 
     redeemCredit,redeemConsortiumPayoff,redeemLanceLoanPayoff,redeemBridgeCost,redeemTaxCost,
