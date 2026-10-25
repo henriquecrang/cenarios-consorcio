@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.2 · Cotas configuráveis</title>
+<title>Consórcio x CDB x Imóvel — V3.3 · Lance Livre recalibrado</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -605,7 +605,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.2 · Cotas configuráveis</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.3 · Lance Livre recalibrado</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -751,8 +751,8 @@ th:first-child,td:first-child{text-align:left}
       <div class="row">
         <div class="field">
           <label>Lance Livre total</label>
-          <input id="lanceTotal" type="number" value="30" step=".5" min="0" max="100">
-          <div class="small">% do saldo devedor da própria cota no mês da contemplação</div>
+          <input id="lanceTotal" type="number" value="70" step=".1" min="0" max="100">
+          <div class="small">% do saldo devedor da própria cota no mês da contemplação. Default analítico: 70% — hipótese de sensibilidade, não probabilidade de contemplação.</div>
         </div>
         <div class="field">
           <label>Lance embutido</label>
@@ -765,7 +765,9 @@ th:first-child,td:first-child{text-align:left}
         O <b>lance embutido</b> é calculado separadamente sobre a <b>carta atualizada da própria cota</b>, limitado a 30% da carta e ao próprio valor total do lance.
         A parte em dinheiro é a diferença entre o Lance Livre efetivo e o embutido efetivamente utilizado.
         <br><br>
-        Exemplo: saldo devedor de R$ 500 mil, carta de R$ 400 mil, Lance Livre de 45% e embutido de 30% ⇒ lance total de R$ 225 mil, R$ 120 mil embutidos e R$ 105 mil em dinheiro.
+        Exemplo reconciliado: saldo devedor de R$ 495.330, carta de R$ 400 mil, Lance Livre de 45% e embutido de 30% ⇒ lance total de R$ 222.898,50, R$ 120 mil embutidos e R$ 102.898,50 em dinheiro.
+        <br><br>
+        <b>Histórico oficial do Grupo 4012:</b> menor Lance Livre vencedor documentado = 60,14%; nos meses recentes com vencedor, os pisos ficaram entre 68,91% e 72,73%, com máximos de 73%. Junho não teve vencedor por Lance Livre. Esse histórico serve apenas como calibração descritiva — não é probabilidade nem garantia de contemplação.
       </div>
 
       <div class="section">2. Empréstimo para o lance</div>
@@ -1699,6 +1701,7 @@ th:first-child,td:first-child{text-align:left}
           Compare cenários sem alterar a simulação principal. As linhas variam os meses de contemplação das cotas ativas,
           o Lance Livre, o rendimento da carta em % do CDI e o percentual da parte em dinheiro do lance financiado.
           Não há probabilidades implícitas: os presets são hipóteses de sensibilidade e todos os campos das linhas alternativas são editáveis.
+          Os Lances Livres sugeridos foram recalibrados para a faixa dos vencedores documentados do Grupo 4012 (aprox. 60%–73%); isso não significa que a faixa se repetirá.
         </div>
 
         <div class="decision-toolbar">
@@ -1977,7 +1980,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=1;
-const SCENARIO_APP_VERSION='3.2';
+const SCENARIO_APP_VERSION='3.3';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -3866,6 +3869,12 @@ if(loanBody){
 
   const warning=$('warning');
   const warnings=[];
+  const lancePctDisplayed=cfg.lancePct*100;
+  if(lancePctDisplayed<60.14){
+    warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está abaixo do menor vencedor documentado nas atas disponíveis do Grupo 4012 (60,14%). Nos meses recentes com vencedor, os pisos ficaram entre 68,91% e 72,73%. Histórico não é garantia de resultado.`);
+  }else if(lancePctDisplayed<68.9081){
+    warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está acima do menor vencedor histórico documentado, mas abaixo do menor piso observado entre julho e setembro (68,91%). Histórico não é garantia de resultado.`);
+  }
   const contemplationCoincidesWithAdjustment = cont>=cfg.firstAdj && (cont-cfg.firstAdj)%12===0;
   if(contemplationCoincidesWithAdjustment) warnings.push(cfg.adjustmentBeforeContemplation
     ? 'A contemplação cai em um mês de reajuste. Pela convenção selecionada, o reajuste ocorre antes da contemplação e aumenta o crédito usado no lance/liberação.'
@@ -3917,12 +3926,12 @@ let decisionMatrixTimer=null;
 let decisionMatrixInitialized=false;
 
 const decisionScenarioDefs=[
-  {key:'earlyAll',name:'Todas cedo',yieldMode:'current'},
-  {key:'twoWaves',name:'Duas ondas',yieldMode:'current'},
-  {key:'staggered',name:'Escalonada',yieldMode:'current'},
-  {key:'stress',name:'Stress de prazo + rendimento',yieldPct:80},
-  {key:'fastHighYield',name:'Rápida + rendimento alto',yieldPct:105},
-  {key:'custom',name:'Histórico / custom',yieldMode:'current'}
+  {key:'earlyAll',name:'Todas cedo',lancePct:73,yieldMode:'current'},
+  {key:'twoWaves',name:'Duas ondas',lancePct:72,yieldMode:'current'},
+  {key:'staggered',name:'Escalonada',lancePct:69,yieldMode:'current'},
+  {key:'stress',name:'Stress de prazo + rendimento',lancePct:73,yieldPct:80},
+  {key:'fastHighYield',name:'Rápida + rendimento alto',lancePct:70,yieldPct:105},
+  {key:'custom',name:'Histórico / custom',lancePct:60.1,yieldMode:'current'}
 ];
 
 function decisionPresetConts(key,count,N,currentConts){
@@ -3943,12 +3952,12 @@ function decisionPresetConts(key,count,N,currentConts){
 
 function decisionPresetDescription(key,conts){
   const months=conts.join(' / ');
-  if(key==='earlyAll') return `Todas as ${conts.length} cotas no mês ${conts[0]}.`;
-  if(key==='twoWaves') return `Contemplação em duas ondas: ${months}.`;
-  if(key==='staggered') return `Contemplações escalonadas: ${months}.`;
-  if(key==='stress') return `Prazo mais lento (${months}) e carta a 80% do CDI.`;
-  if(key==='fastHighYield') return `Contemplação rápida (${months}) e carta a 105% do CDI.`;
-  return 'Linha livre para transcrever uma ata ou testar outra combinação.';
+  if(key==='earlyAll') return `Todas as ${conts.length} cotas no mês ${conts[0]}, com Lance Livre de 73% (topo observado nas atas).`;
+  if(key==='twoWaves') return `Contemplação em duas ondas: ${months}, com Lance Livre de 72%.`;
+  if(key==='staggered') return `Contemplações escalonadas: ${months}, com Lance Livre de 69% (próximo ao piso recente de agosto).`;
+  if(key==='stress') return `Prazo mais lento (${months}), Lance Livre de 73% e carta a 80% do CDI.`;
+  if(key==='fastHighYield') return `Contemplação rápida (${months}), Lance Livre de 70% e carta a 105% do CDI.`;
+  return 'Linha livre iniciada em 60,1%, próxima ao menor vencedor documentado; edite para testar outra combinação.';
 }
 
 function decisionFmtPct(v,digits=1){
@@ -3986,7 +3995,7 @@ function buildDecisionRows(){
         readonly:false,
         conts,
         desc:decisionPresetDescription(def.key,conts),
-        lancePct:currentLance,
+        lancePct:(def.lancePct ?? currentLance),
         yieldPct:(def.yieldPct ?? currentYield),
         finPct:currentFin
       };
@@ -3999,7 +4008,7 @@ function buildDecisionRows(){
       if(row.readonly) return `<span class="decision-input-readonly">${Number(value).toFixed(field==='cont'?0:1).replace('.',',')}${suffix}</span>`;
       const min=field==='cont'?1:0;
       const max=field==='cont'?cfg.N:(field==='lance'?100:(field==='yield'?200:100));
-      const step=field==='cont'?1:1;
+      const step=field==='cont'?1:(field==='lance'?0.1:1);
       return `<input type="number" data-decision-key="${row.key}" data-decision-field="${field}" value="${Number(value)}" min="${min}" max="${max}" step="${step}">`;
     };
     const contCells=row.conts.map((value,i)=>
