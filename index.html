@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.6 · Matriz comparável</title>
+<title>Consórcio x CDB x Imóvel — V3.7 · CDI separado do benchmark</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -606,7 +606,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.6 · Matriz comparável</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.7 · CDI separado do benchmark</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -891,14 +891,14 @@ th:first-child,td:first-child{text-align:left}
       <div class="section">4. Benchmark e carta contemplada</div>
       <div class="row">
         <div class="field">
-          <label>CDB benchmark — retorno líquido</label>
+          <label>CDB benchmark — retorno líquido projetado</label>
           <input id="cdb" type="number" value="11.5" step=".1">
-          <div class="small">% a.a. líquido — usado apenas no benchmark e no caixa financeiro da estratégia</div>
+          <div class="small">% a.a. líquido — hipótese de longo prazo usada apenas no benchmark e no caixa financeiro da estratégia; não é o CDI spot.</div>
         </div>
         <div class="field">
-          <label>CDI de referência</label>
-          <input id="cdi" type="number" value="11.5" step=".1" min="0">
-          <div class="small">% a.a. — referência independente usada apenas para estimar o rendimento das cartas contempladas</div>
+          <label>CDI bruto de referência</label>
+          <input id="cdi" type="number" value="13.65" step=".05" min="0">
+          <div class="small">% a.a. bruto — default spot de 23/10/2026 (BCB/SGS 4389). É uma referência inicial editável, não uma previsão constante para os 214 meses.</div>
         </div>
       </div>
 
@@ -909,9 +909,11 @@ th:first-child,td:first-child{text-align:left}
       </div>
 
       <div class="assump">
-        <b>Premissas independentes:</b> alterar o CDB benchmark não muda o rendimento das cartas. Alterar o CDI ou o percentual do CDI recebido pelas cartas não muda o benchmark.
+        <b>Premissas independentes:</b> o CDB é uma hipótese <b>líquida</b> de benchmark; o CDI é uma referência <b>bruta</b> separada. Alterar um não altera automaticamente o outro.
         <br><br>
-        <b>Bruto × líquido:</b> a faixa comercial de 98%–105% do CDI foi posteriormente esclarecida como referência <b>bruta</b> da aplicação. Para projeção da carta, usamos 80% do CDI como retorno <b>líquido</b>. O modelo não aplica um segundo desconto de IR sobre esse percentual.
+        <b>CDI spot × trajetória:</b> 13,65% a.a. é o último valor spot do BCB/SGS 4389 disponível em 23/10/2026. O motor atual ainda usa taxa constante no horizonte; para prazos longos, trate esse campo como cenário e não como previsão.
+        <br><br>
+        <b>Bruto × líquido da carta:</b> a faixa comercial de 98%–105% do CDI foi esclarecida como referência <b>bruta</b> da aplicação. Para projeção da carta, usamos 80% do CDI bruto como retorno final <b>líquido</b> da carta. O modelo não aplica um segundo desconto de IR sobre esse percentual.
       </div>
 
       <div class="field">
@@ -2004,7 +2006,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=1;
-const SCENARIO_APP_VERSION='3.6';
+const SCENARIO_APP_VERSION='3.7';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
