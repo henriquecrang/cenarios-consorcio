@@ -64,11 +64,19 @@ function runScenario(cfg,overrides={}){
   const embPct=clamp(cfg.embMaxPct,0,0.30);
 
   const sourceCotas=(cfg.cotas && cfg.cotas.length ? cfg.cotas : [{id:'Única',credit0:cfg.credit0,cont:cfg.cont}]);
-  const scenarioCotas=sourceCotas.map(c=>({
+  const scenarioCotas=sourceCotas.map(c=>{
+    const fallbackMode=(c.lanceMode || cfg.lanceMode || 'free')==='fixed' ? 'fixed' : 'free';
+    const fallbackBidPct=fallbackMode==='fixed'
+      ? (c.bidPct ?? c.fixedLancePct ?? cfg.fixedLancePct ?? 0.30)
+      : (c.bidPct ?? c.freeLancePct ?? c.lancePct ?? lancePct);
+    return {
     id:c.id,
     credit0:Math.max(0,c.credit0||0),
     cont:clamp(overrides.cont ?? c.cont,1,N),
     useInPurchase:c.useInPurchase!==false,
+    lanceMode:fallbackMode,
+    bidPct:clamp(Number(fallbackBidPct)||0,0,1),
+    embPct:clamp(Number(c.embPct ?? c.embMaxPct ?? embPct)||0,0,0.30),
     loanTerms:{
       fundPct:clamp(c.loanTerms?.fundPct ?? cfg.emprestimoLancePct,0,1),
       rateMonthly:Math.max(0,c.loanTerms?.rateMonthly ?? cfg.emprestimoTaxaMes),
@@ -76,7 +84,8 @@ function runScenario(cfg,overrides={}){
       term:Math.max(1,c.loanTerms?.term ?? cfg.emprestimoPrazo),
       system:(c.loanTerms?.system || cfg.emprestimoSistema)==='sac' ? 'sac' : 'price'
     }
-  }));
+  };
+  });
   const firstCont=Math.min(...scenarioCotas.map(c=>c.cont));
   const cont=Math.max(...scenarioCotas.map(c=>c.cont)); // última contemplação de todas as cotas
   const purchaseScenarioCotas=scenarioCotas.filter(c=>c.useInPurchase);
@@ -336,7 +345,14 @@ function runScenario(cfg,overrides={}){
     cotas.forEach(q=>{
       if(m===q.cont && !quotaSold && !redeemed && !q.contemplated){
         q.contemplated=true;
-        const lance=resolveEffectiveBid(q.credit,q.outstanding,cfg.lanceMode||'free',lancePct,cfg.fixedLancePct??0.30,embPct);
+        const lance=resolveEffectiveBid(
+          q.credit,
+          q.outstanding,
+          q.lanceMode,
+          q.lanceMode==='free' ? q.bidPct : 0,
+          q.lanceMode==='fixed' ? q.bidPct : (cfg.fixedLancePct??0.30),
+          q.embPct
+        );
         q.requestedLanceAtCont=lance.requestedTotal;
         q.effectiveLanceAtCont=lance.effectiveTotal;
         q.requestedEmbeddedAtCont=lance.requestedEmbedded;
@@ -778,6 +794,9 @@ function runScenario(cfg,overrides={}){
     useInPurchase:q.useInPurchase,
     usedInPurchase:q.usedInPurchase,
     contemplated:q.contemplated,
+    lanceMode:q.lanceMode,
+    bidPct:q.bidPct,
+    embPct:q.embPct,
     letterBalance:q.letterBalance,
     outstanding:q.outstanding,
     requestedLanceAtCont:q.requestedLanceAtCont,
