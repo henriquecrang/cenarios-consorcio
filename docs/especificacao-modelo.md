@@ -129,25 +129,52 @@ Essa conversão é utilizada para:
 - remuneração da carta;
 - TR anual projetada.
 
-A remuneração anual da carta é:
+A remuneração da carta deve ser parametrizada a partir do CDI, separadamente do CDB benchmark.
 
-`i_carta,a = i_CDB,a × percentual_CDB_da_carta`
+Premissa-base líquida atual:
+
+`i_carta,a = i_CDI,a × p_carta`
+
+com:
+
+`p_carta_base = 0,80`
 
 e sua taxa mensal:
 
 `i_carta,m = (1 + i_carta,a)^(1/12) - 1`
 
-O percentual do CDB da carta é uma **premissa legada da V2.54**, não a melhor descrição da regra econômica.
-
-**Evidência comercial e regulatória recebida/verificada em 28/09/2026:**
+**Evidência comercial e regulatória consolidada:**
 - Michele informou que o crédito contemplado e ainda não utilizado fica aplicado e recebe o rendimento líquido efetivo das aplicações do grupo;
-- ela expressou esse resultado como uma faixa aproximada em % do CDI, primeiro 98%–105% e depois 80%–105%, o que ainda precisa ser reconciliado;
+- a faixa de 98%–105% do CDI foi posteriormente esclarecida como referência **bruta** da aplicação/fundo;
+- para projeção financeira da carta, a orientação comercial recebida foi usar aproximadamente **80% do CDI líquido**;
 - a Resolução BCB nº 285/2023 determina que os recursos vinculados à contemplação sejam aplicados nos ativos permitidos e que o crédito do consorciado seja acrescido dos **rendimentos líquidos financeiros** proporcionais ao período de aplicação.
 
-**Regra-alvo da próxima revisão:** o retorno da carta deve ser parametrizado separadamente do retorno do CDB benchmark. O benchmark mede custo de oportunidade; a carta recebe o rendimento líquido efetivo da aplicação vinculada à contemplação.
+**Regra canônica da especificação:** o retorno da carta é independente do CDB benchmark. O benchmark mede custo de oportunidade; a carta recebe o rendimento líquido efetivo da aplicação vinculada à contemplação. Não aplicar um segundo haircut/IR sobre o parâmetro de 80% quando ele já representa retorno líquido.
 
 ---
 
+
+
+## 5.3 Limites de carta no produto QuintoAndar
+
+Resposta comercial de Michele em 29/09/2026:
+
+- `carta_minima_produto = R$ 200.000`;
+- `carta_maxima_produto = R$ 400.000`.
+
+Dentro do produto/grupos QuintoAndar analisados:
+- não há cartas individuais de R$600 mil, R$700 mil, R$1 milhão ou R$1,5 milhão;
+- valores maiores são estruturados por múltiplas cotas.
+
+Para uma necessidade nominal de R$1,37 milhão:
+
+`qtd_min_cotas = ceil(1.370.000 / 400.000) = 4`
+
+Portanto, a estrutura em quatro cotas é compatível com o limite estrutural do produto e não deve ser tratada na interface como mera preferência configurável por uma carta única equivalente.
+
+A justificativa comercial de que o desmembramento aumenta “chances” por sorteio/lance não deve ser codificada como vantagem probabilística sem dados que a sustentem.
+
+---
 
 # 6. Estado inicial do consórcio
 
@@ -234,47 +261,48 @@ A arquitetura futura deve distinguir:
 
 O motor financeiro da nova cota deve usar o prazo contratual remanescente aplicável àquele ingresso, e não presumir que toda nova cota começa com a duração original do grupo.
 
-## 6.6 Ponto documental não resolvido — assembleias anteriores à adesão
+## 6.6 Regra da proposta e ressalva documental — assembleias anteriores à adesão
 
-Existe conflito entre a resposta comercial e o Regulamento Geral Bamaq 2025.
+Para o preset da proposta QuintoAndar/Bamaq do Grupo 4012, a regra-alvo passa a ser:
 
-Resposta de Michele:
-- não existem parcelas retroativas dos meses anteriores;
-- todo o compromisso é diluído nos 214 meses restantes.
+- NÃO existem parcelas retroativas relativas aos meses anteriores à adesão;
+- NÃO existe dedução do crédito contemplado por assembleias anteriores;
+- a cota é tratada como cota nova de lançamento/abertura de vaga em grupo em andamento;
+- o saldo inicial do novo aderente nasce do crédito contratado + taxa de administração + fundo de reserva;
+- esse saldo é distribuído pelo prazo remanescente de 214 meses;
+- na contemplação, a carta não deve sofrer desconto de “mensalidades passadas”.
 
-Regulamento 2025:
-- art. 1º, §3º: consorciado admitido em grupo em andamento paga integralmente as prestações no prazo remanescente — compatível com a fórmula acima;
-- art. 8º, VI, “a”: se essa cota for contemplada, haveria obrigação relativa às mensalidades correspondentes às assembleias ocorridas antes da adesão, com possibilidade de dedução do crédito.
+Essa regra foi confirmada comercialmente de forma expressa por Michele em 29/09/2026 para as quatro cotas da operação.
 
-Até obter o texto aplicável do Regulamento 2026/contrato específico:
-- NÃO adicionar cobrança retroativa ao cenário-base;
-- NÃO remover essa possibilidade do backlog;
-- NÃO deduzir silenciosamente valores do crédito na contemplação.
+A explicação comercial apresentada foi que a cláusula genérica sobre assembleias anteriores se aplicaria a situações de substituição/repescagem de cotas canceladas, enquanto este produto oferece cotas novas de lançamento/abertura de vagas. A especificação registra essa justificativa como **interpretação comercial**, não como conclusão jurídica independente.
 
-Se a Bamaq confirmar que a cláusula ainda se aplica, o motor deverá criar um evento explícito:
+**Ressalva documental:**
+O Regulamento Geral Bamaq 2025, art. 8º, VI, “a”, contém redação que, lida isoladamente, prevê obrigação relativa às assembleias anteriores quando uma adesão em grupo em andamento é contemplada. Ainda não foi apresentado o Regulamento 2026, aditivo ou contrato específico que reconcilie formalmente esse texto com a regra comercial acima.
 
-`AjusteAssembléiasAnteriores_na_contemplacao`
+Portanto, para o software:
+- o preset atual NÃO DEVE implementar `AjusteAssembleiasAnteriores`;
+- o cenário-base NÃO DEVE deduzir qualquer valor retroativo na contemplação;
+- eventual regra contrária só pode ser introduzida depois de evidência documental específica e deve aparecer como evento explícito, nunca como ajuste oculto no saldo/parcela.
 
-que:
-- reduz o crédito disponível OU exige aporte, conforme regra formal;
-- nunca é embutido invisivelmente na parcela mensal.
-
+A conferência do contrato final continua sendo requisito de diligência antes da decisão financeira, mas não altera o comportamento-alvo atual do simulador.
 
 ## 6.7 Primeiro reajuste
 
-A dúvida conceitual principal foi parcialmente resolvida:
+A cronologia mensal do primeiro reajuste desta proposta foi esclarecida comercialmente.
 
-Michele informou que o reajuste anual ocorre no **aniversário do grupo**.
+Evidência acumulada:
+- Michele havia informado que o reajuste anual ocorre no **aniversário do grupo**;
+- em 29/09/2026, esclareceu que a virada mensal da tabela comercial e o reajuste anual de 3% NÃO são o mesmo evento;
+- informou que a próxima assembleia do dia 18 não aplicará os 3% às cotas contratadas agora;
+- informou e depois reafirmou que o **primeiro reajuste ocorrerá em abril de 2027**, aproximadamente sete meses após a entrada atual.
 
-Logo, a cota que entra num grupo já em andamento:
-- herda a data-base anual do grupo;
-- não deve, por padrão, esperar 12 meses completos desde sua própria adesão para sofrer o primeiro reajuste.
+Logo, para a proposta analisada e na resolução mensal do simulador:
+- a cota NÃO deve esperar 12 meses completos desde a adesão para o primeiro reajuste;
+- a cota também NÃO deve sofrer 3% já na próxima assembleia mensal;
+- `primeiroMesReajuste = abril/2027`;
+- o fechamento/virada da tabela comercial é um evento separado e não deve acionar o reajuste contratual.
 
-Ainda falta saber:
-- a data exata do aniversário do Grupo 4012;
-- se a próxima assembleia “do dia 18” é justamente o evento de aniversário;
-- se uma cota contratada imediatamente antes desse evento sofre reajuste já nessa assembleia;
-- se a “trava da tabela” mencionada comercialmente posterga ou não esse primeiro reajuste.
+A resposta mais recente usou a expressão “aniversário da cota/grupo”, enquanto a resposta anterior dizia “aniversário do grupo”. A especificação deve preservar o dado operacional confirmado para esta proposta (abril/2027) e manter a redação contratual exata como evidência documental desejável, sem transformar a ambiguidade verbal em uma nova regra.
 
 A arquitetura deve suportar:
 
@@ -284,9 +312,9 @@ independente de:
 
 `mesAdesaoCota`
 
-e calcular o primeiro reajuste pela próxima ocorrência do aniversário aplicável.
+Além disso, presets de propostas reais DEVEM poder registrar explicitamente o primeiro mês de reajuste conhecido quando a data de entrada ocorre em grupo já em andamento.
 
-# 7. Reajuste do consórcio
+O dia exato dentro de abril/2027 permanece pendente, mas não é necessário para o motor mensal atual. Se houver futura resolução diária/pro rata, esse dado deverá ser confirmado antes da implementação.
 
 # 7. Reajuste do consórcio
 
@@ -329,22 +357,30 @@ e a parcela pós-contemplação é recalculada com base no saldo e no prazo rest
 ## 7.2 Data-base e tabela comercial
 
 Confirmado comercialmente:
-- reajuste anual = aniversário do grupo.
+- reajuste contratual anual = 3%;
+- a referência temporal está associada ao aniversário aplicável ao grupo/cota;
+- para a proposta atual, o primeiro reajuste será em **abril/2027**;
+- a assembleia mensal do dia 18 NÃO é o evento que aplica imediatamente esse reajuste às cotas contratadas agora;
+- a “virada da tabela”/fechamento comercial mensal é evento distinto do reajuste anual;
+- a tabela comercial fecha antes da assembleia, por volta do dia 12 de cada mês, para definir condições/vagas de novas entradas;
+- entrando na tabela atual, o cliente preserva as condições comerciais atuais da proposta; quanto ao reajuste anual, não há 3% antes de abril/2027.
 
 Ainda pendente:
-- data/mês exato do aniversário do Grupo 4012;
-- relação entre “assembleia do dia 18” e esse aniversário;
-- primeiro reajuste de uma cota emitida imediatamente antes da assembleia;
-- ordem se reajuste e contemplação coincidirem;
-- memória oficial do recálculo pós-contemplação.
+- dia exato dentro de abril em que o reajuste é processado, caso seja necessária precisão diária;
+- ordem se reajuste e contemplação coincidirem no mesmo mês;
+- memória oficial do recálculo pós-contemplação;
 
-Também deve existir distinção entre:
-- **reajuste contratual anual de 3%**;
-- **mudança de tabela comercial para novas adesões**.
+A especificação DEVE manter distinção entre:
+- **fechamento/mudança de tabela comercial para novas adesões**;
+- **reajuste contratual anual de 3% de cotas ativas**.
 
-A frase “a tabela vai virar” não deve ser traduzida automaticamente como reajuste da cota já contratada.
+A frase “a tabela vai virar” NÃO deve ser traduzida como reajuste automático da cota já contratada.
 
-A V2.54 mantém configurável a ordem reajuste × contemplação, mas a próxima arquitetura deve ainda incorporar calendário do grupo.
+Para o preset da proposta atual:
+
+`primeiroMesReajuste = abril/2027`
+
+A opção configurável de ordem reajuste × contemplação deve permanecer enquanto a cronologia do mês coincidente não estiver formalmente confirmada.
 
 ## 7.3 Interpretação de previsibilidade
 
@@ -420,6 +456,33 @@ Os painéis auxiliares DEVEM gerar cenários economicamente válidos sob essa me
 
 ---
 
+
+## 9.1 Calendário operacional das assembleias
+
+Michele informou em 29/09/2026:
+- assembleias regulares têm referência no dia 18 de cada mês;
+- se o dia 18 cair em fim de semana/não útil, a assembleia é deslocada para dia útil;
+- para outubro/2026, 18/10 cai em domingo e a assembleia foi informada para **19/10/2026**.
+
+A série documental do Grupo 4012 é coerente com essa convenção:
+- maio/2026: 18/05;
+- julho/2026: 20/07, quando 18/07 caiu em sábado;
+- agosto/2026: 18/08;
+- setembro/2026: 18/09.
+
+**Regra de especificação operacional:**
+`diaBaseAssembleia = 18`
+
+Se houver futura resolução diária:
+`dataAssembleia = próximo_dia_util_em_ou_apos(dia 18)`
+
+Ressalvas:
+- a primeira assembleia do grupo (abril/2026) ocorreu fora desse padrão e deve ser tratada como evento de implantação/lançamento;
+- o motor mensal atual não precisa deslocar datas em dias;
+- essa regra NÃO define o aniversário/reajuste anual de 3%.
+
+---
+
 # 10. Parcela no mês da contemplação
 
 A parcela do próprio mês da contemplação DEVE continuar sendo a parcela reduzida.
@@ -432,12 +495,35 @@ Depois do lance:
 
 quando ainda houver meses restantes.
 
-Essa é uma decisão deliberada de modelagem na V2.54.
+Essa é a decisão canônica de modelagem.
 
-**Ponto aberto após resposta comercial de 28/09/2026:** no exemplo de uma cota com prazo de 214 meses e contemplação na 4ª parcela, Michele informou nova parcela distribuída por **209 meses**, enquanto a convenção acima produziria 210 meses restantes. Não alterar a fórmula até reconciliar a contagem com uma memória de cálculo oficial e a ordem real da parcela no mês da contemplação.
+## 10.1 Reconciliação da memória de 29/09/2026
+
+A memória enviada por Michele para uma cota de R$ 400 mil mostra:
+- prazo inicial: 214 meses;
+- 4 parcelas pagas;
+- saldo final pós-lance: R$ 270.330;
+- rótulo “Nova Parcela (209 meses)”;
+- valor da nova parcela: R$ 1.287.
+
+A matemática interna do próprio documento demonstra:
+
+`270.330 / 209 = 1.293,44`
+
+enquanto:
+
+`270.330 / 210 = 1.287,29`
+
+Portanto:
+- o valor monetário exibido é compatível com **210 meses**;
+- `214 - 4 = 210`;
+- o rótulo “209 meses” é internamente inconsistente.
+
+**Regra canônica:** NÃO alterar o motor para 209 meses com base nesse material. Manter `N - m_cont`.
+
+Se surgir documento formal que demonstre cronologia diferente, reabrir SW-007 com memória que feche simultaneamente prazo, saldo e parcela.
 
 ---
-
 
 # 11. Lance
 
@@ -477,15 +563,49 @@ onde `C` é o valor atualizado da carta da cota.
 
 A confirmação documental da modalidade ainda é desejável.
 
-## 11.3 Regra-alvo — Lance Livre
+## 11.3 Regra canônica — Lance Livre
 
-Para Lance Livre:
+Resposta direta de Michele em 29/09/2026:
 
-`L_livre_solicitado = D × pct_livre`
+- a base do Lance Livre é **sempre o saldo devedor atualizado da cota na data da assembleia**;
+- os percentuais publicados nas atas usam essa mesma base;
+- o sistema classifica os lances do maior percentual para o menor até esgotar o Fundo Comum.
 
-onde `D` é o saldo devedor da cota na base temporal definida para a assembleia.
+Fórmula canônica:
 
-A faixa permitida de `pct_livre` ainda precisa ser confirmada.
+`L_livre_solicitado = D_assembleia × pct_livre`
+
+onde:
+
+`D_assembleia = saldo_devedor_atualizado_da_cota_na_data_da_assembleia`
+
+Regra de ranking:
+
+`ranking_livre = ordenar_desc(pct_livre)`
+
+O valor nominal do lance NÃO é a variável de classificação entre cotas; a classificação é pelo percentual ofertado sobre o saldo atualizado de cada cota.
+
+A faixa formal permitida de `pct_livre` ainda precisa ser confirmada.
+
+### 11.3.1 Memória comercial inconsistente
+
+A memória de 29/09 exibia:
+- saldo devedor: R$495.330;
+- 45% de Lance Livre;
+- embutido: R$120 mil;
+- recursos próprios: R$105 mil.
+
+Pela regra canônica:
+
+`45% × 495.330 = R$222.898,50`
+
+e:
+
+`L_cash = 222.898,50 - 120.000 = R$102.898,50`
+
+Portanto, R$225 mil de lance / R$105 mil próprios daquela memória NÃO devem ser usados para calibrar a fórmula. O exemplo é tratado como inconsistente.
+
+Reabrir esta regra somente se contrato, regulamento específico ou memória oficial posterior contradisserem a resposta direta.
 
 ## 11.4 Lance embutido
 
@@ -503,30 +623,39 @@ O embutido efetivo também NÃO pode exceder o lance total efetivo.
 
 ## 11.5 Parte em dinheiro quando as bases são diferentes
 
-No Lance Livre, NÃO se deve calcular a parcela em dinheiro simplesmente por:
+No Lance Livre, as bases são distintas:
 
-`(pct_livre - pct_emb) × C`
+`L_livre = pct_livre × D_assembleia`
 
-porque `pct_livre` e `pct_emb` usam bases diferentes.
+`L_emb = pct_emb × C`
 
-A fórmula econômica é:
+Logo:
 
 `L_cash = max(0, L_livre_efetivo - L_emb_efetivo)`
 
-Exemplo comercial informado:
-- carta = R$ 400 mil;
-- embutido = 10% da carta = R$ 40 mil;
-- lance livre = 45% do saldo devedor.
+NÃO calcular:
 
-Se o saldo na ocasião estiver próximo de R$ 495 mil:
+`(pct_livre - pct_emb) × C`
 
-`45% × 495 mil ≈ R$ 223 mil`
+porque o percentual Livre usa saldo devedor e o embutido usa carta.
 
-e:
+### Exemplo da memória de 29/09/2026
 
-`L_cash ≈ 223 mil - 40 mil ≈ R$ 183 mil`
+Com:
+- `D_assembleia = R$495.330`;
+- `pct_livre = 45%`;
+- `C = R$400.000`;
+- `pct_emb = 30%`;
 
-Isso explica aproximadamente os R$ 180 mil mencionados por Michele, embora a memória exata ainda precise ser reconciliada.
+temos:
+
+`L_livre = R$222.898,50`
+
+`L_emb = R$120.000`
+
+`L_cash = R$102.898,50`
+
+O valor R$105 mil do print comercial não fecha com a regra confirmada e deve ser ignorado como referência matemática.
 
 ## 11.6 Limite pelo saldo amortizável
 
@@ -548,23 +677,105 @@ Nenhuma parcela do lance pode reduzir a carta ou sair do bolso sem contrapartida
 
 ## 11.8 Prazo de pagamento do lance vencedor
 
-Michele escreveu em mensagem posterior que haveria “3 dias para pagar” após a contemplação relacionada ao lance.
+Em 29/09/2026, Michele corrigiu/precisou a informação: o lance vencedor deve ser pago em **até dois dias úteis**, usando também a expressão “48 horas”.
 
-A ata do Grupo 4012 anteriormente analisada apontava vencimento no segundo dia útil.
+A ata do Grupo 4012 anteriormente analisada já apontava vencimento no segundo dia útil.
 
-Até reconciliação:
-- não hard-code prazo de 3 dias;
-- tratar como requisito operacional/documental separado do cálculo financeiro.
+Regra operacional canônica para esta proposta:
+- prazo = **2 dias úteis / até o segundo dia útil**;
+- não usar “3 dias”;
+- não converter automaticamente em 48 horas corridas, porque fins de semana e feriados quebram essa equivalência.
 
-## 11.9 Pendências antes da implementação
+Esse prazo é metadado operacional de liquidez; o motor mensal não precisa criar um mês adicional.
+
+## 11.9 Destino da amortização do lance
+
+Michele confirmou em áudio que o lance pode amortizar:
+- o valor da parcela; OU
+- o prazo.
+
+A arquitetura deve suportar por cota:
+
+`modoAmortizacaoLance ∈ {reduzirParcela, reduzirPrazo}`
+
+O modo `reduzirParcela` já corresponde à lógica predominante do motor.
+
+O modo `reduzirPrazo` ainda precisa de detalhe contratual para determinar:
+- quais parcelas são consideradas antecipadas;
+- como o prazo residual é recalculado;
+- se a escolha é feita no momento do lance;
+- se pode variar entre cotas.
+
+## 11.10 Pendências antes da implementação
+
+Já resolvido:
+- base do Lance Livre = saldo devedor atualizado da cota na data da assembleia;
+- percentuais das atas usam essa mesma base;
+- classificação por percentual decrescente;
+- contemplação nessa ordem até esgotar o Fundo Comum.
 
 Ainda precisamos confirmar:
-- faixa/mínimo do Lance Livre;
-- momento exato do saldo usado como base;
-- critério de desempate;
+- faixa/mínimo/máximo formal do Lance Livre;
+- critério de desempate em percentuais idênticos;
 - modalidades adicionais;
-- opção de amortizar reduzindo parcela versus prazo/ordem inversa;
-- memória de cálculo oficial do exemplo da 4ª parcela.
+- mecânica exata do modo `reduzirPrazo`;
+- eventual regra quando o saldo residual do Fundo Comum é insuficiente para a próxima contemplação integral.
+
+---
+
+## 11.11 Histórico empírico do Grupo 4012 — calibração, não regra contratual
+
+A série documental das seis primeiras assembleias está completa:
+
+| Mês | Lance Livre vencedor | Nº vencedores Livre | Cotas aptas |
+|---|---:|---:|---:|
+| abr/2026 | 60,1400% | 1 | 473 |
+| mai/2026 | 60,9867% | 1 | 509 |
+| jun/2026 | nenhum | 0 | 792 |
+| jul/2026 | 73,0000%; 72,7300% | 2 | 1.013 |
+| ago/2026 | 70,6877%; 70,5508%; 69,5200%; 68,9081% | 4 | 1.258 |
+| set/2026 | 73,0000%; 72,0000%; 72,0000%; 72,0000% | 4 | 1.502 |
+
+Pisos mensais do Lance Livre quando houve vencedor:
+`[60.1400, 60.9867, null, 72.7300, 68.9081, 72.0000]`
+
+Na Ata 003 / junho:
+- saldo para assembleia = R$ 501.927,02;
+- houve Lance Fixo vencedor a 30,0000%;
+- não houve vencedor por Lance Livre registrado.
+
+**Regra de interpretação:**  
+Lance Fixo e Lance Livre são modalidades distintas. O 30% de junho NÃO deve preencher o `null` da série de Lance Livre.
+
+Reconstrução das afirmações comerciais:
+- antes de recebermos as atas, a vendedora afirmou por escrito que, até a 6ª assembleia, o Lance Livre teria “variado a média entre 45% e 66%”;
+- as atas oficiais não sustentam essa faixa como descrição dos vencedores observados;
+- depois de confrontada com os documentos, a explicação mudou para “média/exemplo didático”, tendência de queda e referência aproximada de 65%, sem memória oficial.
+
+A especificação não deve usar nenhuma dessas referências verbais como premissa. Para calibração, prevalece a série documental de vencedores.
+
+**Limitação estrutural de dados:**  
+O total de ofertas é sigiloso/inacessível ao cliente. Portanto, a série não possui denominador.
+
+A série pode ser usada apenas para:
+- calibração descritiva;
+- comparar o lance simulado com vencedores históricos;
+- identificar cenários muito abaixo/acima dos cortes observados.
+
+A série NÃO deve ser usada para:
+- probabilidade de contemplação;
+- taxa de sucesso;
+- distribuição de lances perdedores;
+- previsão automática;
+- inferência do número total de ofertantes.
+
+**Implicação atual:**  
+45% está abaixo de todos os Lances Livres vencedores documentados. Junho não altera essa conclusão.
+
+**Regra de UX futura:**  
+- mostrar “sem vencedor por Lance Livre” em junho, não 0%;
+- separar Fixo e Livre;
+- rotular “histórico de vencedores — não é probabilidade nem garantia”.
 
 ---
 
@@ -849,13 +1060,51 @@ Como `p_carta` pode variar no tempo, o motor futuro deve permitir:
 - trajetória temporal / série; ou
 - presets conservador/base/otimista.
 
-## 19.3 Faixa comercial ainda não reconciliada
+## 19.3 Premissa-base líquida reconciliada
 
-Michele informou em momentos diferentes:
-- 98% a 105% do CDI líquido;
-- aproximadamente 80% a 105% do CDI líquido.
+A resposta de 29/09/2026 separou duas camadas que antes pareciam contraditórias:
 
-Até esclarecer a divergência, a especificação NÃO deve escolher silenciosamente uma dessas faixas como verdade contratual.
+**Aplicação/fundo — bruto:**
+- rentabilidade típica informada de 98% a 105% do CDI;
+- acompanha o desempenho efetivo das aplicações;
+- não é taxa garantida.
+
+**Carta contemplada — líquido para projeção:**
+- orientação comercial/interna: aproximadamente 80% do CDI;
+- esse número representa o rendimento líquido efetivamente creditado à carta para fins de caixa/projeção.
+
+Regra-base do simulador:
+
+`p_carta_base = 0.80`
+
+`i_carta_liquido = função(i_CDI, 0.80)`
+
+Importante:
+- NÃO aplicar novo IR/haircut sobre `i_carta_liquido` no cenário-base;
+- 80% deve continuar editável;
+- não apresentar 80% como promessa contratual;
+- 98%–105% NÃO deve ser usado como faixa líquida da carta.
+
+## 19.3A Aplicação informada
+
+Michele informou como veículo:
+- **Itaú Premium Renda Fixa Referenciado DI**;
+- CNPJ **03.184.233/0001-80**.
+
+A identidade do fundo foi verificada externamente.
+
+A lâmina oficial do Itaú de julho/2026 mostra:
+- retorno acumulado 2026 até julho: 97,88% do benchmark;
+- 12 meses: 97,53%;
+- 24 meses: 98,01%;
+- 36 meses: 100,49%.
+
+Esses percentuais são de desempenho divulgado do fundo e **não são líquidos de impostos**, conforme a própria lâmina.
+
+Uso na especificação:
+- serve como validação de plausibilidade da camada bruta próxima ao CDI;
+- NÃO substitui o parâmetro líquido de 80% informado pela Bamaq;
+- não prova, por si só, que o Grupo 4012 está atualmente alocado integralmente nesse fundo.
 
 ## 19.4 Destino contábil
 
@@ -1221,44 +1470,103 @@ Essa exceção é material em cenários com:
 A aplicação exata em operações com múltiplas cotas ainda precisa ser confirmada.
 
 
-## 25.3A Evidência concreta das cotações
+## 25.3A Evidência concreta das cotações e resposta com embutido
 
-As cotações individualizadas exibem:
-- carta R$ 400 mil → cashback R$ 40 mil;
-- carta R$ 370 mil → cashback R$ 37 mil;
-- carta R$ 200 mil → cashback R$ 20 mil.
+As cotações individualizadas exibem cashback nominal de 10%:
+- R$400 mil → R$40 mil;
+- R$400 mil → R$40 mil;
+- R$370 mil → R$37 mil;
+- R$200 mil → R$20 mil;
+- total nominal destacado = R$137 mil.
 
-Para as quatro cotas:
-`Cashback_nominal_total = R$ 137.000`
+Para o cenário com 30% de lance embutido em todas as quatro cotas:
 
-Uma cotação agregada posterior mostra explicitamente:
-- crédito total R$ 1.370.000;
-- cashback R$ 137.000;
-- parcela reduzida R$ 3.999,03;
-- parcela integral R$ 8.002,17.
+`Credito_nominal = R$ 1.370.000`
 
-Isso reforça que a proposta comercial atual está sendo apresentada com cashback nominal de 10% sobre as cartas.
+`Lance_embutido_total = R$ 411.000`
 
-Ainda falta confirmar o que acontece quando o crédito efetivamente liberado for inferior ao nominal por causa de lance embutido.
+`Credito_liquido_faturado = R$ 959.000`
+
+Resposta final de Michele:
+
+`Cashback = 10% × Credito_liquido_faturado`
+
+portanto:
+
+`Cashback = R$ 95.900`
+
+Os R$137 mil só seriam atingidos se os R$1,37 milhão nominais fossem efetivamente faturados/utilizados na compra, sem a redução decorrente do lance embutido.
 
 ## 25.4 Múltiplas cotas
 
-Michele informou que, em compra com várias cotas, o cashback incide sobre a soma dos créditos utilizados.
+### 25.4.1 Regra multi-cota confirmada comercialmente
 
-Entretanto, a arquitetura futura deve aplicar corretamente a exceção de 16/06/2026 por cota/operação conforme confirmação formal.
+Quando várias cartas são usadas para adquirir um único imóvel, Bamaq/QuintoAndar tratam a operação de forma unificada para:
+- faturamento;
+- garantia;
+- alienação fiduciária;
+- comparação imóvel × crédito contratado.
 
-Até esclarecer:
-- não assumir que “soma do crédito líquido usado” é sempre a base correta;
-- manter rastreabilidade de crédito contratado, atualizado, liberado e efetivamente utilizado por cota.
+A comparação relevante é agregada:
+
+`credito_contratado_operacao = soma_creditos_nominais_das_cotas_usadas`
+
+No cenário atual:
+
+`imovel = R$ 1.000.000`
+
+`credito_contratado_operacao = R$ 1.370.000`
+
+Como:
+
+`1.000.000 < 1.370.000`
+
+a operação não utiliza todo o crédito nominal agregado.
+
+Após lance embutido:
+
+`credito_liquido_faturado = R$ 959.000`
+
+Base do cashback:
+
+`base_cashback = credito_liquido_faturado`
+
+Logo:
+
+`cashback = 10% × 959.000 = R$ 95.900`
+
+### 25.4.2 Regra canônica para o cenário atual
+
+Para múltiplas cotas usadas em um único imóvel:
+
+1. somar o crédito nominal contratado da operação;
+2. aplicar reduções por lance embutido;
+3. determinar o crédito líquido efetivamente faturado/liberado ao vendedor;
+4. calcular cashback sobre esse crédito líquido.
+
+Não calcular a exceção cota por cota.
+
+### 25.4.3 Guardrail documental
+
+A regra acima está comercialmente confirmada para esta proposta. Se o contrato/regulamento final estabelecer tratamento diferente, reabrir a regra antes da implementação definitiva.
 
 ## 25.5 Pagamento
 
-Regulamento da Campanha, item 4.1.2:
+**Regra documental disponível — Regulamento da Campanha, item 4.1.2:**
 - pagamento em conta bancária de titularidade do consorciado;
 - até 5 dias úteis;
 - contados do registro da alienação na matrícula e do pagamento do crédito ao vendedor.
 
-Michele mencionou 7 dias úteis, mas a especificação deve priorizar o regulamento formal enquanto não houver documento posterior.
+**Resposta comercial reiterada em 29/09/2026:**
+- pagamento por PIX/conta;
+- até 7 dias úteis após a compra no cartório.
+
+A divergência 5 × 7 dias permanece.
+
+**Regra canônica de especificação enquanto não houver aditivo posterior:**
+`prazo_cashback_dias_uteis = 5`
+
+Não substituir por 7 apenas com resposta comercial. Se for apresentado regulamento/aditivo posterior, atualizar a especificação e a cronologia.
 
 ## 25.6 Convenção temporal do modelo mensal
 
@@ -1299,38 +1607,76 @@ Até confirmação:
 
 ## 25.9 Vigência da campanha
 
-O regulamento disponível estabelece adesões elegíveis de 01/09/2025 a 30/09/2026.
+O regulamento disponível estabelece adesões elegíveis até 30/09/2026 e Michele reiterou o mesmo deadline comercial.
 
-Quem adere dentro da vigência preserva os benefícios durante o prazo do consórcio, sujeito às condições.
+Em 29/09/2026, ela esclareceu o marco operacional exigido para efetivar a entrada dentro da condição atual.
 
-A elegibilidade da operação atual depende de confirmar qual evento formal de adesão precisa ocorrer até 30/09/2026 e se houve prorrogação posterior.
+Para esta proposta:
 
----
+`validadeProposta = 30/09/2026`
 
+Não assumir prorrogação automática.
+
+Para fins de estado operacional, a adesão comercial é considerada efetivada quando, dentro do prazo:
+- o contrato tiver sido emitido/homologado;
+- o cliente tiver realizado o aceite eletrônico;
+- a primeira parcela tiver sido paga.
+
+A alocação de grupo/número de cota ocorre como consequência do ingresso no plano, segundo a explicação comercial.
+
+A especificação deve continuar separando:
+- validade da cotação;
+- vigência da campanha;
+- efetivação operacional da adesão;
+- data do reajuste anual.
 
 ## 25.10 Validade comercial / evento de trava
 
-A cotação recebida é válida até 30/09/2026.
+A cotação atual é válida até 30/09/2026.
 
-Michele afirmou que pode:
-- alocar as cotas;
-- emitir o contrato;
-- “travar” valores e condição.
+Fluxo confirmado comercialmente:
 
-A especificação NÃO deve assumir qual ato produz efeito jurídico/comercial até confirmação.
+`documentacao`
+→ `contrato_emitido_homologado`
+→ `contrato_enviado_email`
+→ `aceite_eletronico`
+→ `primeira_parcela_paga`
+→ `cota_alocada / acesso_app`
 
-Metadados futuros úteis:
+Para esta proposta, usar:
+
+`condicaoComercialTravada = contratoEmitido && aceiteEletronico && primeiraParcelaPaga`
+
+e:
+
+`dataLimiteEfetivacao = 30/09/2026`
+
+A emissão isolada NÃO deve mudar `condicaoComercialTravada` para verdadeiro.
+
+Metadados relevantes:
 - `dataCotacao`;
 - `validadeCotacao`;
+- `dataEnvioDocumentos`;
 - `dataEmissaoContrato`;
-- `dataAssinatura`;
+- `dataAceiteEletronico`;
 - `dataPrimeiroPagamento`;
 - `dataAlocacaoCota`;
+- `numeroGrupo`;
+- `numeroCota`;
+- `dataAcessoApp`;
 - `condicaoComercialTravada`.
 
-Esses campos são de rastreabilidade e elegibilidade, não necessariamente de cálculo financeiro mensal.
+Cronologia informada para a proposta atual:
+- primeira parcela: pagamento necessário até 30/09/2026 para efetivação;
+- segunda parcela: vencimento informado em **15/11/2026**.
 
----
+Esses eventos são operacionais e NÃO devem ser confundidos com:
+- assembleia mensal;
+- fechamento da tabela para novas adesões;
+- reajuste anual de 3%.
+
+**Guardrail documental:**  
+Se o contrato final trouxer regra diferente, o documento deve substituir a premissa comercial antes da implementação definitiva.
 
 # 26. Início da locação
 
@@ -2127,7 +2473,7 @@ A suíte de testes deve preservar, no mínimo:
 40. parâmetros comerciais de seguro ainda não documentados (idade, cobertura, taxa/base) não podem virar validações rígidas;
 41. na futura arquitetura multi-cota, seguro deve ser associado à cota individual, não ao agregado;
 42. prazo de uma nova cota em grupo em andamento deve ser o prazo remanescente contratual, não a duração original do grupo;
-43. eventual cobrança relativa a assembleias anteriores à adesão só pode ocorrer como evento explícito e documentado, nunca implícito;
+43. no preset QuintoAndar/Grupo 4012 atual, não deve existir cobrança/dedução por assembleias anteriores; qualquer regra futura contrária só pode ocorrer como evento explícito e documentado, nunca implícito;
 44. taxa administrativa e fundo de reserva da nova cota não devem ser prorateados pelo tempo já decorrido do grupo quando a proposta determinar cobrança integral;
 45. presets de proposta podem carregar parcelas oficiais sem obrigar que “50% reduzida” seja exatamente metade aritmética da parcela integral;
 46. cashback de proposta deve ser rastreado por cota e sua base não pode ser inferida apenas do crédito líquido quando houver regra promocional especial;
@@ -2528,15 +2874,28 @@ Distribuição de meses de contemplação por cota.
 
 Especialmente sobre grandes rendimentos acumulados.
 
-## 59.4 Faixa de remuneração da carta contemplada
+## 59.4 Remuneração da carta contemplada
 
-A futura modelagem deve estar preparada para separar:
+A futura modelagem deve separar:
 - CDI de referência;
-- percentual do CDI atribuído à carta;
+- percentual líquido do CDI atribuído à carta;
 - remuneração por cota;
-- eventual variação temporal desse percentual.
+- eventual variação temporal desse percentual;
+- retorno do benchmark CDB, que é independente.
 
-A resposta comercial de 28/09/2026 informou faixa de 98% a 105% do CDI líquido, mas ainda não há regra suficiente para decidir se isso deve ser um input fixo, uma faixa de cenário, uma variável por cota ou uma taxa efetiva apurada.
+Após a reconciliação de 29/09/2026:
+
+**Default/preset base recomendado para projeção:**
+`p_carta = 80% do CDI`
+
+Interpretação:
+- rendimento líquido efetivo da carta;
+- sem aplicação de novo IR/haircut no fluxo-base;
+- variável/sensibilidade, não garantia.
+
+A referência de 98%–105% deve aparecer apenas, se necessário, como informação sobre a camada bruta das aplicações, nunca como faixa líquida do crédito contemplado.
+
+A arquitetura deve manter input manual para testar cenários alternativos.
 
 ---
 
@@ -2927,7 +3286,7 @@ Continuam pendentes, entre outros:
 3. override das parcelas oficiais cotadas;
 4. regra definitiva do cashback em cenário com embutido;
 5. calendário real do aniversário do grupo e primeiro reajuste;
-6. eventual tratamento de assembleias anteriores à adesão;
+6. reconciliação documental residual da ausência de cobrança por assembleias anteriores à adesão;
 7. destino formal do residual após compra;
 8. módulos contratuais de seguro, cessão, resgate, encerramento e substituição de garantia ainda dependentes das pendências documentais já registradas.
 
