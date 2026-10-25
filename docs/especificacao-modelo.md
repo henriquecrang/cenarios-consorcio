@@ -3321,6 +3321,27 @@ Preferências puramente visuais continuam fora do estado financeiro salvo.
 
 A biblioteca é ferramenta de comparação e rastreabilidade. Salvar um cenário com o nome de uma administradora **não constitui evidência** de que seus parâmetros foram confirmados pela administradora.
 
+# 77A. Migração de presets por versão
+
+Desde a V3.8, presets salvos registram e usam `appVersion` e `formatVersion` para detectar premissas antigas.
+
+Regra de segurança:
+- nunca alterar silenciosamente um preset existente;
+- só sugerir migração quando o preset é anterior à mudança e o valor salvo coincide exatamente com um antigo default conhecido;
+- preservar o original;
+- criar uma cópia migrada.
+
+Migrações reconhecidas:
+- versão < 3.3 e Lance Livre = 30% → sugerir 70%;
+- versão < 3.4 e Carta/CDI = 98% → sugerir 80%;
+- versão < 3.7 e CDI = 11,5% → sugerir 13,65%.
+
+Valores customizados não são modificados automaticamente.
+
+A política da matriz também migra o antigo `buyAtLastCont` para `purchasePolicy`.
+
+O formato de persistência passa a `formatVersion = 2` e o estado financeiro a `stateVersion = 2`.
+
 # 78. Layout vertical
 
 Detalhamentos que cresceram com a arquitetura multi-cota são apresentados em cartões/sublinhas, sem exigir tabela horizontal larga.
