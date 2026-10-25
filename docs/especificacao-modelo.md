@@ -3293,6 +3293,21 @@ Incluem:
 
 Os presets da matriz são **cenários de sensibilidade**, não probabilidades nem previsões de contemplação.
 
+## 76.4 Sensibilidade isolada de financiamento
+
+Desde a V3.9, três linhas adicionais preservam:
+- meses de contemplação da Base comparável;
+- Lance Livre da Base comparável;
+- rendimento da carta da Base comparável;
+- política comum de compra/preço;
+
+e variam apenas a fração do dinheiro do lance financiada:
+- 0%;
+- 50%;
+- 100%.
+
+Isso permite medir separadamente o custo econômico da alavancagem bancária.
+
 # 77. Biblioteca de consórcios / cenários
 
 A V3.2 possui gerenciamento local de N cenários salvos.
