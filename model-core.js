@@ -31,6 +31,14 @@
     };
   }
 
+  function resolveCashbackBase(price,availableCredit,principalCredit,policy='principal'){
+    const safePrice=Math.max(0,Number(price)||0);
+    const safeAvailable=Math.max(0,Number(availableCredit)||0);
+    const safePrincipal=Math.max(0,Number(principalCredit)||0);
+    const candidate=policy==='available' ? safeAvailable : safePrincipal;
+    return Math.min(safePrice,safeAvailable,candidate);
+  }
+
   function calculateCashback(creditUsed,cashbackPct){
     const safeCreditUsed=Math.max(0,Number(creditUsed)||0);
     const safeCashbackPct=Math.max(0,Number(cashbackPct)||0);
@@ -39,6 +47,7 @@
 
   return {
     resolveEffectiveLance,
+    resolveCashbackBase,
     calculateCashback
   };
 });
