@@ -1,4 +1,27 @@
 ============================================================
+AUDITORIA V3.15 — LANCE FIXO × LANCE LIVRE
+============================================================
+
+Issue #15: RESOLVIDA.
+
+Implementado:
+- seletor explícito Livre × Fixo na simulação principal;
+- Livre usa saldo devedor atualizado;
+- Fixo usa carta atualizada, default 30%;
+- embutido permanece sobre carta e limitado ao lance total;
+- warnings históricos de 60%–73% só aparecem para Livre;
+- matriz possui modalidade visível/editável por linha;
+- presets históricos ficam explicitamente em Livre;
+- linhas de financiamento herdam a modalidade da Base comparável;
+- presets antigos sem modalidade são determinísticos como Livre;
+- regressões unitárias e de integração protegem as bases.
+
+Caso de regressão:
+- Livre 45% sobre R$495.330 = R$222.898,50;
+- Fixo 30% sobre R$400.000 = R$120.000;
+- com embutido de 30%, o Fixo pode ser integralmente embutido.
+
+============================================================
 AUDITORIA V3.14 — CRÉDITO RESIDUAL
 ============================================================
 
@@ -195,7 +218,7 @@ Pendência removida:
 A matriz deixa de ter como problema estrutural a falta de comparabilidade entre política de compra e tamanho do ativo.
 
 PENDÊNCIAS — SIMULADOR CONSÓRCIO x CDB x IMÓVEL
-Base atual de software: V3.14
+Base atual de software: V3.15
 Estado: documento canônico de incertezas e gaps ainda reais
 
 Objetivo: registrar tudo o que ainda não está suficientemente confirmado ou modelado, deixando explícito:
@@ -213,7 +236,7 @@ Nível de evidência:
 - O histórico de versões e auditorias permanece no Git e em `docs/follow-up-auditorias.md`. Este arquivo deve registrar prioritariamente o que ainda está aberto na V3.14; referências históricas só são mantidas quando explicam a origem de uma pendência.
 
 ============================================================
-0. ESTADO ATUAL DO SOFTWARE — V3.14
+0. ESTADO ATUAL DO SOFTWARE — V3.15
 ============================================================
 
 Esta seção descreve o estado canônico atual. O histórico detalhado de versões anteriores fica no follow-up das auditorias e no Git.
@@ -238,7 +261,6 @@ IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
 - política anti-pooling verificada mês a mês por cota.
 
 PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
-- seletor explícito Lance Fixo × Lance Livre;
 - compra com subconjunto das cotas já contempladas;
 - override das parcelas oficiais cotadas;
 - trajetória temporal de CDI/CDB para horizontes longos;
@@ -317,7 +339,7 @@ Exemplo dado:
 - R$ 5 mil quitam a parcela;
 - R$ 5 mil permanecem acumulando no crédito.
 
-Estado atual da V3.14:
+Estado atual da V3.15:
 A matemática e a arquitetura multi-cota já coincidem com a regra comercial:
 - `yieldUsed_j = min(rendimento_j, parcela_j)`;
 - o rendimento usado reduz a obrigação de caixa da própria cota;
