@@ -242,6 +242,7 @@ Nível de evidência:
 Esta seção descreve o estado canônico atual. O histórico detalhado de versões anteriores fica no follow-up das auditorias e no Git.
 
 IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
+- modalidade e percentuais de lance configuráveis por cota;
 - compra com subconjunto selecionável de cotas; cotas não usadas continuam independentes;
 - arquitetura multi-cota configurável;
 - proposta QuintoAndar 400 / 400 / 370 / 200 como preset estrutural;
@@ -294,6 +295,29 @@ Implementado:
 
 Limite deliberado:
 A V3.16 modela uma única compra. Não presume quitação do imóvel/consórcio anterior por cotas posteriores nem uma segunda aquisição.
+
+============================================================
+AUDITORIA V3.17 — LANCE INDIVIDUAL POR COTA
+============================================================
+
+Issue #17: RESOLVIDA.
+
+Gap:
+A linha multi-cota ainda aplicava uma única modalidade/percentual de lance a todas as cotas, embora as cotas sejam operacionalmente independentes.
+
+Implementado:
+- `lanceMode`, `bidPct` e `embPct` por cota;
+- configuração global preservada como default/copiar para todas;
+- Lance Livre por cota continua usando saldo devedor;
+- Lance Fixo por cota usa carta atualizada;
+- embutido é individual e limitado ao próprio lance;
+- matriz pode aplicar override homogêneo apenas para sensibilidade;
+- persistência inclui os novos controles dinâmicos;
+- warnings históricos de Lance Livre passam a identificar as cotas relevantes;
+- regressão de integração mistura Fixo e Livre na mesma assembleia.
+
+Pendência removida:
+O motor não exige mais que todas as cotas usem a mesma estratégia de lance.
 
 ============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
