@@ -253,8 +253,9 @@ function makeConfig({
   // Antes da contemplação de C, sua dívida não deve entrar no passivo comparável
   // apenas porque A+B já compraram o imóvel.
   const h5=r.hist.find(h=>h.m===5);
-  const debtAB=a.outstanding===0 ? 0 : null; // apenas documenta que o valor final não serve ao mês 5
   assert.ok(h5);
+  close(h5.comparableDebt,(h5.debtByQuota.A||0)+(h5.debtByQuota.B||0));
+  assert.ok(h5.debt>h5.comparableDebt); // C+D ainda não contempladas ficam fora do passivo comparável.
   assert.ok(h5.comparableAsset>0);
 }
 
