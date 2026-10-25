@@ -363,6 +363,28 @@ Pendências residuais:
 Detalhes diários só precisam ser modelados se o projeto passar a exigir resolução abaixo de um mês.
 
 ============================================================
+AUDITORIA V3.20 — RESGATE PÓS-180 DIAS
+============================================================
+
+Issue #20: RESOLVIDA QUANTO AO DEFAULT DE MODELAGEM.
+
+Problema anterior:
+Ao ativar resgate, a interface sugeria por default compensar o saldo devedor diretamente com a própria carta, embora essa mecânica não esteja confirmada para a Bamaq.
+
+V3.20:
+- resgate continua desativado por default;
+- se ativado, a fonte de quitação default passa a ser empréstimo-ponte;
+- compensação direta permanece apenas como sensibilidade explicitamente não confirmada;
+- selecionar compensação direta gera warning;
+- resgate pós-180 dias continua separado do encerramento do grupo.
+
+Importante:
+A ponte também é uma sensibilidade, não um produto Bamaq confirmado. Taxa, prazo e IOF permanecem inputs.
+
+Pendência externa:
+Confirmar se a Bamaq admite compensação interna da própria carta no resgate voluntário. Até lá, ela não deve ser cenário-base.
+
+============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
 ============================================================
 
