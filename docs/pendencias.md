@@ -1,4 +1,23 @@
 ============================================================
+AUDITORIA V3.7 — CDI BRUTO × CDB LÍQUIDO
+============================================================
+
+Issue #9: RESOLVIDA NO NÍVEL DE PARAMETRIZAÇÃO.
+
+Problema:
+O app usava 11,5% a.a. tanto para o CDB benchmark líquido quanto para o CDI de referência bruto.
+
+Implementado na V3.7:
+- CDB permanece hipótese líquida independente em 11,5% a.a.;
+- CDI passa a 13,65% a.a. como referência spot de 23/10/2026 (BCB/SGS 4389);
+- interface rotula explicitamente bruto × líquido;
+- 13,65% é tratado como referência editável, não previsão de 214 meses;
+- a carta permanece em 80% do CDI como retorno líquido projetado.
+
+Pendência residual:
+A trajetória de longo prazo do CDI continua sendo uma sensibilidade macroeconômica. O motor ainda usa taxa constante. Isso não bloqueia o uso do simulador, mas cenários de carta mantida por muitos anos devem testar trajetórias/taxas alternativas.
+
+============================================================
 AUDITORIA V3.6 — MATRIZ COMPARÁVEL
 ============================================================
 
