@@ -2321,7 +2321,7 @@ Cotas contempladas em meses diferentes começam a gerar dívida/parcelas bancár
 
 ### SW-072 — Painel decisório / matriz de cenários
 
-**Status:** IMPLEMENTADA — V2.61  
+**Status:** IMPLEMENTADA E REAUDITADA — V3.6  
 **Prioridade:** P0 CONCLUÍDA  
 **Tipo:** ANÁLISE / SENSIBILIDADE / UX  
 **Origem:** decisão interna para suportar a decisão até 30/09  
@@ -2338,7 +2338,15 @@ Comparar múltiplos cenários usando o mesmo motor financeiro, variando:
 Δ vs CDB, patrimônio final, aportes, aportes em valor presente, pico mensal, lance em dinheiro, principal financiado, pico da dívida bancária, mês da compra, complemento e cashback.
 
 **Critério de aceite:**  
-A linha “Atual” reproduz a simulação principal; presets de cenário não são apresentados como probabilidades.
+Os presets não são apresentados como probabilidades e, desde a V3.6, todas as linhas usam uma política comum de compra/preço.
+
+**Correção V3.6 após auditoria:**  
+- “Atual” foi substituída por “Base comparável”;
+- default de compra = última contemplação;
+- default de preço = imóvel-alvo fixo de R$1 milhão;
+- políticas alternativas são explícitas;
+- preço do imóvel passou a ser output da matriz;
+- política da matriz é persistida e estados antigos de `buyAtLastCont` são migrados.
 
 ---
 
