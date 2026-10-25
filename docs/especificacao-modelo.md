@@ -1,13 +1,14 @@
 # Especificação canônica do modelo — Simulador Consórcio × CDB × Imóvel
 
-**Baseline de implementação atual:** V3.2  
-**Baseline auditada histórica:** V2.54  
-**Status:** especificação funcional e financeira do comportamento esperado do simulador  
+**Baseline de implementação atual:** V3.11  
+**Status:** especificação funcional e financeira canônica do comportamento esperado do simulador  
 **Documentos complementares:**  
-- `pendencias_simulador_consorcio_v3_2_pre_respostas17.txt` — o que ainda não está confirmado ou resolvido;  
-- `follow_up_auditorias_simulador_v3_2_pre_respostas17.md` — por que determinadas decisões foram tomadas e como cada achado de auditoria foi tratado.
+- `docs/pendencias.md` — premissas externas, regras contratuais e funcionalidades ainda abertas;  
+- `docs/backlog-software.md` — histórico/estado das mudanças de software;  
+- `docs/backlog-perguntas-bamaq.md` — perguntas e respostas comerciais/documentais;  
+- `docs/follow-up-auditorias.md` — trilha histórica de auditorias e evidências.
 
-> **Nota de versionamento (29/09/2026):** várias seções abaixo preservam a descrição do comportamento da V2.54 porque documentam a evolução do modelo. Quando uma regra de “comportamento atual da V2.54” conflitar com a Parte XI — Baseline de implementação V3.2, prevalece a Parte XI para descrever o software atual. A evidência externa/contratual continua sendo a registrada nas seções temáticas originais.
+O Git e o arquivo de follow-up preservam a evolução histórica. Este documento deve ser lido linearmente como o **estado canônico atual**; descrições de comportamento de versões antigas não prevalecem sobre as regras abaixo.
 
 ---
 
@@ -41,25 +42,31 @@ Uma alteração intencional da regra econômica deve ser registrada também em `
 
 ## 2.1 Unidade econômica simulada
 
-A V2.54 modela **uma única carta equivalente**.
+A unidade estrutural do motor é a **cota individual**:
 
-Ela NÃO modela nativamente:
+`cotas[]`
 
-- várias cotas com números próprios;
-- contemplações independentes;
-- lances independentes;
-- saldos devedores independentes;
-- rendimentos independentes;
-- combinação parcial de cartas;
-- contemplações escalonadas.
+Cada cota mantém identidade própria para:
+- crédito/carta;
+- saldo devedor;
+- mês de contemplação;
+- lance;
+- embutido;
+- rendimento;
+- parcela;
+- tranche bancária associada.
 
-A carta única equivalente é adequada como aproximação quando os fluxos das cotas reais são suficientemente sincronizados.
+O simulador permite 1 a 50 cotas como capacidade de produto. Isso NÃO afirma limite contratual da Bamaq.
 
-A segunda auditoria demonstrou que essa equivalência pode deixar de existir economicamente quando as contemplações são distribuídas no tempo.
+O preset QuintoAndar analisado usa:
+- R$400 mil;
+- R$400 mil;
+- R$370 mil;
+- R$200 mil.
 
-Portanto, qualquer uso da V2.54 para uma operação real composta por múltiplas cotas deve ser classificado como **exploratório**.
+Agregações são permitidas apenas para KPIs e fluxos consolidados; não podem apagar diferenças de timing ou permitir pooling indevido entre cotas.
 
-**Evidência comercial recebida em 28/09/2026:** para a operação de R$ 1,37 milhão, Michele informou uma estrutura concreta de quatro cotas novas — R$ 400 mil, R$ 400 mil, R$ 370 mil e R$ 200 mil — que podem ser alocadas no mesmo grupo (como o Grupo 4012). Ela também informou que cada cota possui identificação e contemplação próprias. Isso reforça que a próxima arquitetura deve ser genuinamente multi-cota, e não apenas dividir visualmente uma carta agregada.
+A compra com apenas um subconjunto das cotas contempladas ainda é uma funcionalidade pendente e está registrada na seção 79.
 
 ---
 
@@ -218,7 +225,7 @@ No exemplo:
 
 `P0 = 250.000 / 214 = R$ 1.168,22`
 
-Esse exemplo valida diretamente a fórmula estrutural já utilizada pela V2.54.
+Esse exemplo valida diretamente a fórmula estrutural usada pelo motor atual.
 
 ## 6.4 Parcela reduzida
 
@@ -541,19 +548,9 @@ Ela também confirmou que:
 - podem contemplar de 1 a 4 cotas no mesmo mês;
 - o resultado depende também do saldo financeiro disponível no Fundo Comum.
 
-Essa informação revela uma divergência conhecida da V2.54: o software atual usa uma única base — a carta — para o “lance total”. Portanto, a regra abaixo deve ser tratada em dois níveis: comportamento implementado na V2.54 e regra-alvo para a próxima revisão.
+A arquitetura atual implementa Lance Livre e embutido com bases distintas, por cota. A modalidade Lance Fixo permanece especificada, mas ainda não possui seletor explícito na interface.
 
-## 11.1 Comportamento atual da V2.54 — provisório
-
-A V2.54 calcula:
-
-`L_solicitado = C × pct_lance`
-
-para qualquer lance total.
-
-Esse comportamento permanece apenas por compatibilidade com a versão auditada e é adequado ao lance fixo, mas NÃO representa corretamente o lance livre descrito comercialmente.
-
-## 11.2 Regra-alvo — Lance Fixo
+## 11.2 Lance Fixo
 
 Para Lance Fixo de 30%:
 
@@ -899,9 +896,9 @@ Portanto:
 
 Esse default deixa de ser apenas prudencial e passa a estar alinhado à condição comercial informada.
 
-## 17.2 O que a V2.54 faz hoje
+## 17.2 Sensibilidades implementadas
 
-A V2.54 oferece três sensibilidades genéricas:
+O simulador oferece três sensibilidades genéricas:
 - valor fixo mensal;
 - percentual da parcela bruta;
 - percentual do saldo devedor.
@@ -3168,11 +3165,11 @@ E uma limitação estrutural deve ser apresentada ao usuário antes que o result
 
 ---
 
-# PARTE XI — BASELINE DE IMPLEMENTAÇÃO ATUAL: V3.2
+# PARTE XI — ARQUITETURA DE IMPLEMENTAÇÃO ATUAL — V3.11
 
 # 71. Arquitetura de cotas
 
-A linha principal V3.2 não usa mais uma única carta equivalente como arquitetura principal.
+A linha principal usa arquitetura multi-cota como padrão.
 
 O motor trabalha com:
 
@@ -3207,7 +3204,7 @@ Quando existe apenas uma cota, a interface volta a apresentar um slider de mês 
 
 # 72. Regra de lance implementada
 
-A V3.2 implementa como regra principal:
+A versão atual implementa como regra principal:
 
 `lanceLivre_j = pctLivre × saldoDevedor_j_no_mes_da_contemplacao`
 
@@ -3226,7 +3223,7 @@ Limitação atual:
 
 # 73. Remuneração da carta e benchmark
 
-A V3.2 separa três conceitos:
+A versão atual separa três conceitos:
 
 1. retorno do CDB benchmark;
 2. CDI de referência;
@@ -3252,7 +3249,7 @@ O excesso de rendimento permanece na própria cota.
 
 `yieldExcess_A -> installment_B`
 
-A V3.2 exibe por cota:
+A versão atual exibe por cota:
 - rendimento aferido acumulado;
 - rendimento usado na própria parcela.
 
@@ -3262,7 +3259,7 @@ A especificação-alvo ainda pode ampliar os KPIs para mostrar explicitamente re
 
 Cada contemplação pode criar uma tranche bancária independente.
 
-Por tranche/cota, a V3.2 suporta:
+Por tranche/cota, a versão atual suporta:
 - mês de liberação = mês da contemplação;
 - percentual do dinheiro do lance financiado;
 - principal;
@@ -3353,7 +3350,7 @@ Isso permite medir separadamente o custo econômico da alavancagem bancária.
 
 # 77. Biblioteca de consórcios / cenários
 
-A V3.2 possui gerenciamento local de N cenários salvos.
+A versão atual possui gerenciamento local de N cenários salvos.
 
 Persistência:
 - `localStorage` do navegador.
