@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.5 · Núcleo financeiro testável</title>
+<title>Consórcio x CDB x Imóvel — V3.6 · Matriz comparável</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -357,8 +357,9 @@ th:first-child,td:first-child{text-align:left}
 .decision-table td:nth-child(15)::before{content:"Principal financiado"}
 .decision-table td:nth-child(16)::before{content:"Pico dívida banco"}
 .decision-table td:nth-child(17)::before{content:"Compra"}
-.decision-table td:nth-child(18)::before{content:"Complemento compra"}
-.decision-table td:nth-child(19)::before{content:"Cashback"}
+.decision-table td:nth-child(18)::before{content:"Preço imóvel"}
+.decision-table td:nth-child(19)::before{content:"Complemento compra"}
+.decision-table td:nth-child(20)::before{content:"Cashback"}
 .decision-table input{
   width:100%;min-width:0;padding:7px 8px;border-radius:8px;font-size:12px;text-align:right
 }
@@ -605,7 +606,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.5 · Núcleo financeiro testável</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.6 · Matriz comparável</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1710,9 +1711,27 @@ th:first-child,td:first-child{text-align:left}
         <div class="decision-toolbar">
           <button type="button" id="decisionResetPresets" class="preset-btn">Restaurar cenários sugeridos</button>
           <label class="decision-check">
-            <input type="checkbox" id="decisionBuyAtLastCont" checked>
-            nas linhas alternativas, comprar no mês da última contemplação
+            Política de compra
+            <select id="decisionPurchasePolicy">
+              <option value="last" selected>comprar na última contemplação</option>
+              <option value="main">herdar da simulação principal</option>
+              <option value="none">não comprar no horizonte</option>
+            </select>
           </label>
+          <label class="decision-check">
+            Preço na matriz
+            <select id="decisionPricePolicy">
+              <option value="fixed" selected>imóvel-alvo fixo</option>
+              <option value="credit">usar todo o crédito disponível</option>
+            </select>
+          </label>
+          <label class="decision-check">
+            Imóvel-alvo (R$)
+            <input id="decisionPropertyPrice" type="number" value="1000000" step="10000" min="0" style="width:130px">
+          </label>
+        </div>
+        <div class="small" id="decisionComparisonRule" style="margin:-4px 0 10px">
+          Comparação padrão: todas as linhas compram um imóvel-alvo de R$1.000.000 no mês da última contemplação. Assim, contemplação, lance, rendimento e financiamento variam sem trocar silenciosamente o ativo comprado.
         </div>
 
         <div class="decision-summary">
@@ -1755,6 +1774,7 @@ th:first-child,td:first-child{text-align:left}
                 <th>Principal financiado</th>
                 <th>Pico dívida banco</th>
                 <th>Compra</th>
+                <th>Preço imóvel</th>
                 <th>Complemento compra</th>
                 <th>Cashback</th>
               </tr>
@@ -1766,7 +1786,7 @@ th:first-child,td:first-child{text-align:left}
           <b>Leitura:</b> “Δ vs CDB” é patrimônio líquido comparável da estratégia menos o benchmark ao fim do horizonte.
           “Pico mensal” é o maior aporte externo exigido em um único mês; “aportes próprios” é a soma nominal de todos os aportes externos.
           O percentual financiado é aplicado uniformemente à parte em dinheiro do lance nas cotas da linha, preservando taxa, TR, prazo e sistema configurados para cada tranche.
-          A linha <b>Atual</b> reproduz exatamente a configuração principal e não é editável.
+          A linha <b>Base comparável</b> usa os valores atuais de contemplação/lance/rendimento/financiamento, mas obedece à mesma política de compra e preço escolhida para toda a matriz. Para reproduzir literalmente a tela principal, selecione “herdar da simulação principal”.
         </div>
       </div>
 
@@ -1984,7 +2004,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=1;
-const SCENARIO_APP_VERSION='3.5';
+const SCENARIO_APP_VERSION='3.6';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -3963,8 +3983,8 @@ function buildDecisionRows(){
 
   const rows=[
     {
-      key:'current',name:'Atual',
-      desc:'Configuração principal exatamente como está acima.',
+      key:'current',name:'Base comparável',
+      desc:'Valores atuais de contemplação/lance/rendimento/financiamento sob a política comum de compra e preço da matriz.',
       readonly:true,conts:currentConts,lancePct:currentLance,yieldPct:currentYield,finPct:currentFin
     },
     ...decisionScenarioDefs.map(def=>{
@@ -4008,6 +4028,7 @@ function buildDecisionRows(){
       <td data-label="Principal financiado" data-out="loanPrincipal">—</td>
       <td data-label="Pico dívida banco" data-out="peakLoan">—</td>
       <td data-label="Compra" data-out="buy">—</td>
+      <td data-label="Preço imóvel" data-out="price">—</td>
       <td data-label="Complemento compra" data-out="complement">—</td>
       <td data-label="Cashback" data-out="cashback">—</td>
     </tr>`;
@@ -4047,6 +4068,22 @@ function readDecisionRow(row,cfg){
   };
 }
 
+function decisionComparisonPolicy(baseCfg,lastCont){
+  const purchasePolicy=$('decisionPurchasePolicy')?.value || 'last';
+  const pricePolicy=$('decisionPricePolicy')?.value || 'fixed';
+  const targetPrice=Math.max(0,+$('decisionPropertyPrice')?.value || baseCfg.priceInput || 0);
+
+  let buyRaw=lastCont;
+  if(purchasePolicy==='main') buyRaw=baseCfg.buyRaw;
+  else if(purchasePolicy==='none') buyRaw=baseCfg.N+1;
+
+  return {
+    buyRaw,
+    lockPropertyPrice:pricePolicy==='credit',
+    priceInput:targetPrice
+  };
+}
+
 function makeDecisionCandidate(baseCfg,spec){
   const cotas=baseCfg.cotas.map((q,i)=>({
     ...q,
@@ -4057,15 +4094,16 @@ function makeDecisionCandidate(baseCfg,spec){
     }
   }));
   const lastCont=Math.max(...cotas.map(q=>q.cont));
+  const comparison=decisionComparisonPolicy(baseCfg,lastCont);
   return {
     ...baseCfg,
+    ...comparison,
     cotas,
     firstCont:Math.min(...cotas.map(q=>q.cont)),
     cont:lastCont,
     lancePct:spec.lancePct,
     cartaPctCdi:spec.yieldPct,
-    usarEmprestimoLance:spec.finPct>0,
-    buyRaw:$('decisionBuyAtLastCont')?.checked ? lastCont : baseCfg.buyRaw
+    usarEmprestimoLance:spec.finPct>0
   };
 }
 
@@ -4082,6 +4120,7 @@ function decisionMetrics(r){
     loanPrincipal:r.loanPrincipal,
     peakLoan,
     buy:r.buy,
+    price:r.purchased ? r.price : null,
     complement:r.purchased ? r.complement : null,
     cashback:r.purchased ? r.purchaseCashback : null
   };
@@ -4104,7 +4143,8 @@ function writeDecisionResult(row,m){
   set('cashLance',money(m.cashLance));
   set('loanPrincipal',money(m.loanPrincipal));
   set('peakLoan',money(m.peakLoan));
-  set('buy',m.buy>0 ? `mês ${m.buy}` : '—');
+  set('buy',m.buy>0 && m.buy<=9999 ? `mês ${m.buy}` : '—');
+  set('price',m.price===null?'—':money(m.price));
   set('complement',m.complement===null?'—':money(m.complement));
   set('cashback',m.cashback===null?'—':money(m.cashback));
 }
@@ -4115,8 +4155,31 @@ function drawDecisionMatrix(){
   if(!decisionMatrixInitialized || !body.children.length) buildDecisionRows();
 
   const cfg=collectScenarioConfig();
-  const baseResult=runScenario(cfg);
+  const currentFin=decisionMainFinancePct(cfg,runScenario(cfg))/100;
+  const currentSpec={
+    key:'current',
+    current:true,
+    conts:cfg.cotas.map(c=>c.cont),
+    lancePct:cfg.lancePct,
+    yieldPct:cfg.cartaPctCdi,
+    finPct:currentFin
+  };
+  const baseResult=runScenario(makeDecisionCandidate(cfg,currentSpec));
   const results=[];
+
+  const policyText=$('decisionComparisonRule');
+  if(policyText){
+    const purchasePolicy=$('decisionPurchasePolicy')?.value || 'last';
+    const pricePolicy=$('decisionPricePolicy')?.value || 'fixed';
+    const target=Math.max(0,+$('decisionPropertyPrice')?.value||cfg.priceInput||0);
+    const purchaseLabel=purchasePolicy==='last'
+      ? 'comprar no mês da última contemplação'
+      : (purchasePolicy==='none' ? 'não comprar no horizonte' : 'herdar o mês de compra da simulação principal');
+    const priceLabel=pricePolicy==='fixed'
+      ? `imóvel-alvo fixo de ${money(target)}`
+      : 'usar todo o crédito disponível como preço do imóvel';
+    policyText.textContent=`Regra comum da matriz: ${purchaseLabel}; ${priceLabel}.`;
+  }
 
   // Mantém a linha "Atual" sincronizada visualmente com a configuração principal
   // sem reconstruir as linhas alternativas e sem apagar edições feitas nelas.
@@ -4168,8 +4231,14 @@ function initDecisionMatrix(){
   const body=$('decisionScenarioBody');
   if(!body || decisionMatrixInitialized) return;
   buildDecisionRows();
-  $('decisionResetPresets')?.addEventListener('click',resetDecisionScenarioPresets);
-  $('decisionBuyAtLastCont')?.addEventListener('input',scheduleDecisionMatrix);
+  $('decisionResetPresets')?.addEventListener('click',()=>{
+    const cfg=collectScenarioConfig();
+    if($('decisionPropertyPrice')) $('decisionPropertyPrice').value=Math.round(cfg.priceInput||1000000);
+    resetDecisionScenarioPresets();
+  });
+  $('decisionPurchasePolicy')?.addEventListener('input',scheduleDecisionMatrix);
+  $('decisionPricePolicy')?.addEventListener('input',scheduleDecisionMatrix);
+  $('decisionPropertyPrice')?.addEventListener('input',scheduleDecisionMatrix);
 }
 
 
