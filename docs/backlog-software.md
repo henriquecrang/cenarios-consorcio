@@ -1,3 +1,22 @@
+### SW-088 — Modalidade Lance Fixo × Lance Livre
+
+**Status:** IMPLEMENTADA — V3.15  
+**Prioridade:** P1 CONCLUÍDA  
+**Tipo:** LANCE / MOTOR / MATRIZ  
+**Origem:** gap canônico / issue #15
+
+**Implementado:**
+- seletor principal Livre × Fixo;
+- Fixo default 30% sobre carta;
+- Livre sobre saldo devedor;
+- núcleo `resolveEffectiveBid()`;
+- matriz com modalidade por linha;
+- presets históricos explícitos em Livre;
+- persistência e compatibilidade com presets antigos;
+- regressões unitárias e de integração.
+
+---
+
 ### SW-087 — Crédito residual explícito
 
 **Status:** IMPLEMENTADA PARCIALMENTE — V3.14  
@@ -173,10 +192,10 @@ O motor ainda não possui curva temporal de CDI. Para horizontes longos, testar 
 # Backlog de possíveis mudanças no software — Simulador Consórcio × CDB × Imóvel
 
 **Criado em:** 28/09/2026  
-**Baseline atual:** V3.14  
+**Baseline atual:** V3.15  
 **Objetivo:** registrar mudanças de software, decisões implementadas e gaps ainda relevantes.
 
-**Estado canônico da documentação:** V3.14, após auditoria e correções V3.6–V3.14.
+**Estado canônico da documentação:** V3.15, após auditoria e correções V3.6–V3.15.
 
 > Os tickets antigos preservam contexto histórico de implementação. Para o estado funcional vigente, prevalecem os status mais recentes, a especificação canônica e as seções SW-080 em diante.
 
@@ -230,7 +249,7 @@ Mudanças que alterem fórmulas, cronologia ou significado econômico devem tamb
 # Itens
 
 
-## Reconciliação com a linha atual V3.14
+## Reconciliação com a linha atual V3.15
 
 Os tickets SW-001 em diante foram criados ao longo de várias versões. O corpo histórico de cada ticket é preservado para rastreabilidade; o **status mais recente** e a especificação V3.11 descrevem o software vigente.
 
