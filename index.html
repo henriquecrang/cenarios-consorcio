@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.20 · Resgate conservador</title>
+<title>Consórcio x CDB x Imóvel — V3.21 · Gate de garantia substituta</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.20 · Resgate conservador</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.21 · Gate de garantia substituta</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1359,7 +1359,23 @@ th:first-child,td:first-child{text-align:left}
             <span>Substituir a garantia e manter o consórcio</span>
           </label>
         </div>
-        <div class="small">Na segunda opção, o valor líquido da venda é aplicado no CDB e as parcelas do consórcio continuam. A aceitação de outro imóvel como garantia depende de aprovação da Bamaq; tratamos aqui como hipótese de simulação.</div>
+        <div class="small">Na segunda opção, o valor líquido da venda é aplicado no CDB e as parcelas do consórcio continuam. A aceitação de outro imóvel como garantia depende de aprovação da Bamaq.</div>
+      </div>
+
+      <div class="row" id="garantiaSubstitutaFields">
+        <div class="field">
+          <label>Assumir garantia substituta aprovada?</label>
+          <label class="decision-check">
+            <input id="garantiaSubstitutaAprovada" type="checkbox">
+            sim, assumir aprovação prévia da Bamaq
+          </label>
+          <div class="small">Default: não. O simulador não conhece a fórmula objetiva de suficiência da garantia; marcar esta opção significa apenas assumir que a análise da Bamaq já foi aprovada.</div>
+        </div>
+        <div class="field">
+          <label>Custos da substituição de garantia</label>
+          <input id="custoSubstituicaoGarantia" type="number" value="0" step="500" min="0">
+          <div class="small">R$ manual para vistoria, avaliação, cartório e outros custos. Default 0 por falta de tabela confirmada.</div>
+        </div>
       </div>
 
       <div class="field">
@@ -2133,7 +2149,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.20';
+const SCENARIO_APP_VERSION='3.21';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -2745,7 +2761,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -3019,6 +3035,8 @@ function collectScenarioConfig(){
     propAdj:pct($('valImovel').value),
 
     sellPropertyPayoff:$('vendaImovelQuitaConsorcio').checked,
+    substituteGuaranteeApproved:$('garantiaSubstitutaAprovada').checked,
+    substituteGuaranteeCost:Math.max(0,+$('custoSubstituicaoGarantia').value||0),
     payLanceLoanOnPropertySale:$('quitarEmpVendaImovelSim').checked,
     propertySaleBase:$('vendaBaseMercado').checked ? 'market' : 'purchase',
     propertySalePctOfPurchase:Math.max(0,pct($('pctVendaSobreCompra').value)),
@@ -3078,6 +3096,9 @@ function collectScenarioConfig(){
   $('pctVendaSobreCompra').disabled = propertySaleDisabled;
   $('vendaImovelQuitaConsorcio').disabled = propertySaleDisabled;
   $('vendaImovelTrocaGarantia').disabled = propertySaleDisabled;
+  const guaranteeFieldsDisabled=propertySaleDisabled || cfg.sellPropertyPayoff;
+  $('garantiaSubstitutaAprovada').disabled = guaranteeFieldsDisabled;
+  $('custoSubstituicaoGarantia').disabled = guaranteeFieldsDisabled;
   $('quitarEmpVendaImovelSim').disabled = propertySaleDisabled;
   $('quitarEmpVendaImovelNao').disabled = propertySaleDisabled;
   $('corretagemVendaImovel').disabled = propertySaleDisabled;
@@ -3114,7 +3135,7 @@ function simulate(){
     residualCredit,residualGross,residualAppliedToCosts,residualUnallocated,residualComparableAsset,totalNetRent,
     redeemCredit,redeemConsortiumPayoff,redeemLanceLoanPayoff,redeemBridgeCost,redeemTaxCost,
     redeemNetCash,redeemTopUp,redeemAportesAte,redeemNetPosition,
-    propertySalePrice,propertySaleBrokerage,propertySaleTax,propertySaleOtherCosts,propertySaleTotalCosts,
+    propertySalePrice,propertySaleBrokerage,propertySaleTax,propertySaleOtherCosts,propertySaleGuaranteeCost,propertySaleBlockedByGuarantee,propertySaleTotalCosts,
     propertySaleConsortiumPayoff,propertySaleLoanPayoff,propertySaleNetCash,propertySaleTopUp,
     cumulativeExternal,realContributionsToday,totalStrategyToday,benchmarkToday,realGainStrategy,realGainBenchmark,
     annualizedStrategyReal,annualizedBenchmarkReal,realIrrStrategyAnnual,realIrrBenchmarkAnnual,
@@ -3369,17 +3390,21 @@ if(loanBody){
   $('kVendaImovelEmprestimo').textContent=(propertySold ? money(propertySaleLoanPayoff) : '—');
   $('kVendaImovelTopUp').textContent=(propertySold ? money(propertySaleTopUp) : '—');
   $('kVendaImovelLiquido').textContent=(propertySold ? money(propertySaleNetCash) : '—');
-  $('kVendaImovelModo').textContent=!propertySold
-    ? '—'
-    : (cfg.sellPropertyPayoff ? 'consórcio quitado na venda' : 'garantia substituída; consórcio segue');
-  $('kVendaImovelFormula').textContent=!propertySold
-    ? '—'
-    : `${money(propertySalePrice)} de venda (${(cfg.propertySalePctOfPurchase*100).toFixed(0)}% sobre ${cfg.propertySaleBase==='market'?'valor de mercado':'preço de compra'}) − ${money(propertySaleTotalCosts)} de custos` +
+  $('kVendaImovelModo').textContent=propertySaleBlockedByGuarantee
+    ? 'venda bloqueada — garantia não aprovada'
+    : (!propertySold
+        ? '—'
+        : (cfg.sellPropertyPayoff ? 'consórcio quitado na venda' : 'garantia substituída; consórcio segue'));
+  $('kVendaImovelFormula').textContent=propertySaleBlockedByGuarantee
+    ? 'Venda não executada: substituição de garantia depende de aprovação explícita.'
+    : (!propertySold
+        ? '—'
+        : `${money(propertySalePrice)} de venda (${(cfg.propertySalePctOfPurchase*100).toFixed(0)}% sobre ${cfg.propertySaleBase==='market'?'valor de mercado':'preço de compra'}) − ${money(propertySaleTotalCosts)} de custos${propertySaleGuaranteeCost>0?` (inclui ${money(propertySaleGuaranteeCost)} de substituição de garantia)`:''}` +
       (cfg.sellPropertyPayoff ? ` − ${money(propertySaleConsortiumPayoff)} de saldo do consórcio` : '') +
       (cfg.payLanceLoanOnPropertySale && propertySaleLoanPayoff>0 ? ` − ${money(propertySaleLoanPayoff)} do empréstimo do lance` : '') +
       (propertySaleTopUp>0
         ? ` = ${money(propertySaleTopUp)} adicionais do bolso e ${money(0)} aplicados no CDB`
-        : ` = ${money(propertySaleNetCash)} aplicados no CDB`);
+        : ` = ${money(propertySaleNetCash)} aplicados no CDB`));
 
   $('kFlowAportes').textContent=money(cumulativeExternal);
   $('kFlowCdb').textContent=money(last.cdb);
@@ -3419,6 +3444,9 @@ if(loanBody){
   if(embeddedWasLimitedByTotal){
     const detalhe=(embeddedLimitedCotas||[]).map(x=>`${x.id}: solicitado ${money(x.requested)}, efetivo ${money(x.effective)} (lance efetivo ${money(x.lance)})`).join('; ');
     warnings.push(`Em uma ou mais cotas, o embutido solicitado era maior que o próprio Lance Livre. O embutido foi limitado corretamente. ${detalhe}`);
+  }
+  if(propertySaleBlockedByGuarantee){
+    warnings.push('A venda do imóvel não foi executada porque o cenário escolheu substituir a garantia sem marcar aprovação prévia da Bamaq. Informe a aprovação explicitamente para simular essa saída.');
   }
   if(cfg.resgateAtivo && !cfg.resgateComPonte){
     warnings.push('Resgate pós-180 dias configurado com compensação direta da própria carta. Essa mecânica NÃO está confirmada para a Bamaq e deve ser tratada apenas como sensibilidade; a regra documental disponível exige quitação prévia das obrigações.');
