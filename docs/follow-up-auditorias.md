@@ -1,4 +1,6 @@
-# Follow-up das auditorias — Simulador Consórcio × CDB × Imóvel
+# Follow-up de auditorias — Simulador Consórcio × CDB × Imóvel
+
+**Nota de leitura:** este arquivo preserva entradas históricas no estado em que cada auditoria/evidência foi registrada. Quando houver conflito entre entradas antigas e novas, prevalece a evidência posterior explicitamente marcada como reconciliação.
 
 **Documento vivo de decisões de modelagem e acompanhamento de auditoria**  
 **Versão atual de referência do simulador:** V3.2  
@@ -361,7 +363,9 @@ Não escolhemos uma delas como “verdade da Bamaq”.
 
 **Evidência posterior — 28/09/2026:** Michele confirmou a regra de 3% a.a. e a incidência econômica antes/depois da contemplação, mas não esclareceu a ordem dos eventos quando reajuste e contemplação caem no mesmo mês.
 
-**Gatilho para revisão:** confirmação da data-base e da cronologia real da Bamaq; nessa ocasião, o default de ordem pode ser fixado e a opção configurável eventualmente mantida apenas como sensibilidade.
+**Evidência posterior — 29/09/2026:** Michele separou a virada mensal da tabela do reajuste anual e informou que, para a proposta atual, o primeiro reajuste ocorrerá em abril/2027, não na próxima assembleia do dia 18. Isso resolve o posicionamento mensal do primeiro reajuste, mas NÃO resolve a ordem interna caso uma contemplação ocorra justamente no mês de abril/2027.
+
+**Gatilho para revisão:** confirmação da ordem reajuste × contemplação no mês coincidente; nessa ocasião, o default de ordem pode ser fixado e a opção configurável eventualmente mantida apenas como sensibilidade.
 
 ---
 
@@ -1101,56 +1105,102 @@ Informado:
 
 ### EVID-003 — Crédito contemplado aplicado
 
-Informado:
-- se uma cota contemplar antes das outras, seu crédito fica em “conta de investimento exclusiva”;
-- rendimento informado: 98% a 105% do CDI, “de forma líquida”;
-- o crédito pode ficar investido enquanto se aguardam as outras cotas para compra conjunta.
+**Informações consolidadas de Michele:**
+- crédito contemplado não utilizado permanece aplicado;
+- aplicação vinculada ao grupo, em veículo conservador de renda fixa/alta liquidez;
+- retorno bruto típico das aplicações: 98%–105% do CDI;
+- retorno líquido orientado para projeção da cota: aproximadamente 80% do CDI;
+- rendimento líquido é repassado ao crédito;
+- não há taxa adicional de gestão cobrada do consorciado sobre esse rendimento, segundo a informação comercial;
+- fundo informado: Itaú Premium Renda Fixa Referenciado DI;
+- CNPJ: 03.184.233/0001-80.
 
-**Efeito nas decisões:** confirma comercialmente a existência de remuneração, mas mostra que a V2.54 não descreve perfeitamente a regra ao usar `% do CDB`. Não alterar o motor até esclarecer o critério da faixa, aplicação, custodiante, tributação/taxas e duração.
+**Verificação externa:**
+O fundo e CNPJ existem e correspondem a veículo do Itaú que busca acompanhar CDI. A lâmina oficial de julho/2026 registra retorno bruto:
+- 97,88% do benchmark no ano até julho;
+- 97,53% em 12 meses;
+- 98,01% em 24 meses;
+- 100,49% em 36 meses.
+
+A própria lâmina informa que esses retornos divulgados não são líquidos de impostos.
+
+**Efeito nas decisões:**  
+- a divergência 98%–105% versus 80% fica reconciliada como bruto versus líquido;
+- cenário-base líquido da carta passa a ser 80% do CDI;
+- não aplicar IR adicional ao mesmo rendimento no fluxo-base;
+- manter sensibilidade porque não existe garantia contratual de 80%.
+
+**Ressalva:**  
+Ainda não há extrato específico do Grupo 4012 comprovando a aplicação atual nesse fundo.
+
+**Estado:** PREMISSA ECONÔMICA RECONCILIADA; FUNDO IDENTIFICADO; PROVA ESPECÍFICA DO GRUPO OPCIONAL.
 
 ---
-
 
 ### EVID-004 — Bases distintas para Lance Fixo, Livre e Embutido
 
-Informado por Michele em 28/09/2026:
+Michele informou inicialmente e confirmou de forma explícita em 29/09/2026:
 - Lance Fixo de 30% → base no valor atualizado da carta;
-- Lance Livre → base no saldo devedor;
-- embutido → até 30% do valor atualizado da carta;
-- apuração individual por cota;
-- possibilidade de ofertar nas quatro cotas na mesma assembleia;
-- contemplação de 1 a 4 cotas conforme competitividade e disponibilidade do Fundo Comum.
+- Lance Livre → base no saldo devedor atualizado da cota na data da assembleia;
+- Embutido → até 30% do valor da carta;
+- apuração individual por cota.
 
-**Efeito nas decisões:** a V2.54 possui divergência conhecida para Lance Livre, porque usa `% da carta` para o lance total. A próxima revisão do motor deve introduzir modalidade e base de cálculo próprias.
+Nova confirmação crítica:
+- os percentuais de Lance Livre publicados nas atas usam exatamente o saldo devedor atualizado da cota naquele mês;
+- o ranking é do maior percentual para o menor;
+- as contemplações seguem até esgotar o Fundo Comum.
 
-**Estado:** CONFIRMAÇÃO COMERCIAL ESCRITA; REGRA FORMAL E DETALHES OPERACIONAIS AINDA PENDENTES.
+**Decisão:**  
+A regra deixa de ser apenas hipótese/reiteração verbal e passa a ser a regra comercial canônica da modelagem.
 
-### EVID-005 — Memória comercial da cota de R$ 400 mil
+A memória que produziu R$225 mil para 45% com saldo exibido de R$495.330 é incompatível com essa regra e não deve ser reproduzida.
 
-Informado:
-- carta R$ 400 mil;
-- saldo inicial R$ 500 mil;
-- 214 meses;
-- parcela integral R$ 2.336,40;
-- reduzida R$ 1.167,60;
-- contemplação na 4ª parcela;
-- lance livre de 45%, com 10% embutido e aproximadamente R$ 180 mil em dinheiro;
-- crédito líquido R$ 360 mil;
-- nova parcela R$ 1.302 por 209 meses.
-
-**Reconciliação preliminar:**
-- saldo inicial de R$ 500 mil é coerente com 25% de encargos;
-- parcela integral é coerente, por arredondamento, com R$ 500 mil / 214;
-- parcela reduzida informada não é exatamente 50% da parcela integral;
-- a contagem de 209 meses não decorre diretamente de 214 menos 4;
-- os aproximadamente R$ 180 mil em dinheiro fazem sentido se 45% for sobre saldo devedor e o embutido de R$ 40 mil for subtraído em valor, mas não como “35% da carta”.
-
-**Decisão:** usar o exemplo como evidência de direção da regra, não como memória matemática definitiva. Não alterar fórmula pós-contemplação nem cronologia até receber cálculo oficial detalhado.
-
-**Estado:** EVIDÊNCIA COMERCIAL ÚTIL, MAS COM INCONSISTÊNCIAS/ARREDONDAMENTOS A ESCLARECER.
+**Estado:** BASE DO LANCE LIVRE E ORDEM DE CLASSIFICAÇÃO CONFIRMADAS COMERCIALMENTE.
 
 ---
 
+### EVID-005 — Memórias comerciais da cota de R$ 400 mil
+
+**Memória recebida em 29/09/2026:**
+- crédito: R$400.000;
+- valor final inicial: R$500.000;
+- saldo devedor após 4 parcelas: R$495.330;
+- embutido: R$120.000;
+- recursos próprios: R$105.000;
+- rótulo: 45% do saldo devedor;
+- saldo final: R$270.330;
+- nova parcela: R$1.287;
+- rótulo: 209 meses.
+
+**Reconciliação posterior:**
+
+### Lance
+Michele confirmou diretamente que:
+`Lance Livre = percentual × saldo devedor atualizado na data da assembleia`.
+
+Portanto:
+`45% × 495.330 = R$222.898,50`
+
+e, com R$120 mil de embutido:
+`cash = R$102.898,50`.
+
+Assim, os R$105 mil próprios / R$225 mil totais do print são inconsistentes com a regra confirmada.
+
+### Prazo
+A parcela de R$1.287 continua confirmando 210 meses:
+- `270.330 / 210 = R$1.287,29`;
+- `270.330 / 209 = R$1.293,44`.
+
+**Decisão:**  
+A memória contém pelo menos dois problemas de apresentação/cálculo:
+- valor do Lance Livre não reproduz a base confirmada;
+- rótulo de 209 meses não reproduz a parcela.
+
+Ela NÃO deve servir como memória oficial de regressão sem correção.
+
+**Estado:** REGRAS RECONCILIADAS; PRINT COMERCIAL CLASSIFICADO COMO INCONSISTENTE.
+
+---
 
 ### EVID-006 — Aplicação dos recursos e rendimento líquido
 
@@ -1188,18 +1238,23 @@ Michele citou a Circular BCB nº 3.432/2009 para o recebimento em dinheiro após
 
 **Estado:** REGRA CONFIRMADA; FONTE NORMATIVA ATUALIZADA.
 
-### EVID-008 — Divergência 98%–105% versus 80%–105% do CDI
+### EVID-008 — Divergência 98%–105% versus 80% resolvida
 
-A mesma fonte comercial informou duas faixas diferentes em respostas sucessivas:
-- 98%–105% do CDI líquido;
-- aproximadamente 80%–105% do CDI líquido.
+A aparente divergência foi esclarecida em 29/09/2026:
 
-**Decisão:** não escolher silenciosamente uma faixa. Registrar pergunta de reconciliação e manter o software preparado para sensibilidade ampla.
+- **98%–105% do CDI:** rentabilidade bruta da aplicação/fundo;
+- **~80% do CDI:** rentabilidade líquida orientada para projeção da carta contemplada.
 
-**Estado:** ABERTO / RECONCILIAÇÃO NECESSÁRIA.
+**Decisão:**  
+- encerrar a leitura “80%–105% líquido”;
+- usar 80% como base líquida de projeção;
+- manter input manual;
+- preservar 98%–105% apenas como contexto da aplicação bruta;
+- evitar dupla tributação no motor.
+
+**Estado:** RECONCILIADO COMERCIALMENTE.
 
 ---
-
 
 ### EVID-009 — Uso do rendimento para pagar a parcela da própria cota
 
@@ -1333,30 +1388,31 @@ Também não há base suficiente, no regulamento geral consultado, para afirmar 
 ---
 
 
-### EVID-015 — Cashback: resposta comercial versus regulamento formal
+### EVID-015 — Cashback: interpretação multi-cota reconciliada comercialmente
 
-Michele informou:
-- 10% sobre crédito efetivamente utilizado;
-- soma dos créditos usados quando várias cotas participam;
-- sem teto monetário próprio;
-- até 7 dias úteis;
-- pagamento por PIX/conta com livre movimentação;
-- “isento de IR”.
+Michele havia informado que o cashback incide sobre o crédito efetivamente utilizado/líquido pago ao vendedor.
 
-**Regulamento da Campanha:**
-- pagamento em conta em até 5 dias úteis após registro da alienação e pagamento ao vendedor;
-- regra geral de 10% sobre crédito liberado;
-- exceção desde 16/06/2026: quando o imóvel vale pelo menos o crédito contratado, a base é o crédito total contratado e disposto na cota, não o efetivamente liberado;
-- utilização livre do valor recebido;
-- não há, no texto do regulamento, regra fiscal qualificando o cashback como isento.
+Em 29/09/2026, após ser confrontada especificamente com a exceção do regulamento, ela esclareceu:
 
-**Decisão:**
-- em conflitos, priorizar o regulamento formal;
-- abrir reconciliação sobre base multi-cota/lance embutido e prazo 5×7 dias;
-- tratar fiscalidade como pendência independente;
-- revisar motor, pois a V2.54 usa apenas `credito_usado × 10%`.
+- em compra com múltiplas cartas para um único imóvel, a análise é unificada/agregada;
+- a comparação é feita entre o valor do imóvel e o crédito contratado somado das cartas;
+- no cenário R$1 milhão de imóvel versus R$1,37 milhão nominais, o imóvel é inferior ao crédito contratado agregado;
+- com 30% de lance embutido, o crédito efetivamente faturado/liberado é R$959 mil;
+- cashback = 10% desse valor = R$95,9 mil;
+- R$137 mil somente ocorreria se os R$1,37 milhão fossem efetivamente faturados/utilizados.
 
-**Estado:** REGRA PROMOCIONAL PARCIALMENTE CONFIRMADA; DIVERGÊNCIAS DOCUMENTAIS RELEVANTES.
+**Decisão:**  
+A antiga bifurcação “por cota versus agregado” deixa de ser necessária para o cenário atual.
+
+Usar:
+`cashback = 10% × credito_liquido_faturado`
+
+**Ressalva:**  
+A resposta é comercial. Contrato/regulamento final deve ser conferido.
+
+**Estado:** INTERPRETAÇÃO MULTI-COTA RESOLVIDA COMERCIALMENTE.
+
+---
 
 ### EVID-016 — Vigência da campanha
 
@@ -1599,7 +1655,7 @@ Michele informou para a proposta QuintoAndar:
 
 ### EVID-026 — Entrada de nova cota em grupo em andamento
 
-Michele confirmou:
+Michele confirmou inicialmente:
 - 214 meses = prazo contratual remanescente da nova cota;
 - não haveria parcelas retroativas dos meses anteriores;
 - 24% de administração + 1% de Fundo de Reserva são integralmente devidos sobre o crédito contratado;
@@ -1614,19 +1670,28 @@ A conta fecha exatamente:
 - art. 1º, §3º confirma que quem entra em grupo em andamento fica obrigado ao pagamento integral das prestações no prazo remanescente;
 - porém, art. 8º, VI, “a” afirma que, se houver contemplação, o consorciado deve pagar mensalidades correspondentes às assembleias anteriores à adesão ou sofrer dedução no crédito.
 
-**Contradição:**
-Essa segunda cláusula não combina com a afirmação comercial de “nenhuma parcela retroativa”.
+**Resposta complementar — 29/09/2026:**
+Ao ser confrontada diretamente com essa cláusula, Michele respondeu que, para as quatro cotas do Grupo 4012 / produto QuintoAndar-Bamaq:
+- “NÃO EXISTE e NÃO HAVERÁ” cobrança nem desconto retroativo referente às assembleias anteriores à entrada;
+- são cotas novas de lançamento/abertura de vagas, e não substituição/repescagem de cota cancelada;
+- o novo aderente não assume dívida nem histórico de terceiros;
+- saldo e parcelas são recalculados do zero e distribuídos exclusivamente sobre o prazo restante;
+- na contemplação, o crédito liberado será o valor integral da carta contratada, sem desconto de “mensalidades passadas”;
+- segundo ela, o saldo por cota é apenas carta + taxa de administração + fundo de reserva, diluídos nas parcelas futuras;
+- os números da proposta comercial seriam definitivos para essas cotas.
 
-**Decisão de modelagem:**
-- manter a V2.54 sem retroativos, pois é o que corresponde à proposta/memória comercial atualmente apresentada;
-- elevar a cláusula conflitante para confirmação formal;
-- se ela for aplicável ao Grupo 4012, implementar ajuste separado no momento da contemplação;
-- manter 214 meses e 25% integrais como default da proposta.
+**Leitura da nova evidência:**
+A dúvida econômica para o cenário-base fica fortemente reduzida: a regra específica informada para a operação é **sem retroativos**. A explicação de que o art. 8º, VI, “a” se referiria a modelos de substituição de cotas canceladas é, porém, uma interpretação comercial e ainda não foi confrontada com Regulamento 2026/aditivo/contrato específico.
 
-**Estado:** FÓRMULA INICIAL CONFIRMADA; REGRA DE EVENTUAL AJUSTE DE ASSEMBLEIAS ANTERIORES EM CONFLITO DOCUMENTAL.
+**Decisão de modelagem atualizada:**
+- manter o preset e o cenário-base sem retroativos;
+- não implementar SW-060 para esta proposta;
+- tratar a contradição com o Regulamento 2025 como diligência documental residual, não como hipótese financeira paralela no default;
+- reabrir a regra apenas se documento formal aplicável contradisser a confirmação comercial específica.
+
+**Estado:** AUSÊNCIA DE RETROATIVOS FORTEMENTE CONFIRMADA COMERCIALMENTE PARA A PROPOSTA; RECONCILIAÇÃO DOCUMENTAL/CONTRATUAL AINDA PENDENTE.
 
 ---
-
 
 ### EVID-027 — Cotações individualizadas da operação de R$ 1,37 milhão
 
@@ -1684,7 +1749,7 @@ Matematicamente:
 
 **Estado:** CASHBACK MAIS FORTE; LIMITE DE DESPESAS A RECONCILIAR.
 
-### EVID-030 — Nova mensagem sobre modalidades de lance
+### EVID-030 — Modalidades, destino da amortização e prazo de pagamento do lance
 
 Michele reiterou:
 - Lance Livre;
@@ -1694,36 +1759,52 @@ Michele reiterou:
 - lance não vencedor não gera pagamento;
 - possibilidade de nova tentativa no mês seguinte.
 
-Ela também citou “3 dias” para pagamento do lance contemplado.
+Em áudio de 29/09/2026, acrescentou:
+- Lance Livre é sobre saldo devedor;
+- embutido é sobre a carta;
+- os lances amortizam o saldo;
+- a amortização pode reduzir o valor da parcela OU o prazo;
+- o lance vencedor deve ser pago em até **2 dias úteis**, usando também “48 horas”.
 
-**Reconciliação:** a ata do Grupo 4012 anteriormente analisada indicava prazo no segundo dia útil. A mensagem comercial deve ser tratada como explicação simplificada até confirmação.
+**Reconciliação do prazo:**  
+A nova resposta converge com a ata do Grupo 4012, que apontava vencimento no segundo dia útil. A referência anterior a “3 dias” fica superada.
 
-**Decisão:** não alterar cronologia de pagamento do lance ainda.
+**Decisão:**  
+- SW-008 pode avançar para especificação com dois modos de amortização;
+- SW-066 pode usar 2 dias úteis como parâmetro operacional;
+- “48 horas” não deve substituir “2 dias úteis” em calendário com fins de semana/feriados;
+- a base do Lance Livre continua dependente da reconciliação numérica registrada em EVID-035/QN-007.
 
-**Estado:** MODALIDADES REFORÇADAS; PRAZO DE PAGAMENTO EM CONFLITO.
+**Estado:** MODALIDADES E PRAZO OPERACIONAL FORTALECIDOS; BASE NUMÉRICA DO LIVRE AINDA ABERTA.
 
 ---
 
-
 ### EVID-031 — Reajuste ocorre no aniversário do grupo
 
-Em áudio posterior, Michele esclareceu que o reajuste anual de 3% não está incluído nos valores mostrados na proposta e ocorre no **aniversário do grupo**.
+Em áudio de 28/09/2026, Michele esclareceu que o reajuste anual de 3% não está incluído nos valores mostrados na proposta e ocorre no **aniversário do grupo**. Ela também afirmou que “a tabela atual está prestes a virar na assembleia do dia 18”, o que inicialmente deixou dúvida sobre a relação entre os dois eventos.
 
-Ela também afirmou que “a tabela atual está prestes a virar na assembleia do dia 18” e ofereceu alocar as cotas/emitir o contrato para “travar” os valores e condições.
+**Resposta complementar — 29/09/2026:**
+Michele esclareceu expressamente que:
+- a virada/fechamento da tabela na assembleia mensal e o reajuste anual de 3% NÃO são o mesmo evento;
+- a tabela comercial fecha antes da assembleia, por volta do dia 12, para novas entradas e condições comerciais;
+- entrando agora, a cota garante a condição comercial atual;
+- a próxima assembleia do dia 18 NÃO aplicará o reajuste anual às novas cotas;
+- o primeiro reajuste ocorrerá em **abril de 2027**, aproximadamente sete meses depois;
+- ao ser questionada especificamente sobre a anotação de “7 meses”, confirmou que ela estava correta.
 
 **Leitura:**
-- data-base passa a ser calendário do grupo, não aniversário individual da adesão;
-- ainda NÃO sabemos se a assembleia do dia 18 é exatamente o aniversário anual;
-- ainda NÃO sabemos se uma cota emitida agora recebe 3% já na próxima assembleia;
-- “travar tabela” pode se referir às condições de entrada e não necessariamente impedir o reajuste contratual posterior.
+- para a resolução mensal do simulador, o primeiro reajuste da proposta está determinado em abril/2027;
+- virada de tabela comercial e reajuste contratual anual são eventos independentes;
+- a entrada atual não sofre 3% já na próxima assembleia;
+- a expressão mais recente “aniversário da cota/grupo” é menos precisa que a formulação anterior “aniversário do grupo”, mas não altera o dado operacional de abril/2027; a redação contratual exata ainda é desejável.
 
 **Decisão de modelagem:**
-- futura arquitetura deve ter calendário de grupo;
-- não aplicar automaticamente primeiro reajuste após 12 meses da adesão;
-- manter o primeiro reajuste configurável até receber a data exata;
-- não interpretar “trava” comercial como isenção de reajuste.
+- futura arquitetura deve manter calendário de grupo separado da data de adesão;
+- preset desta proposta deve registrar primeiro reajuste em abril/2027;
+- fechamento mensal da tabela NÃO dispara `reajusteAnualCotaAtiva`;
+- manter a ordem reajuste × contemplação configurável até confirmação específica do mês coincidente.
 
-**Estado:** DATA-BASE CONCEITUAL CONFIRMADA; PRIMEIRO REAJUSTE AINDA CRÍTICO.
+**Estado:** PRIMEIRO REAJUSTE E SEPARAÇÃO TABELA × REAJUSTE CONFIRMADOS COMERCIALMENTE; ORDEM NO MÊS COINCIDENTE AINDA ABERTA.
 
 ### EVID-032 — Cotação agregada da operação
 
@@ -1763,20 +1844,382 @@ Michele reiterou em áudio que:
 
 ### EVID-034 — Validade da cotação e evento de “trava”
 
-Michele solicitou autorização para emitir o contrato/alocar as cotas para “garantir a janela”, enquanto as cotações indicam validade até 30/09/2026.
+A cotação/proposta atual está limitada a 30/09/2026.
 
-**Questão ainda aberta:**
-Não está definido qual marco efetivamente fixa:
-- cashback;
-- tabela de entrada;
-- parcela inicial;
-- prazo remanescente;
-- demais benefícios.
+**Resposta final de Michele sobre o marco operacional — 29/09/2026:**  
+Para efetivar a entrada dentro da condição de cashback e participar normalmente do grupo, ela descreveu:
+
+1. emissão/homologação do contrato;
+2. envio por e-mail;
+3. aceite eletrônico;
+4. pagamento da primeira parcela até 30/09.
+
+Segundo ela, após aceite + pagamento:
+- o cliente já entra no plano;
+- grupo e número de cota são alocados;
+- é liberado acesso ao aplicativo;
+- passa a participar das assembleias.
+
+Ela também informou a segunda parcela para 15/11/2026.
+
+**Conclusão:**  
+A emissão do contrato, isoladamente, não é o marco final. O evento comercial completo é aceite eletrônico + primeira parcela paga, após emissão/homologação.
+
+**Decisão operacional:**  
+Antes do aceite:
+- conferir integralmente o contrato;
+- validar quatro cotas, valores, taxas, prazo, cashback e reajuste;
+- efetuar o pagamento apenas após a conferência;
+- guardar contrato, comprovante do aceite e comprovante da primeira parcela.
+
+**Estado:** MARCO OPERACIONAL DE ADESÃO/LOCK RESPONDIDO COMERCIALMENTE.
+
+---
+
+### EVID-035 — Memória de cálculo de 29/09 expõe duas inconsistências internas
+
+Michele enviou uma visualização de cálculo para uma cota de R$400 mil após quatro parcelas.
+
+**Valores do documento:**
+- valor final inicial: R$500.000;
+- quatro parcelas pagas: R$4.670;
+- saldo devedor: R$495.330;
+- embutido: R$120.000;
+- recursos próprios: R$105.000;
+- indicação “45% do saldo devedor”;
+- saldo final: R$270.330;
+- nova parcela: R$1.287;
+- indicação “209 meses”.
+
+**Teste 1 — Lance Livre:**  
+`45% × 495.330 = 222.898,50`, não R$225.000.
+
+O documento usa R$225.000 de lance (`120.000 + 105.000`), que corresponde a 45% de R$500.000.
+
+**Teste 2 — Prazo pós-contemplação:**  
+`270.330 / 209 = 1.293,44`, incompatível com R$1.287.
+
+`270.330 / 210 = 1.287,29`, compatível com o valor exibido.
+
+**Conclusões de modelagem:**
+- o rótulo de 209 meses não deve alterar a fórmula canônica; 210 meses é sustentado pelo próprio valor da parcela;
+- a base do Lance Livre permanece crítica, pois o áudio diz saldo devedor enquanto a memória parece usar o valor inicial de R$500 mil;
+- não ajustar a V3.2 para reproduzir R$225 mil até a Bamaq esclarecer a base.
+
+**Estado:** NOVA EVIDÊNCIA DE ALTA IMPORTÂNCIA — RESOLVE A CONTAGEM DE MESES, MAS REABRE/REFORÇA A BASE DO LANCE.
+
+
+
+### EVID-036 — Histórico oficial dos Lances Livres do Grupo 4012
+
+As seis primeiras atas oficiais do Grupo 4012 estão agora incorporadas:
+- 001 — 27/04/2026;
+- 002 — 18/05/2026;
+- 003 — 18/06/2026;
+- 004 — 20/07/2026;
+- 005 — 18/08/2026;
+- 006 — 18/09/2026.
+
+**Lances Livres vencedores:**
+- abril: 60,1400%;
+- maio: 60,9867%;
+- junho: nenhum vencedor por Lance Livre;
+- julho: 73,0000% e 72,7300%;
+- agosto: 70,6877%, 70,5508%, 69,5200% e 68,9081%;
+- setembro: 73,0000%, 72,0000%, 72,0000% e 72,0000%.
+
+**Ata 003 / junho:**  
+- 792 cotas ativas não contempladas aptas;
+- saldo para assembleia R$501.927,02;
+- Lance Fixo vencedor de 30,0000%;
+- nenhum Lance Livre vencedor exibido;
+- total de 2 cotas ativas contempladas.
+
+**Consequência para a fala comercial:**  
+A citação de contemplação com 30% encontra suporte documental em junho, mas é Lance Fixo. Ela não serve como exemplo de Lance Livre baixo.
+
+45% continua abaixo de todos os vencedores Livres documentados.
+
+**Limitação:**  
+O conjunto de ofertas perdedoras não é disponibilizado ao cliente por sigilo, conforme Michele. Portanto, a série não permite taxas de sucesso.
+
+**Decisão:**  
+- série oficial 001–006 fechada;
+- manter Fixo e Livre separados;
+- não calcular probabilidade;
+- não usar “média 65%” como premissa sem evidência adicional.
+
+**Estado:** SÉRIE DE RESULTADOS COMPLETA; DISTRIBUIÇÃO DE OFERTAS INACESSÍVEL.
+
+---
+
+### EVID-037 — Cashback de R$95,9 mil no cenário de 30% embutido
+
+Michele confirmou em duas respostas sucessivas:
+
+- quatro cotas totalizam R$1,37 milhão;
+- 30% de embutido consome R$411 mil;
+- crédito líquido faturado/liberado = R$959 mil;
+- cashback = R$95,9 mil.
+
+Na segunda resposta, reconciliou o regulamento:
+- operação multi-cota é tratada de forma agregada;
+- imóvel de R$1 milhão é comparado com crédito contratado somado de R$1,37 milhão;
+- não há análise da exceção individualmente por cota;
+- R$137 mil só ocorreria com faturamento/utilização integral dos R$1,37 milhão nominais.
+
+Também afirmou que o cashback seria pago por PIX e seria isento de IR.
+
+**Decisão de modelagem:**  
+- cashback do preset atual = R$95,9 mil;
+- sem retenção de IR no fluxo;
+- tratamento fiscal declaratório/custo de aquisição continua separado.
+
+**Estado:** CÁLCULO E INTERPRETAÇÃO COMERCIAL DO CASHBACK FECHADOS PARA O CENÁRIO.
+
+---
+
+### EVID-038 — Fundo Itaú Premium identificado e premissa líquida de 80% do CDI
+
+Em 29/09/2026, Michele respondeu à pergunta sobre rentabilidade e aplicação do crédito contemplado.
+
+**Resposta comercial:**
+- aplicação bruta acompanha CDI, geralmente entre 98% e 105% do CDI;
+- para projeção financeira, usar aproximadamente 80% do CDI como retorno líquido efetivamente creditado à cota;
+- fundo informado: Itaú Premium;
+- CNPJ: 03.184.233/0001-80;
+- instituição: Itaú.
+
+**Verificação independente:**
+Fontes públicas do Itaú/CVM confirmam que o CNPJ corresponde ao Itaú Premium Renda Fixa Referenciado DI.
+
+A lâmina oficial do Itaú de julho/2026 mostra:
+- retorno 2026 até julho = 97,88% do benchmark;
+- 12 meses = 97,53%;
+- 24 meses = 98,01%;
+- 36 meses = 100,49%;
+- benchmark = CDI;
+- os retornos divulgados não são líquidos de impostos.
+
+**Leitura:**
+A camada bruta próxima de 98% do CDI é verificável externamente e faz sentido econômico. O número de 80% é uma orientação comercial/interna de retorno líquido para a carta, não a rentabilidade bruta publicada do fundo.
+
+**Decisão de modelagem:**
+- `p_carta_base = 80%`;
+- tratar como líquido;
+- não descontar IR novamente;
+- não tratar como garantia;
+- manter sensibilidade manual;
+- solicitar extrato do Grupo 4012 apenas se for necessário comprovar o veículo efetivamente usado naquele grupo.
+
+**Estado:** PREMISSA-BASE SUFICIENTE PARA PROJEÇÃO; PROVA ESPECÍFICA DO GRUPO AINDA NÃO RECEBIDA.
+
+
+### EVID-039 — Calendário mensal da assembleia e prazo comercial de 30/09
+
+Em 29/09/2026, Michele acrescentou dois elementos operacionais:
+
+**Assembleia:**
+- referência mensal no dia 18;
+- quando 18 cai em fim de semana/não útil, a assembleia é transferida para dia útil;
+- outubro/2026: assembleia informada para **19/10**, pois 18/10 é domingo.
+
+**Consistência com histórico do Grupo 4012:**
+A ata de julho/2026 é datada de 20/07/2026. O dia 18/07/2026 caiu em sábado, o que é coerente com deslocamento para a segunda-feira seguinte.
+
+**Contratação:**
+- Michele reiterou que “a proposta é até o dia 30”;
+- orientou envio dos documentos previamente solicitados;
+- contrato seria confeccionado e enviado por e-mail após a documentação;
+- não esclareceu qual ato formal precisa ocorrer até 30/09.
+
+**Decisões:**
+- registrar calendário operacional da assembleia separadamente do reajuste anual;
+- tratar 19/10/2026 como próxima assembleia informada;
+- manter validade comercial da proposta em 30/09;
+- não assumir prorrogação;
+- manter aberto o marco formal de adesão;
+- não inventar checklist documental porque a lista referida por Michele não está incorporada nesta rodada.
+
+**Estado:** NOVO DETALHE OPERACIONAL CONFIRMADO; DEADLINE COMERCIAL REITERADO; MARCO FORMAL AINDA ABERTO.
+
+
+### EVID-040 — Michele rebaixa 45% a exemplo didático e confirma sigilo das ofertas
+
+Após receber a leitura das atas, Michele respondeu que:
+- os percentuais usados anteriormente eram apenas média/exemplo didático;
+- os lances variam mês a mês;
+- na experiência comercial dela tenderiam a cair;
+- mencionou aproximadamente 65% como uma referência anterior a setembro, sem certeza;
+- houve contemplações com Lance Fixo de 30%;
+- há lances menores;
+- a ata de junho teria sido reenviada;
+- o conjunto completo de lances ofertados não é disponibilizado porque os lances são sigilosos;
+- o cliente vê apenas os resultados divulgados / lances contemplados.
+
+**Leitura metodológica:**
+A resposta é útil principalmente por duas razões:
+1. elimina 45% como referência competitiva;
+2. confirma que o denominador de lances perdedores não está disponível.
+
+A fala de tendência de queda permanece opinião/experiência comercial e não substitui as atas.
+
+**Estado:** EXPLICAÇÃO COMERCIAL ÚTIL; SEM NOVO DADO QUANTITATIVO PARA PROBABILIDADE.
+
+
+### EVID-041 — Ata 003 / junho: sem vencedor por Lance Livre
+
+A Ata de Assembleia nº 003, de 18/06/2026, completa a série mensal que faltava.
+
+Dados principais:
+- Grupo 004012;
+- 792 cotas ativas não contempladas aptas;
+- saldo para assembleia: R$501.927,02;
+- Lance Fixo: cota 0053 a 30,0000%;
+- Lance Livre: nenhum vencedor exibido;
+- cotas ativas contempladas no total: 2.
+
+**Interpretação:**  
+O mês de junho não adiciona um percentual baixo à série de Lance Livre. Ele adiciona um mês sem contemplação por essa modalidade.
+
+Isso é especialmente importante porque a vendedora citou clientes contemplados a 30%; a ata mostra que esse 30% pertence ao Lance Fixo.
+
+**Decisão:**  
+- representar junho como `sem vencedor Livre`;
+- não usar 30% como piso do Livre;
+- manter 45% abaixo de todos os vencedores Livres observados;
+- não inferir que a ausência de vencedor se deveu à falta de ofertas, falta de caixa, desclassificação ou outro motivo sem evidência adicional.
+
+**Estado:** DADO DOCUMENTAL NOVO E RELEVANTE PARA SEPARAR MODALIDADES.
+
+
+### EVID-042 — Base e ranking do Lance Livre confirmados diretamente
+
+Em resposta específica à inconsistência encontrada na memória de cálculo, Michele afirmou:
+
+- a base de cálculo da oferta de Lance Livre no sistema da Bamaq é **sempre o saldo devedor da cota na data da assembleia**;
+- os percentuais de 60%–73% mostrados nas atas usam exatamente essa mesma base;
+- um lance de 65% significa 65% do saldo devedor atualizado daquela cota naquele mês;
+- o sistema classifica as ofertas do maior percentual para o menor;
+- a contemplação segue a classificação até esgotar o saldo disponível no Fundo Comum.
+
+**Consequência matemática para o exemplo de R$400 mil:**
+- saldo exibido: R$495.330;
+- Livre 45% = R$222.898,50;
+- embutido 30% da carta = R$120.000;
+- recursos próprios coerentes = R$102.898,50.
+
+O valor de R$105 mil do print anterior é incompatível com a regra agora explicitamente confirmada.
 
 **Decisão:**
-Tratar emissão, assinatura, pagamento e alocação como eventos distintos até confirmação.
+- fechar QN-007;
+- preservar a fórmula do Lance Livre sobre saldo;
+- descartar R$225 mil do print como teste de regressão;
+- incorporar ranking percentual e limite do Fundo Comum à especificação;
+- manter aberto apenas desempate/faixa formal.
 
-**Estado:** URGENTE — ELEGIBILIDADE/LOCK A CONFIRMAR.
+**Estado:** REGRA CRÍTICA DE MODELAGEM RESOLVIDA COMERCIALMENTE.
+
+
+### EVID-043 — Limites de carta do produto QuintoAndar
+
+Em resposta direta à pergunta sobre cartas maiores, Michele informou:
+
+- nos grupos do produto QuintoAndar, a carta mínima é R$200 mil;
+- a carta máxima é R$400 mil;
+- não existem cartas individuais de R$600 mil, R$700 mil, R$1 milhão ou R$1,5 milhão dentro desse produto;
+- operações maiores são montadas por desmembramento em múltiplas cotas.
+
+Ela apresentou como justificativas comerciais:
+- mais cotas geram mais números para sorteio;
+- cotas menores tornam o lance nominal menor;
+- a fragmentação aumentaria a competição e a “saúde” do grupo.
+
+**Leitura metodológica:**  
+O limite R$200 mil–R$400 mil é uma informação operacional objetiva e pode entrar na especificação/preset.
+
+As afirmações sobre aumento de chance/saúde do grupo são qualitativas e não devem ser convertidas em probabilidade ou vantagem quantitativa no simulador sem evidência.
+
+**Consequência para o cenário de R$1,37 milhão:**  
+Com teto de R$400 mil por cota, são necessárias pelo menos quatro cotas dentro do produto QuintoAndar. A combinação proposta de 400 + 400 + 370 + 200 mil respeita esse limite.
+
+**Escopo não respondido:**  
+A fala se refere aos grupos QuintoAndar. Não esclarece se a Bamaq oferece, fora desse produto, cartas imobiliárias maiores com condições diferentes.
+
+**Estado:** LIMITE DO PRODUTO QUINTOANDAR RESOLVIDO COMERCIALMENTE.
+
+
+### EVID-044 — Aceite eletrônico + primeira parcela até 30/09 efetivam a entrada
+
+Em 29/09/2026, Michele respondeu diretamente à pergunta sobre o que precisa acontecer até 30/09.
+
+Segundo ela:
+- a administradora emite/homologa o contrato;
+- o contrato chega por e-mail;
+- o cliente faz o aceite eletrônico;
+- o cliente paga a primeira parcela até 30/09;
+- com isso, já entra no plano;
+- grupo e número de cota são alocados;
+- acesso ao aplicativo é liberado;
+- o cliente participa da assembleia seguinte;
+- a segunda parcela fica para 15/11/2026.
+
+**Interpretação operacional:**  
+O deadline não é apenas para envio de documentos nem apenas para emissão do contrato. A sequência precisa chegar a **aceite + pagamento da primeira parcela**.
+
+**Regra de modelagem documental:**  
+`adesaoEfetivada = contratoEmitido && aceiteEletronico && primeiraParcelaPaga`
+
+**Estado:** RESPOSTA COMERCIAL DIRETA; CONFERÊNCIA DO CONTRATO FINAL AINDA OBRIGATÓRIA ANTES DO ACEITE.
+
+
+### EVID-045 — Regra agregada do cashback confirmada
+
+Ao ser questionada diretamente sobre o item 4.1.3.1 e a diferença entre analisar cada cota ou a soma das cotas, Michele respondeu:
+
+- Bamaq/QuintoAndar tratam a compra de um único imóvel com múltiplas cartas como operação unificada;
+- o imóvel é comparado com o crédito contratado agregado;
+- no exemplo, R$1 milhão < R$1,37 milhão;
+- com lance embutido, o crédito efetivamente faturado e liberado ao vendedor é R$959 mil;
+- cashback oficial informado = 10% × R$959 mil = **R$95.900**;
+- R$137 mil exigiria faturamento/utilização integral dos R$1,37 milhão nominais.
+
+Ela também declarou o cashback como isento de IR.
+
+**Consequência:**  
+A principal ambiguidade econômica de R$41,1 mil entre R$95,9 mil e R$137 mil fica encerrada comercialmente.
+
+**Ressalva tributária:**  
+A alegação de isenção de IR é comercial e não resolve, sozinha, obrigação de declaração ou efeito no custo fiscal do imóvel.
+
+**Estado:** REGRA MULTI-COTA DO CASHBACK RESOLVIDA COMERCIALMENTE.
+
+
+### EVID-046 — Divergência material entre estimativa comercial de lances e atas oficiais
+
+Em mensagem anterior ao envio das atas, Michele afirmou que o grupo caminhava para a 7ª assembleia e que, até então, a média do Lance Livre teria “variado entre 45% e 66%”. A mensagem também mencionava média de 5 a 6 contemplados por assembleia.
+
+As atas oficiais 001–006 mostram, para Lance Livre vencedor:
+- abril: 60,1400%;
+- maio: 60,9867%;
+- junho: nenhum vencedor Livre;
+- julho: 72,7300%–73,0000%;
+- agosto: 68,9081%–70,6877%;
+- setembro: 72,0000%–73,0000%.
+
+Depois de confrontada com as atas, a explicação comercial mudou para “média didática”, tendência de queda e referência aproximada em torno de 65%. Essa reformulação não corresponde de forma clara à formulação original.
+
+**Conclusão metodológica:**  
+Não é possível inferir intenção, mas a afirmação comercial original é materialmente incompatível ou, no mínimo, não verificável à luz dos documentos oficiais apresentados. A confiança em premissas comerciais sem suporte documental deve, portanto, ser reduzida.
+
+**Hierarquia de evidência reforçada:**
+1. contrato/regulamento/norma oficial;
+2. atas/documentos operacionais oficiais;
+3. memórias de cálculo reproduzíveis;
+4. resposta comercial escrita;
+5. resposta comercial verbal.
+
+**Estado:** DIVERGÊNCIA MATERIAL REGISTRADA; USAR DOCUMENTOS OFICIAIS PARA CALIBRAÇÃO DO LANCE.
 
 ---
 
