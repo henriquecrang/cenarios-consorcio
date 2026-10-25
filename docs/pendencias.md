@@ -342,6 +342,27 @@ Pendência residual:
 Só implementar override de fluxo se recebermos memória oficial/contratual que permita reproduzir a composição por cota sem arbitrar distribuição.
 
 ============================================================
+AUDITORIA V3.19 — GUARDRAILS OPERACIONAIS
+============================================================
+
+Issue #19: RESOLVIDA NA CAMADA DE UX.
+
+Implementado:
+- aviso de que lance vencedor deve ser pago em até 2 dias úteis;
+- “48 horas” não é interpretado como prazo corrido;
+- modo de abatimento com rendimento explicita a necessidade de solicitação mensal no aplicativo;
+- o cenário assume aderência operacional perfeita quando esse modo está ativo.
+
+Sem alteração do motor mensal:
+- não há calendário diário;
+- não há feriados;
+- não há simulação de esquecimento/cutoff;
+- não há atraso de pagamento do lance.
+
+Pendências residuais:
+Detalhes diários só precisam ser modelados se o projeto passar a exigir resolução abaixo de um mês.
+
+============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
 ============================================================
 
