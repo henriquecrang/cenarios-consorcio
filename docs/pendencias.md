@@ -1,4 +1,24 @@
 ============================================================
+AUDITORIA V3.10 — BASE DO CASHBACK
+============================================================
+
+Issue #7: RESOLVIDA NO SOFTWARE COM POLÍTICA CONSERVADORA.
+
+Problema:
+O motor usava todo o `letterBalance` na compra como base potencial de cashback. Como esse saldo inclui rendimentos acumulados, cenários de espera podiam elevar silenciosamente o benefício acima dos R$95,9 mil comercialmente confirmados.
+
+Implementado na V3.10:
+- separação entre principal líquido pós-embutido e rendimentos;
+- default = principal líquido pós-embutido, limitado ao preço/crédito efetivamente usado;
+- rendimentos acumulados excluídos da base por default;
+- sensibilidade opcional permite incluir rendimentos, com alerta de que não há confirmação documental;
+- KPI exibe a base elegível;
+- regressões unitárias protegem R$95,9 mil no cenário canônico.
+
+Pendência residual:
+Ainda não existe confirmação documental específica sobre a elegibilidade de rendimentos financeiros acumulados para o cashback. Por isso a alternativa inclusiva permanece apenas como sensibilidade.
+
+============================================================
 AUDITORIA V3.9 — FINANCIAMENTO DO LANCE
 ============================================================
 
