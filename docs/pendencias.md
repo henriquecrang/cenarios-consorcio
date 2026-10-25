@@ -148,46 +148,44 @@ Nível de evidência:
 - Na rodada comercial de 28/09 não alteramos automaticamente o motor. Depois daquela rodada, porém, houve uma sequência deliberada de evoluções de software até a V3.2. As pendências abaixo continuam preservando a evidência comercial, mas as referências à V2.54 devem ser lidas como histórico quando conflitarem com a seção de sincronização V3.2.
 
 ============================================================
-0. SINCRONIZAÇÃO DO ESTADO DO SOFTWARE — V3.2 (29/09/2026)
+0. ESTADO ATUAL DO SOFTWARE — V3.11
 ============================================================
 
-Esta seção prevalece sobre descrições antigas de “comportamento atual da V2.54” existentes ao longo deste arquivo. Elas são mantidas como histórico da rodada de respostas de 28/09/2026.
+Esta seção descreve o estado canônico atual. Referências posteriores a V2.54/V3.2 dentro de itens históricos devem ser lidas apenas como registro da evolução, não como descrição do software vigente.
 
-IMPLEMENTADO NA LINHA PRINCIPAL V3.2:
-- arquitetura genuinamente multi-cota, com quantidade configurável de 1 a 50 cotas;
-- preset estrutural QuintoAndar de 4 cotas: R$400 mil + R$400 mil + R$370 mil + R$200 mil;
-- contemplação independente por cota; quando existe apenas 1 cota, a interface volta a usar slider de mês de contemplação;
-- Lance Livre calculado como percentual do saldo devedor de cada cota;
-- lance embutido calculado sobre a carta atualizada de cada cota, limitado a 30% e ao próprio valor do Lance Livre;
-- dinheiro do lance = Lance Livre efetivo - embutido efetivo;
-- CDI de referência, percentual do CDI da carta e retorno do benchmark CDB separados;
-- vedação de pooling: rendimento de uma cota só pode pagar a parcela daquela própria cota;
-- financiamento do lance por tranches independentes, liberadas na data de contemplação de cada cota, com parâmetros de financiamento globais ou por cota;
-- painel decisório / matriz de cenários para contemplação, Lance Livre, remuneração da carta e percentual financiado;
-- biblioteca de cenários/consórcios em localStorage, com seleção, salvar/salvar como, exportação e importação em JSON;
-- layout vertical para evitar rolagem horizontal;
-- quantidade de cotas incluída no estado salvo/importado.
+IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
+- arquitetura multi-cota configurável;
+- proposta QuintoAndar 400 / 400 / 370 / 200 como preset estrutural;
+- contemplação independente por cota;
+- Lance Livre sobre saldo devedor atualizado de cada cota;
+- lance embutido sobre a carta atualizada, limitado a 30% e ao próprio Lance Livre;
+- vedação de pooling de rendimentos entre cotas;
+- financiamento por tranches independentes;
+- rendimento da carta separado do benchmark CDB;
+- CDI bruto separado do CDB líquido;
+- default líquido da carta em 80% do CDI;
+- matriz de cenários com política comum de compra/preço;
+- sensibilidades explícitas de financiamento 0% / 50% / 100%;
+- cashback conservador sobre principal líquido pós-embutido, sem rendimentos acumulados por default;
+- presets versionados com migração explícita e preservação do original;
+- motor completo em `scenario-engine.js`, compartilhado pelo navegador e testes;
+- regressões unitárias + integração no GitHub Actions;
+- política anti-pooling verificada mês a mês por cota.
 
-PENDÊNCIAS DE MODELAGEM QUE CONTINUAM ABERTAS MESMO NA V3.2:
-- o software modela corretamente o Lance Livre, mas ainda não possui seletor explícito para alternar Livre × Fixo; portanto SW-005 continua apenas parcialmente resolvida;
-- compra com subconjunto de cotas contempladas ainda não está implementada: a compra continua condicionada à última contemplação;
-- cashback ainda não incorpora definitivamente a regra promocional nominal versus crédito líquido pós-embutido;
-- calendário real do aniversário do grupo e primeiro reajuste de 3% continuam sem implementação contratual definitiva;
-- eventual cobrança/dedução ligada às assembleias anteriores à adesão continua não implementada; resposta comercial escrita de 29/09/2026 afirma especificamente que ela NÃO existe para as quatro cotas novas do Grupo 4012/QuintoAndar, restando apenas reconciliação documental/contratual com o Regulamento Geral 2025;
-- valores oficiais de parcela reduzida/integral da cotação ainda não são usados como override; por isso a proposta pode aparecer como aproximadamente R$4.001 em vez de R$3.999,03;
-- regras de resgate, encerramento, cessão, garantia, seguro contratual e residual continuam com as pendências históricas registradas neste arquivo.
+PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
+- seletor explícito Lance Fixo × Lance Livre;
+- compra com subconjunto das cotas já contempladas;
+- override das parcelas oficiais cotadas;
+- trajetória temporal de CDI/CDB para horizontes longos;
+- dia exato e ordem do reajuste quando coincide com contemplação;
+- reconciliação documental da ausência de retroativos para entrada no grupo em andamento;
+- destino formal do crédito residual após compra;
+- confirmação documental sobre inclusão de rendimentos acumulados na base do cashback;
+- detalhes operacionais do pedido mensal para usar rendimento na própria parcela;
+- módulos de seguro, cessão, resgate, encerramento e substituição de garantia ainda dependentes de regras documentais.
 
-STATUS DAS GRANDES PENDÊNCIAS ESTRUTURAIS:
-- “carta única equivalente” como limitação estrutural: RESOLVIDA no motor principal;
-- base incorreta do Lance Livre: RESOLVIDA;
-- dependência indevida entre rendimento da carta e benchmark: RESOLVIDA;
-- pooling de rendimento entre cotas: RESOLVIDA;
-- financiamento do lance em datas diferentes: RESOLVIDA;
-- comparação de cenários: RESOLVIDA na camada de software;
-- incertezas externas/comerciais correspondentes continuam abertas quando explicitamente registradas abaixo.
-
-IMPORTANTE:
-A V3.2 ainda não passou por uma nova auditoria independente equivalente à realizada sobre a V2.53/V2.54. As implementações acima devem ser tratadas como “implementadas e verificadas durante desenvolvimento”, não como “reauditadas”.
+ESTADO DE QUALIDADE:
+A V3.11 já passou pela auditoria posterior à V3.5 e pelas correções V3.6–V3.11. As regras críticas possuem testes automatizados. O que permanece aberto está concentrado em premissas externas, documentação contratual e funcionalidades ainda não implementadas.
 
 ============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
@@ -254,19 +252,20 @@ Exemplo dado:
 - R$ 5 mil quitam a parcela;
 - R$ 5 mil permanecem acumulando no crédito.
 
-Comparação com a V2.54:
-A matemática principal já coincide com essa descrição:
-- `yieldUsed = min(rendimento, parcela)`;
-- o rendimento usado reduz a obrigação de caixa;
-- o excedente capitaliza na carta.
+Estado atual da V3.11:
+A matemática e a arquitetura multi-cota já coincidem com a regra comercial:
+- `yieldUsed_j = min(rendimento_j, parcela_j)`;
+- o rendimento usado reduz a obrigação de caixa da própria cota;
+- o excedente capitaliza na própria carta;
+- pooling entre cotas é proibido;
+- o invariante é testado mês a mês na suíte de integração.
 
-Diferenças ainda não representadas:
-- a V2.54 aplica o abatimento automaticamente em todos os meses quando o modo “usar rendimento para pagar parcela” está ativo;
-- na operação real, a solicitação precisa ser feita mensalmente;
-- a V2.54 usa uma carta equivalente, portanto ainda não consegue impor a regra “rendimento da cota A só paga a parcela da cota A”.
+Diferença operacional ainda não representada:
+- quando o modo “usar rendimento para pagar parcela” está ativo, o simulador presume que o consorciado faz corretamente a solicitação em todos os meses elegíveis;
+- na operação real, a solicitação precisa ser feita pelo aplicativo segundo a informação comercial.
 
 Conclusão:
-A hipótese operacional R1 sobre uso do rendimento para pagar parcelas deixa de ser uma pendência conceitual. O que resta é documentar e, na versão multi-cota, representar corretamente a restrição por cota e a necessidade de solicitação mensal.
+A regra econômica e a restrição por cota estão implementadas. O que resta é apenas detalhar a operação mensal da solicitação, se isso se tornar relevante para uma sensibilidade de aderência.
 
 Detalhes operacionais ainda úteis:
 - Se o rendimento for menor que a parcela, o abatimento parcial funciona automaticamente pelo valor disponível?
