@@ -1295,62 +1295,62 @@ A semântica “R$ de hoje” versus “valor nominal futuro” continua pendent
 
 ## 23.5 Crédito residual
 
-A convenção anterior de preservar a sobra como ativo vinculado, sem rendimento e sem destinação, está SUPERADA como regra econômica definitiva.
+Desde a V3.14, o software não presume que a diferença entre crédito disponível e preço do imóvel seja um ativo financeiro livre.
 
-Quando:
+No mês da compra:
 
-`Credito_compra > Preco_imovel`
+`Residual_bruto = max(0, Credito_compra - Preco_imovel)`
 
-a diferença:
+A política de destino é explícita.
 
-`Residual = Credito_compra - Preco_imovel`
+### Política A — não assumir destinação
 
-não deve permanecer indefinidamente como “ativo residual” depois da conclusão da compra.
+Default conservador:
 
-A Resolução BCB nº 285/2023 determina que a diferença seja destinada, a critério do consorciado, a uma das alternativas permitidas.
+`residualCreditPolicy = unallocated`
 
-### Opção A — despesas vinculadas ao bem
+Nesse modo:
+- o residual continua rastreado;
+- NÃO entra no patrimônio comparável;
+- NÃO rende;
+- NÃO reduz automaticamente dívida ou custos;
+- a interface mostra alerta de destinação pendente.
 
-Pode ser usada para obrigações vinculadas ao bem/serviço, respeitado o limite regulamentar de até 10% do crédito objeto da contemplação.
+Essa política evita atribuir valor econômico livre a um recurso cujo uso pós-compra é regulado.
 
-Uma mensagem comercial posterior citou “até R$ 123,3 mil” para a operação de R$ 1,37 milhão. Esse número NÃO corresponde a 10% do total nominal (R$ 137 mil) e, portanto, não deve ser usado como regra até a Bamaq explicar sua base.
+### Política B — despesas vinculadas ao bem
 
-Para imóvel, exemplos comercialmente mencionados:
-- ITBI;
-- escritura;
-- registro/cartório.
+`residualCreditPolicy = costs`
 
-A lista exata aceita pela Bamaq deve seguir contrato/regulamento e pode incluir outras despesas regulatoriamente admitidas.
+O motor pode usar parte do residual para reduzir custos de aquisição pagos do bolso:
 
-### Opção B — antecipação das prestações vincendas
+`Residual_para_custos = min(Residual_bruto, Custos_compra, Limite_configurado)`
 
-No Regulamento Geral Bamaq, a diferença pode quitar prestações vincendas em **ordem indireta**.
+Default do teto:
 
-A regra-alvo é:
+`Limite_configurado = 10% × principal_liquido_disponivel_na_compra`
 
-`Residual_para_divida = min(Residual_disponivel, valor_elegivel_para_antecipacao)`
+A base exata do limite em operação multi-cota continua pendente; por isso o percentual é configurável.
 
-e a obrigação correspondente deve ser efetivamente extinta/reduzida.
+Depois da aplicação:
 
-Não assumir redução linear do valor de todas as parcelas futuras até confirmação específica do Grupo 4012.
+`Residual_sem_destinacao = Residual_bruto - Residual_para_custos`
 
-### Opção C — devolução em dinheiro
+O residual ainda sem destinação continua fora do patrimônio comparável.
 
-Só é elegível quando:
+### Destinos ainda não implementados
 
-- obrigações financeiras perante o grupo e a administradora estiverem integralmente quitadas.
+A regulação/documentação também admite:
+- quitação/antecipação de prestações vincendas, conforme contrato;
+- devolução em dinheiro quando as obrigações perante grupo/administradora estiverem quitadas.
 
-Nesse caso, a diferença pode ser transferida para conta do consorciado.
+Esses destinos ainda não foram implementados porque permanecem abertos:
+- mecânica exata de ordem indireta no Grupo 4012;
+- efeito sobre prazo versus parcela;
+- alocação em operação multi-cota;
+- procedimento/timing da devolução em dinheiro.
 
-### Antes da conclusão da compra
-
-Enquanto parte do crédito ainda não foi efetivamente utilizada, ela permanece vinculada à contemplação e continua sujeita à regra de rendimento líquido até a utilização.
-
-### Regra multi-cota
-
-Em compra com várias cotas, o motor futuro deve manter rastreabilidade da origem do residual por cota, até confirmar se limites e destinações podem ser agregados entre créditos.
-
----
+A implementação futura não deve reintroduzir dupla contagem do residual nem tratá-lo como caixa livre antes de elegibilidade.
 
 ## 23.6 Complemento de preço
 
@@ -2809,27 +2809,25 @@ A existência do fundo e seu perfil de renda fixa/DI são verificáveis, mas ain
 
 Portanto, a aplicação específica deve permanecer como metadado/documentação, não como premissa rígida do motor.
 
-# 56. Crédito residual
+# 56. Crédito residual — estado atual
 
-A convenção antiga de congelar o residual está revogada como especificação-alvo.
+A V3.14 implementa duas políticas explícitas:
+1. residual não alocado — rastreado, mas excluído do patrimônio comparável;
+2. residual aplicado a custos de aquisição, limitado por teto configurável.
 
-Depois da compra de bem com valor inferior ao crédito utilizado, a diferença NÃO deve ficar simplesmente congelada como ativo.
+A escolha padrão é conservadora: **não assumir destinação**.
 
-Destinos permitidos, conforme Resolução BCB nº 285/2023 e Regulamento Geral Bamaq:
-
-1. despesas vinculadas ao bem, até o limite regulamentar/contratual;
-2. quitação/antecipação de prestações vincendas conforme contrato;
-3. devolução em dinheiro quando todas as obrigações financeiras com grupo e administradora estiverem quitadas.
-
-Para o Regulamento Geral Bamaq, a antecipação identificada é em ordem indireta.
-
-A escolha do destino deve ser representada explicitamente no software.
+Destinos regulatórios ainda não implementados:
+1. quitação/antecipação de prestações vincendas conforme contrato;
+2. devolução em dinheiro quando as obrigações financeiras estiverem quitadas.
 
 Pendências:
-- regra específica do Grupo 4012;
-- possibilidade de reduzir valor de parcela versus apenas ordem indireta;
-- teto de despesas em operação multi-cota;
+- regra específica do Grupo 4012 para ordem indireta;
+- efeito sobre valor de parcela versus prazo;
+- base do teto de despesas em operação multi-cota;
 - procedimento e timing da devolução em dinheiro.
+
+Até essas regras serem fechadas, o simulador não conta residual não alocado como ativo comparável.
 
 # 57. Múltiplas cotas — arquitetura atual e gaps residuais
 
