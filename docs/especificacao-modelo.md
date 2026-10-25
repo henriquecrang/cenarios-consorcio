@@ -66,7 +66,7 @@ O preset QuintoAndar analisado usa:
 
 Agregações são permitidas apenas para KPIs e fluxos consolidados; não podem apagar diferenças de timing ou permitir pooling indevido entre cotas.
 
-A compra com apenas um subconjunto das cotas contempladas ainda é uma funcionalidade pendente e está registrada na seção 79.
+A compra pode usar apenas um subconjunto das cotas. Cada cota possui `useInPurchase`; apenas cotas selecionadas determinam o mês mínimo da compra e são consumidas na aquisição. Cotas não selecionadas continuam independentes.
 
 ---
 
@@ -3436,48 +3436,90 @@ A versão atual deve permanecer utilizável apenas com rolagem vertical nas larg
 
 Essa regra é de UX e não altera o motor financeiro.
 
-# 79. Gaps conhecidos — estado atual V3.11
+# 79. Compra com subconjunto de cotas — V3.16
 
-Continuam pendentes no produto ou na documentação externa:
+## 79.1 Seleção por cota
 
-1. compra usando apenas subconjunto das cotas contempladas;
-2. override das parcelas oficiais cotadas;
-4. trajetória temporal de CDI/CDB em vez de taxa constante;
-5. dia exato e ordem do reajuste em mês coincidente com contemplação;
-6. reconciliação documental da ausência de cobrança por assembleias anteriores à adesão;
-7. destino formal do crédito residual depois da compra;
-8. confirmação documental sobre rendimentos acumulados na base de cashback;
-9. módulos contratuais de seguro, cessão, resgate, encerramento e substituição de garantia;
-10. detalhes operacionais do pedido mensal de uso do rendimento para pagar parcela.
+Cada cota possui:
 
-Esses gaps devem permanecer explícitos; o motor não deve preencher lacunas contratuais silenciosamente.
+`useInPurchase ∈ {true,false}`
 
-# 80A. Arquitetura de testes de integração
+Default: `true`.
 
-Desde a V3.11:
-- `model-core.js` contém regras financeiras puras de baixo nível;
-- `scenario-engine.js` contém o motor completo `runScenario`, sem dependência do DOM;
-- `index.html` usa `scenario-engine.js`;
-- os testes Node usam exatamente o mesmo módulo do navegador.
+A seleção é persistida no estado do cenário e herdada pela matriz comparativa.
 
-Regressões de integração cobrem:
-1. operação de quatro cotas R$400k + R$400k + R$370k + R$200k;
-2. contemplação conjunta no mês 4 antes do reajuste;
-3. crédito líquido pós-embutido de R$959 mil;
-4. cashback conservador de R$95,9 mil;
-5. contemplação no mês 12 após reajuste de 3%;
-6. contemplações escalonadas;
-7. separação entre principal e rendimentos;
-8. política alternativa de cashback;
-9. financiamento de 100% da parte em dinheiro do lance;
-10. cronologia de 210 meses remanescentes após contemplação no mês 4;
-11. invariante mensal anti-pooling por cota:
-   `yieldUsed_j <= min(yield_j, installment_j)`.
+## 79.2 Elegibilidade temporal da compra
 
-O histórico mensal do motor expõe, para auditoria/teste:
-- parcela por cota;
-- rendimento por cota;
-- rendimento usado por cota.
+Defina:
+
+`S = { j | useInPurchase_j = true }`
+
+Se `S` não estiver vazio:
+
+`m_compra_min = max(m_cont,j, j ∈ S)`
+
+Cotas não selecionadas NÃO atrasam a compra.
+
+Se nenhuma cota estiver selecionada, a compra fica fora do horizonte.
+
+## 79.3 Crédito usado na aquisição
+
+No mês da compra:
+
+`Credito_compra = Σ letterBalance_j, j ∈ S`
+
+e:
+
+`Principal_compra = Σ letterPrincipalAtCont_j, j ∈ S`
+
+Somente as cotas de `S`:
+- entram na base de crédito da compra;
+- podem gerar cashback da operação;
+- são marcadas como `usedInPurchase=true`;
+- têm `letterBalance` consumido/zerado pela aquisição.
+
+## 79.4 Cotas não usadas
+
+Cotas com `useInPurchase=false`:
+- continuam pagando seu próprio fluxo;
+- se ainda não contempladas, contemplam normalmente depois da compra;
+- quando contempladas, formam carta própria;
+- continuam rendendo;
+- rendimento continua restrito à própria parcela;
+- NÃO são automaticamente usadas para quitar a compra anterior;
+- NÃO geram segunda compra automaticamente.
+
+## 79.5 Patrimônio comparável
+
+Após compra parcial:
+- o imóvel entra como ativo;
+- cartas contempladas e não usadas permanecem como ativos separados;
+- dívida comparável inclui cotas usadas no imóvel e cotas já contempladas;
+- dívida de cota não contemplada e não usada permanece fora do passivo comparável até existir ativo correspondente, preservando a convenção de comparabilidade do modelo.
+
+## 79.6 Guardrail
+
+Esta funcionalidade modela uma única compra com subconjunto de cotas. Ela NÃO presume:
+- amortização da dívida já vinculada com cartas posteriores;
+- quitação automática entre cotas;
+- segunda aquisição;
+- pooling de rendimentos.
+
+Esses destinos exigem regra própria e documentação suficiente.
+
+## 79.7 Regressão canônica
+
+Caso de integração:
+- A/B contemplam no mês 4 e são selecionadas;
+- C contempla no mês 12 e D no 16, ambas não selecionadas;
+- compra no mês 4;
+- principal líquido de A+B = R$560 mil;
+- imóvel = R$600 mil;
+- complemento = R$40 mil;
+- cashback conservador = R$56 mil;
+- A/B são consumidas na compra;
+- C/D permanecem independentes e acumulam rendimento quando contempladas;
+- não há pooling.
 
 # 80. Estado de qualidade atual — V3.15
 
