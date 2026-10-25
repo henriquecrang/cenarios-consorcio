@@ -19,17 +19,24 @@ function makeConfig({
   fixedLancePct=0.30,
   residualCreditPolicy='unallocated',
   residualExpenseCapPct=0.10,
-  useInPurchase=[true,true,true,true]
+  useInPurchase=[true,true,true,true],
+  perQuotaBids=null
 }={}){
   const credits=[400000,400000,370000,200000];
   const loanTerms={fundPct:financedPct,rateMonthly:0.0155,trAnnual:0,term:120,system:'price'};
-  const cotas=credits.map((credit0,i)=>({
-    id:String.fromCharCode(65+i),
-    credit0,
-    cont:conts[i],
-    useInPurchase:useInPurchase[i]!==false,
-    loanTerms:{...loanTerms}
-  }));
+  const cotas=credits.map((credit0,i)=>{
+    const bid=perQuotaBids?.[i] || {};
+    return {
+      id:String.fromCharCode(65+i),
+      credit0,
+      cont:conts[i],
+      useInPurchase:useInPurchase[i]!==false,
+      lanceMode:bid.mode,
+      bidPct:bid.pct,
+      embPct:bid.embPct,
+      loanTerms:{...loanTerms}
+    };
+  });
   const lastCont=Math.max(...conts);
 
   return {
@@ -220,6 +227,42 @@ function makeConfig({
       assert.ok(used<=inst+0.01,`cota ${q.id}, mês ${h.m}: abatimento excedeu parcela própria`);
     }
   }
+}
+
+// Modalidade e percentual de lance podem variar por cota na mesma operação.
+{
+  const r=runScenario(makeConfig({
+    conts:[4,4,4,4],
+    financedPct:0,
+    perQuotaBids:[
+      {mode:'fixed',pct:0.30,embPct:0.30},
+      {mode:'free',pct:0.70,embPct:0.30},
+      {mode:'free',pct:0.60,embPct:0.20},
+      {mode:'fixed',pct:0.30,embPct:0.10}
+    ]
+  }));
+
+  const [a,b,c,d]=r.cotaDetails;
+  assert.equal(a.lanceMode,'fixed');
+  assert.equal(b.lanceMode,'free');
+  assert.equal(c.lanceMode,'free');
+  assert.equal(d.lanceMode,'fixed');
+
+  // Fixo usa carta; Livre usa saldo devedor.
+  close(a.requestedLanceAtCont,a.credit0*0.30,0.02);
+  assert.ok(b.requestedLanceAtCont>b.credit0*0.70); // saldo inclui adm + reserva, menos parcelas pagas.
+  assert.ok(c.requestedLanceAtCont>c.credit0*0.60);
+  close(d.requestedLanceAtCont,d.credit0*0.30,0.02);
+
+  close(a.requestedEmbeddedAtCont,a.credit0*0.30,0.02);
+  close(c.requestedEmbeddedAtCont,c.credit0*0.20,0.02);
+  close(d.requestedEmbeddedAtCont,d.credit0*0.10,0.02);
+
+  close(
+    r.cashLanceTotal,
+    a.cashLanceAtCont+b.cashLanceAtCont+c.cashLanceAtCont+d.cashLanceAtCont,
+    0.02
+  );
 }
 
 // Compra com subconjunto: A+B compram cedo; C+D continuam independentes.
