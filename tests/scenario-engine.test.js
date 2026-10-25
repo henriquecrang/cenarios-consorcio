@@ -208,6 +208,36 @@ function makeConfig({
   close(r.purchaseCashback,100000);
 }
 
+// Taxa de transferência: depende do saldo devedor de cada cota, não da oferta.
+{
+  const cfg=makeConfig({
+    conts:[4,4,4,4],
+    lancePct:0.73,
+    buyRaw:215
+  });
+
+  const runSale=offer=>runScenario(cfg,{
+    quotaSale:{
+      month:5,
+      grossOffer:offer,
+      saleFeePct:0.01,
+      saleFeeCap:1000,
+      saleExtraCostPct:0,
+      payLanceLoanOnSale:false
+    }
+  });
+
+  const a=runSale(100000);
+  const b=runSale(500000);
+  const expected=Object.values(a.quotaSaleDebtByQuota)
+    .reduce((sum,debt)=>sum+Math.min(debt*0.01,1000),0);
+
+  close(a.quotaSaleTransferFee,expected);
+  close(b.quotaSaleTransferFee,expected);
+  close(a.quotaSaleTransferFee,b.quotaSaleTransferFee);
+  assert.deepEqual(Object.keys(a.quotaSaleTransferFeeByQuota).sort(),['A','B','C','D']);
+}
+
 // Financiamento por cota: 100% da parte em dinheiro do lance gera principal
 // bancário exatamente igual ao cash lance agregado.
 {
