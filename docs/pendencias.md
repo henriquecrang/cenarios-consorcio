@@ -40,9 +40,9 @@ IMPLEMENTADO NA LINHA PRINCIPAL V3.2:
 PENDÊNCIAS DE MODELAGEM QUE CONTINUAM ABERTAS MESMO NA V3.2:
 - o software modela corretamente o Lance Livre, mas ainda não possui seletor explícito para alternar Livre × Fixo; portanto SW-005 continua apenas parcialmente resolvida;
 - compra com subconjunto de cotas contempladas ainda não está implementada: a compra continua condicionada à última contemplação;
-- cashback ainda não incorpora definitivamente a regra promocional nominal versus crédito líquido pós-embutido;
-- calendário real do aniversário do grupo e primeiro reajuste de 3% continuam sem implementação contratual definitiva;
-- eventual cobrança/dedução ligada às assembleias anteriores à adesão continua não implementada por falta de confirmação;
+- cashback multi-cota foi comercialmente reconciliado: no cenário de R$1,37 milhão com 30% embutido, a base é o crédito líquido faturado de R$959 mil e o cashback é R$95,9 mil; a V3.2 já calcula cashback como percentual do crédito usado, faltando proteger esse comportamento por regressão;
+- o primeiro reajuste desta proposta foi comercialmente fixado em abril/2027; o dia exato e a ordem reajuste × contemplação no mês coincidente continuam sem formalização/implementação diária;
+- eventual cobrança/dedução ligada às assembleias anteriores à adesão continua não implementada; resposta comercial escrita de 29/09/2026 afirma especificamente que ela NÃO existe para as quatro cotas novas do Grupo 4012/QuintoAndar, restando apenas reconciliação documental/contratual com o Regulamento Geral 2025;
 - valores oficiais de parcela reduzida/integral da cotação ainda não são usados como override; por isso a proposta pode aparecer como aproximadamente R$4.001 em vez de R$3.999,03;
 - regras de resgate, encerramento, cessão, garantia, seguro contratual e residual continuam com as pendências históricas registradas neste arquivo.
 
@@ -64,44 +64,45 @@ A V3.2 ainda não passou por uma nova auditoria independente equivalente à real
 
 
 1.1. Rendimento da carta contemplada não utilizada [R1]
-Status após respostas de 28/09/2026:
-MAJORITARIAMENTE CONFIRMADO QUANTO À EXISTÊNCIA E À NATUREZA LÍQUIDA DOS RENDIMENTOS; FAIXA/IMPLEMENTAÇÃO AINDA PRECISA DE RECONCILIAÇÃO.
+Status após resposta de 29/09/2026:
+REGRA ECONÔMICA E PREMISSA-BASE MAJORITARIAMENTE RESOLVIDAS; PROVA ESPECÍFICA DO GRUPO AINDA OPCIONAL.
 
-Michele informou que:
-- após a homologação da contemplação, o crédito não utilizado é apartado e aplicado;
-- os recursos ficam vinculados ao grupo, em aplicações de alta liquidez;
-- a remuneração acompanha o resultado efetivo dessas aplicações;
-- não existe taxa fixa/promissória garantida de 98% do CDI;
-- a rentabilidade pode variar ao longo do tempo;
-- o rendimento é repassado de forma líquida ao crédito do consorciado;
-- não há taxa adicional de gestão financeira sobre esses rendimentos;
-- os rendimentos permanecem até a utilização do crédito ou, segundo ela, até o encerramento do grupo.
+Michele reconciliou as referências anteriores:
+- 98% a 105% do CDI = rentabilidade BRUTA típica das aplicações do grupo;
+- aproximadamente 80% do CDI = rentabilidade LÍQUIDA orientada pela Bamaq para projeções financeiras da carta contemplada.
 
-Verificação externa em fonte oficial:
-- A Lei nº 11.795/2008 estabelece que cada grupo possui patrimônio próprio, separado do patrimônio da administradora e dos demais grupos.
-- A Resolução BCB nº 285/2023, vigente para grupos constituídos a partir de 1º/07/2024, exige que recursos do grupo sejam depositados em instituições bancárias e restringe as aplicações a:
-  a) títulos públicos federais registrados no Selic, inclusive compromissadas; e
-  b) determinados fundos abertos de renda fixa (Curto Prazo, Referenciado ou Simples).
-- A mesma Resolução determina que os recursos vinculados à contemplação permaneçam aplicados até o último dia útil anterior à utilização.
-- O art. 17 determina que o crédito disponibilizado seja acrescido dos rendimentos líquidos financeiros proporcionais ao período de aplicação.
+Ela também informou:
+- instituição: Itaú;
+- fundo: Itaú Premium Renda Fixa Referenciado DI;
+- CNPJ: 03.184.233/0001-80;
+- aplicação de perfil conservador e alta liquidez;
+- o rendimento líquido é repassado à cota sem nova incidência/cobrança de IR, segundo a explicação comercial.
 
-Conclusão:
-A existência de remuneração líquida da carta contemplada não utilizada deixa de ser mera hipótese comercial: há respaldo regulatório atual para o acréscimo dos rendimentos líquidos efetivamente obtidos nas aplicações permitidas.
+Verificação externa:
+- o CNPJ 03.184.233/0001-80 corresponde efetivamente ao Itaú Premium Renda Fixa Referenciado DI;
+- a lâmina oficial do Itaú de julho/2026 mostra desempenho bruto de:
+  - 97,88% do benchmark em 2026 até julho;
+  - 97,53% em 12 meses;
+  - 98,01% em 24 meses;
+  - 100,49% em 36 meses;
+- isso é coerente com a descrição de retorno bruto próximo ao CDI.
+
+Conclusão de modelagem:
+- cenário-base realista da carta: `p_carta_liquido = 80% do CDI`;
+- esse percentual deve ser entendido como retorno líquido efetivo da carta;
+- NÃO aplicar IR adicional sobre esse mesmo rendimento no fluxo-base;
+- manter sensibilidade editável porque 80% não é taxa garantida;
+- 98%–105% deixa de ser faixa líquida do simulador e passa a ser apenas referência da aplicação bruta.
 
 Pontos ainda não fechados:
-- Michele primeiro informou faixa de 98% a 105% do CDI e, nesta resposta, escreveu aproximadamente 80% a 105% do CDI. Precisamos esclarecer qual faixa é correta.
-- O percentual do CDI não é contratualmente garantido; ele é uma aproximação do rendimento efetivo. Portanto, não devemos modelá-lo como taxa fixa garantida.
-- Ainda precisamos saber como a Bamaq transforma o rendimento efetivo do fundo/aplicação em uma métrica do tipo “x% do CDI” nos extratos.
-- Precisamos do nome/CNPJ exato das aplicações usadas atualmente pelo Grupo 4012, se isso puder ser informado.
-- Michele citou “Fundo Itaú Premium ou equivalentes”; isso é plausível como exemplo de fundo de renda fixa referenciado, mas não foi confirmado como o fundo efetivamente utilizado pelo Grupo 4012.
-- “Conta de investimento exclusiva” precisa ser entendida operacionalmente: conta bancária individual por cota ou apenas segregação/controle contábil individual dentro dos recursos do grupo?
-- Precisamos confirmar se a faixa/rentabilidade é igual para todas as cotas contempladas ou depende da aplicação/data.
+- não recebemos extrato do Grupo 4012 comprovando que o fundo informado é efetivamente o veículo corrente daquele grupo;
+- “conta de investimento exclusiva” ainda precisa ser entendida operacionalmente: conta individual ou segregação contábil;
+- eventual tributação/efeito fiscal no recebimento em espécie continua separado;
+- a expressão “80% do CDI líquido” é linguagem comercial imprecisa; para o simulador, usar 80% da referência CDI como retorno final líquido da carta, sem novo haircut.
 
-Como obter:
-- Pedir um extrato real/anônimo de cota contemplada não utilizada.
-- Pedir o nome/CNPJ da aplicação utilizada pelo Grupo 4012.
-- Perguntar qual das faixas está correta: 98%–105% ou 80%–105% do CDI.
-- Pedir a cláusula do contrato/regulamento que descreve a aplicação e o repasse dos rendimentos.
+Como obter, se quisermos elevar a prova:
+- pedir extrato/anônimo recente de crédito contemplado do Grupo 4012;
+- pedir documento Bamaq que identifique o fundo da posição atual.
 
 
 1.2. Uso do rendimento da carta para pagar parcelas [R1]
@@ -148,10 +149,10 @@ Como obter:
 
 
 1.3. Entrada em grupo já em andamento
-Status após resposta de 28/09/2026:
-MECÂNICA ECONÔMICA PRINCIPAL CONFIRMADA COMERCIALMENTE E COERENTE COM O ART. 1º DO REGULAMENTO BAMAQ 2025, MAS EXISTE UMA CONTRADIÇÃO DOCUMENTAL IMPORTANTE SOBRE “PARCELAS RETROATIVAS” EM CASO DE CONTEMPLAÇÃO.
+Status após resposta complementar de 29/09/2026:
+MECÂNICA ECONÔMICA E AUSÊNCIA DE RETROATIVOS FORTEMENTE CONFIRMADAS COMERCIALMENTE PARA AS QUATRO COTAS; CONTRADIÇÃO DOCUMENTAL COM O REGULAMENTO GERAL 2025 AINDA NÃO FOI RECONCILIADA POR DOCUMENTO FORMAL.
 
-Michele informou:
+Michele já havia informado que:
 - a nova cota entra no grupo já em andamento com prazo REMANESCENTE de 214 meses;
 - não há cobrança mensal retroativa dos meses anteriores à adesão;
 - todo o plano da nova cota é diluído pelos 214 meses restantes;
@@ -163,19 +164,27 @@ Michele informou:
   - prazo remanescente: 214 meses;
   - parcela integral inicial: R$ 1.168,22.
 
+Em 29/09/2026, ao ser confrontada diretamente com a cláusula do Regulamento Geral Bamaq 2025 sobre assembleias anteriores, Michele respondeu de forma expressa e específica para a operação:
+- para as quatro cotas do Grupo 4012 / produto QuintoAndar-Bamaq, “NÃO EXISTE e NÃO HAVERÁ” cobrança nem desconto retroativo referente às assembleias anteriores à entrada;
+- as cotas seriam cotas NOVAS de lançamento/abertura de vagas em grupo em andamento, e não substituição/assunção de cota cancelada com histórico anterior;
+- saldo devedor e parcelas seriam calculados “do zero” para o novo aderente e distribuídos exclusivamente no prazo remanescente;
+- quando houver contemplação, o crédito liberado seria o valor integral da carta contratada, sem desconto de “mensalidades passadas”;
+- segundo ela, o saldo por cota é estritamente crédito contratado + taxa de administração + fundo de reserva, diluídos nas parcelas futuras;
+- ela qualificou os números da proposta comercial como definitivos para essa operação.
+
 Reconciliação matemática:
 `R$ 200.000 × 1,25 = R$ 250.000`
 `R$ 250.000 / 214 = R$ 1.168,224...`
 
-Logo, o novo exemplo fecha praticamente de forma exata com a fórmula já usada pela V2.54:
+Logo, o exemplo fecha praticamente de forma exata com:
 
 `D0 = C0 × (1 + 24% + 1%)`
 
 `P0 = D0 / 214`
 
-Isso também reforça a leitura anterior do exemplo de R$ 400 mil, cujo saldo inicial de R$ 500 mil e parcela integral de cerca de R$ 2.336,45 seguem a mesma lógica.
+Isso também reforça a leitura do exemplo de R$ 400 mil, cujo saldo inicial de R$ 500 mil e parcela integral de cerca de R$ 2.336,45 seguem a mesma lógica.
 
-CONFIRMAÇÃO DOCUMENTAL PARCIAL
+EVIDÊNCIA DOCUMENTAL JÁ EXISTENTE
 O Regulamento Geral Bamaq 2025, art. 1º, §3º, afirma que o consorciado admitido em grupo em andamento fica obrigado ao pagamento integral das prestações previstas no instrumento dentro do prazo remanescente para o término do grupo.
 
 Isso é compatível com:
@@ -183,39 +192,26 @@ Isso é compatível com:
 - nenhuma “taxa já consumida” antes da entrada;
 - diluição do compromisso pelo prazo que resta.
 
-CONTRADIÇÃO DOCUMENTAL IMPORTANTE
-No mesmo Regulamento 2025, art. 8º, VI, alínea “a”, existe uma regra adicional dizendo que, quando a adesão ocorreu em grupo já em andamento e houver contemplação por sorteio ou lance, o consorciado deve pagar as mensalidades correspondentes às assembleias realizadas ANTES da adesão; se não pagar, a Administradora pode deduzir esse valor do crédito contemplado.
+RESSALVA DOCUMENTAL AINDA ABERTA
+No mesmo Regulamento 2025, art. 8º, VI, alínea “a”, existe texto dizendo que, quando a adesão ocorreu em grupo já em andamento e houver contemplação por sorteio ou lance, o consorciado deve pagar mensalidades correspondentes às assembleias realizadas ANTES da adesão; se não pagar, a Administradora pode deduzir esse valor do crédito contemplado.
 
-Essa cláusula é incompatível, ao menos à primeira leitura, com a afirmação comercial de:
-“Você não precisa pagar parcelas retroativas dos meses que já se passaram antes de você entrar.”
+A nova resposta da Michele não ignora essa contradição: ela apresenta uma interpretação específica de que a cláusula genérica se relacionaria a modelos de substituição/repescagem de cotas canceladas, enquanto a operação QuintoAndar/Bamaq analisada seria de cota nova de lançamento/abertura de vaga. Essa explicação reduz muito o risco operacional, mas continua sendo uma afirmação comercial, não uma cláusula do Regulamento 2026 ou do contrato específico já apresentada por escrito pela administradora.
 
-Possibilidades a reconciliar:
-1. o Regulamento 2026 pode ter alterado essa cláusula;
-2. o Grupo 4012 / parceria QuintoAndar pode possuir regra específica/aditivo que afasta a cobrança;
-3. “cotas novas de lançamento” podem receber tratamento operacional diferente de outra forma de ingresso em grupo em andamento;
-4. a resposta comercial pode estar simplificando ou incorreta.
+Decisão de modelagem após a resposta de 29/09:
+- NÃO implementar cobrança/dedução retroativa no preset nem no cenário-base desta proposta;
+- NÃO criar evento de ajuste de assembleias anteriores para as quatro cotas do Grupo 4012 enquanto a única evidência específica da operação afirmar que esse ajuste não existe;
+- manter a contradição documental registrada como risco jurídico/documental residual, a ser conferido no contrato/regulamento aplicável antes da assinatura;
+- se surgir documento formal contraditório, reabrir SW-060 e recalcular o impacto antes da decisão.
 
-Até resolver isso:
-NÃO implementar nenhuma cobrança retroativa no cenário-base, porque a proposta concreta e a memória comercial usam 214 meses sem adicional.
-MAS também NÃO considerar a questão definitivamente encerrada, porque uma cobrança/dedução na contemplação poderia alterar de forma material:
-- crédito líquido disponível;
-- necessidade de aporte;
-- lance;
-- comparação com CDB;
-- estratégia de contemplação precoce.
-
-O que ainda falta:
-- cláusula correspondente no Regulamento 2026 aplicável à proposta;
-- contrato/proposta específica das quatro cotas;
-- resposta formal da Bamaq dizendo se a alínea sobre assembleias anteriores se aplica ou não ao Grupo 4012/QuintoAndar;
-- confirmar se “214 meses” é o número de parcelas efetivamente cobradas do novo aderente;
-- confirmar data-base do primeiro reajuste para quem entra agora;
-- permanecem separadas as dúvidas da memória pós-contemplação: parcela reduzida R$ 1.167,60 no exemplo de R$ 400 mil e 209 meses restantes após contemplação na 4ª parcela.
+O que ainda falta para encerramento documental, não para a modelagem-base:
+- contrato/proposta final das quatro cotas mostrando o prazo/saldo efetivo;
+- Regulamento 2026, aditivo ou cláusula específica aplicável ao produto que permita reconciliar formalmente o art. 8º, VI, “a” de 2025;
+- confirmação documental de que “214 meses” é exatamente o número de parcelas contratuais do novo aderente sem ajuste anterior fora da proposta;
+- permanece aberta apenas a fórmula comercial da parcela reduzida R$1.167,60 no exemplo de R$400 mil; o rótulo “209 meses” foi reconciliado como erro de apresentação, pois a própria parcela pós-contemplação confirma 210 meses.
 
 Como obter:
-- pedir à Michele/Bamaq uma resposta expressa confrontando a cláusula;
-- pedir proposta/contrato das quatro cotas antes de assinar;
-- obter memória de evolução do saldo para uma cota nova no Grupo 4012.
+- conferir o contrato/proposta final antes de assinar;
+- pedir, se necessário, a cláusula/regulamento 2026 que formaliza o tratamento das cotas novas de lançamento/abertura de vagas em grupo em andamento.
 
 1.4. Tributação/custos sobre o rendimento da carta contemplada [R1 / B6]
 Status após resposta de 28/09/2026:
@@ -239,7 +235,7 @@ O que ainda vale confirmar:
 - se o recebimento em espécie após 180 dias gera algum evento fiscal adicional para o consorciado pessoa física além do rendimento já creditado líquido;
 - se a Bamaq emite informe de rendimentos ou documento fiscal;
 - se há algum custo específico de encerramento do grupo não capturado pelos rendimentos líquidos;
-- esclarecer a inconsistência da faixa 98%–105% versus 80%–105% do CDI.
+- se desejável, obter extrato/posição específica do Grupo 4012 e documentação fiscal; a antiga divergência 98%–105% versus ~80% foi reconciliada como bruto da aplicação versus líquido projetado da carta.
 
 Como obter:
 - contrato/regulamento Bamaq;
@@ -250,59 +246,52 @@ Como obter:
 
 
 1.5. Índice/regra de reajuste do consórcio
-Status após novas mensagens/áudios de 28/09/2026:
-REGRA ECONÔMICA PRINCIPAL RESPONDIDA COMERCIALMENTE E DATA-BASE CONCEITUAL PARCIALMENTE RESPONDIDA; FALTA A DATA EXATA E O EFEITO DA PRÓXIMA ASSEMBLEIA.
+Status após resposta escrita de 29/09/2026:
+REGRA ECONÔMICA, DISTINÇÃO ENTRE TABELA COMERCIAL E REAJUSTE ANUAL, MÊS DO PRIMEIRO REAJUSTE E MARCO OPERACIONAL DA ADESÃO RESPONDIDOS COMERCIALMENTE. RESTAM A ORDEM REAJUSTE × CONTEMPLAÇÃO NO MÊS COINCIDENTE, O DIA EXATO DO REAJUSTE SE PRECISARMOS DE RESOLUÇÃO DIÁRIA E A MEMÓRIA OFICIAL DO RECÁLCULO PÓS-CONTEMPLAÇÃO.
 
-Michele confirmou:
+Michele já havia confirmado:
 - o reajuste é FIXO em 3% ao ano;
 - antes da contemplação, os 3% corrigem crédito/carta e parcelas;
 - depois da contemplação, o saldo devedor continua reajustado em 3% a.a.;
 - a carta contemplada deixa de seguir o reajuste fixo e passa a render financeiramente;
-- o reajuste anual ocorre no ANIVERSÁRIO DO GRUPO, e não necessariamente 12 meses após a adesão individual.
+- o reajuste anual está ligado ao aniversário do grupo, e não deve ser modelado simplesmente como “12 meses depois da adesão individual”.
 
-Essa última informação resolve uma dúvida importante:
-A nova cota deve herdar o calendário anual do grupo.
+NOVA RESPOSTA — 29/09/2026
+Michele esclareceu expressamente que:
+- a “virada da tabela” / fechamento da assembleia mês a mês e o reajuste anual fixo de 3% NÃO são o mesmo evento;
+- a tabela comercial fecha antes da assembleia, por volta do dia 12 de cada mês, e funciona como janela para entrada no grupo e garantia das condições comerciais/vaga disponíveis;
+- entrando agora, a condição comercial atual é travada com os valores da proposta, incluindo a parcela reduzida agregada de R$ 3.999,03;
+- a próxima assembleia do dia 18 NÃO aplica o reajuste anual de 3% às novas cotas desta proposta;
+- o primeiro reajuste anual ocorrerá em ABRIL DE 2027, daqui a aproximadamente 7 meses;
+- ela reafirmou separadamente que a anotação anterior de “primeiro reajuste daqui a 7 meses” estava correta.
 
-Consequência para modelagem:
-A futura arquitetura deve separar:
-- data de adesão da cota;
-- calendário/aniversário do grupo;
-- meses de reajuste.
+Interpretação para o modelo:
+- para a resolução mensal do simulador, o calendário do primeiro reajuste desta proposta passa a estar suficientemente definido: abril/2027;
+- “virada da tabela comercial” e “reajuste contratual anual” devem permanecer como eventos distintos;
+- o simples fechamento/assembleia mensal não deve disparar os 3% na cota já contratada;
+- a ausência do reajuste anual antes de abril/2027 não elimina outros eventos que possam alterar a parcela, como contemplação, lance e recálculo pós-contemplação;
+- a arquitetura futura ainda deve separar `mesAdesaoCota` de `mesAniversarioGrupo`/calendário de reajuste.
 
-Não é correto simplesmente aplicar o primeiro reajuste 12 meses depois do mês 1 da simulação.
+Observação de redação:
+Na resposta mais recente Michele usou a expressão “aniversário da cota/grupo”. Em respostas anteriores ela havia dito “aniversário do grupo”. Como ela fixou operacionalmente o primeiro reajuste desta proposta em abril/2027, essa possível imprecisão de linguagem não impede a simulação mensal atual, mas a redação contratual exata continua desejável antes de transformar o conceito em regra jurídica definitiva.
 
-NOVA INFORMAÇÃO OPERACIONAL
-Michele também escreveu:
-“A tabela atual está prestes a virar na assembleia do dia 18” e ofereceu alocar as cotas imediatamente/emitir o contrato para “travar esses valores e essa condição”.
-
-Essa frase cria uma questão de alta prioridade:
-- a assembleia do dia 18 é justamente o aniversário/reajuste anual do Grupo 4012?
-- se as cotas forem contratadas antes dessa assembleia, elas entram com os valores atuais e sofrem 3% já no próximo dia 18?
-- ou a “trava” garante a tabela atual até o aniversário seguinte?
-- “virar a tabela” significa reajuste de 3%, mudança do prazo remanescente, nova tabela comercial ou mais de uma dessas coisas?
-
-A cotação também está marcada como válida até 30/09/2026, o que parece ser uma janela comercial distinta da assembleia do dia 18. Não misturar os dois prazos sem confirmação.
-
-Comparação com a V2.54:
-A regra econômica central está alinhada ao motor, mas a cronologia NÃO está:
-- hoje o simulador pensa em reajustes por intervalos relativos ao início da simulação;
-- a regra real parece seguir o calendário do grupo.
+Pontos que deixam de estar abertos:
+- a assembleia do dia 18 NÃO é, para esta entrada, o evento que aplica imediatamente os 3%;
+- as novas cotas NÃO recebem 3% na próxima assembleia apenas por terem sido contratadas agora;
+- o primeiro reajuste desta proposta ocorre em abril/2027;
+- a virada mensal da tabela comercial é um evento distinto do reajuste contratual anual;
+- as assembleias regulares são operacionalmente referenciadas ao dia 18 e, quando o dia 18 não é útil, são deslocadas para dia útil; para outubro/2026 Michele informou 19/10 porque 18/10 cai em domingo. O histórico de julho/2026 também é coerente com esse deslocamento, pois a assembleia ocorreu em 20/07.
 
 Pontos ainda não respondidos:
-- data exata do aniversário anual do Grupo 4012;
-- se a assembleia “do dia 18” é a assembleia de aniversário;
-- quando ocorre o primeiro reajuste das cotas se contratadas agora;
-- o que exatamente fica “travado” ao emitir/assinar o contrato antes da mudança de tabela;
+- dia exato de abril/2027 em que o reajuste é processado, caso no futuro precisemos de precisão diária;
 - ordem exata se reajuste e contemplação coincidirem no mesmo mês;
 - memória oficial do recálculo da parcela pós-contemplação.
 
-Observação:
-A frase comercial “o valor da parcela não vai alterar” deve ser entendida como referência à composição/estrutura inicial da proposta, porque a própria Michele esclareceu em seguida que o reajuste anual no aniversário do grupo NÃO está incluído nesses valores.
+Marco operacional já encerrado:
+- para a proposta analisada, a vendedora informou emissão/homologação do contrato → aceite eletrônico → pagamento da primeira parcela dentro do prazo comercial; a alocação da cota ocorre como consequência.
 
-Como obter:
-- perguntar a data exata do aniversário do Grupo 4012;
-- perguntar diretamente se as cotas assinadas agora já recebem 3% na próxima assembleia do dia 18;
-- perguntar o que “travar os valores” significa juridicamente/operacionalmente;
+Como obter o que resta:
+- manter QN-063 aberta somente quanto ao dia exato, se essa precisão se tornar necessária;
 - confirmar ordem reajuste × contemplação;
 - pedir exemplo oficial de um reajuste pós-contemplação.
 
@@ -484,6 +473,41 @@ Pendente:
 - confirmar se o “50%” é arredondamento comercial;
 - confirmar se esses valores são os que constarão efetivamente nos boletos iniciais.
 
+
+2.1A. Alternativas com cartas individuais maiores / outros grupos
+Status após resposta de 29/09/2026:
+RESOLVIDO PARA O PRODUTO QUINTOANDAR.
+
+Michele informou que, nos grupos do produto QuintoAndar:
+- carta mínima = R$200 mil;
+- carta máxima = R$400 mil;
+- não há cartas individuais de R$600 mil, R$700 mil, R$1 milhão ou R$1,5 milhão dentro desse produto;
+- por isso valores maiores são estruturados por desmembramento em várias cotas.
+
+Consequência para a operação de R$1,37 milhão:
+- permanecendo no produto QuintoAndar, não é possível concentrar o valor em uma ou duas cartas grandes;
+- o número mínimo teórico de cotas, respeitando teto de R$400 mil, é 4;
+- a estrutura atual de R$400 mil + R$400 mil + R$370 mil + R$200 mil é compatível com esse limite.
+
+Racional comercial apresentado pela vendedora:
+- mais cotas dão mais números para participar dos sorteios;
+- cotas menores reduzem o valor nominal associado a cada lance;
+- a fragmentação ajudaria a “saúde” do grupo e a competição.
+
+Essas justificativas devem ser tratadas como narrativa comercial até demonstração quantitativa. O benefício objetivo e verificável da fragmentação é:
+- múltiplas oportunidades independentes de contemplação;
+- maior flexibilidade de combinar créditos;
+- porém com maior complexidade operacional e risco de contemplações desencontradas.
+
+Escopo residual:
+A resposta foi sobre “nossos grupos do QuintoAndar”. Não foi esclarecido se existem outros grupos Bamaq fora do produto QuintoAndar com cartas maiores e, caso existam, se manteriam cashback/condições.
+
+Decisão:
+- para o desenho atual QuintoAndar, considerar o teto de R$400 mil resolvido;
+- não manter “cartas maiores dentro do mesmo produto” como alternativa de cenário;
+- só reabrir se decidirmos comparar um produto Bamaq fora do QuintoAndar.
+
+
 2.2. Contemplação individual
 Status após respostas de 28/09/2026:
 RESPONDIDO COMERCIALMENTE.
@@ -524,57 +548,114 @@ Como obter:
 - confirmação operacional da Bamaq.
 
 
-2.4. Lances em múltiplas cotas
-Status após respostas de 28/09/2026:
-MAJORITARIAMENTE RESPONDIDO COMERCIALMENTE, COM FÓRMULA DO LANCE LIVRE A RECONCILIAR.
+2.4. Lances, base de cálculo e contemplação por cota
+Status após resposta direta de 29/09/2026:
+BASE DO LANCE LIVRE E ORDEM DE CLASSIFICAÇÃO RESOLVIDAS COMERCIALMENTE; MEMÓRIA ANTIGA PASSA A SER TRATADA COMO INCONSISTENTE.
 
-Michele confirmou:
-- lance individual por cota;
-- possibilidade de ofertar nas quatro cotas na mesma assembleia;
-- possibilidade de contemplar 1, 2, 3 ou as 4 no mesmo mês;
-- resultado depende de valor ofertado, modalidade (Fixo ou Livre) e disponibilidade do Fundo Comum;
-- embutido limitado a 30% da carta atualizada, por cota.
+Michele confirmou expressamente:
+- Lance Livre = percentual do saldo devedor atualizado da cota na data da assembleia;
+- os percentuais publicados nas atas (60%–73%) usam exatamente essa mesma base;
+- o sistema ordena as ofertas do maior percentual para o menor;
+- as contemplações seguem essa ordem até esgotar o saldo disponível no Fundo Comum do mês;
+- Lance Embutido continua sendo calculado sobre a carta;
+- o embutido reduz o poder de compra;
+- a amortização pode reduzir parcela ou prazo;
+- lance vencedor deve ser pago em até 2 dias úteis.
 
-Bases informadas:
-- Lance Fixo de 30%: sobre a carta atualizada.
-- Lance Livre: sobre o saldo devedor.
-- Embutido: sobre a carta atualizada.
+REGRA CANÔNICA DO LANCE LIVRE
+`L_livre = pct_livre × saldo_devedor_atualizado_na_assembleia`
 
-Impacto:
-A V2.54 usa a carta como base para qualquer “lance total”. Isso representa o Fixo, mas NÃO o Livre.
+PARTE EM DINHEIRO COM EMBUTIDO
+`L_cash = max(0, L_livre - L_embutido)`
 
-Exemplo comercial:
-Carta R$ 400 mil; lance livre de 45%; embutido de 10% da carta; aproximadamente R$ 180 mil em dinheiro.
+onde o embutido é calculado sobre a carta conforme a regra própria.
 
-Interpretação preliminar:
-Com saldo perto de R$ 495 mil, 45% do saldo ≈ R$ 223 mil. Menos R$ 40 mil embutidos ≈ R$ 183 mil em dinheiro. Isso é coerente com os ~R$ 180 mil informados, mas não com “35% da carta”.
+RECONCILIAÇÃO DA MEMÓRIA DE 29/09
+A memória mostrava:
+- saldo R$495.330;
+- 45% de Lance Livre;
+- R$120 mil embutidos;
+- R$105 mil próprios.
 
-Informação que ainda falta:
-- faixa/mínimo/máximo do lance livre;
-- percentuais diferentes por cota;
-- critério de desempate;
-- efeito do Fundo Comum quando há mais lances vencedores do que caixa disponível;
-- se é possível escolher reduzir parcela versus prazo/ordem inversa;
-- memória oficial do exemplo.
+Pela regra agora explicitamente confirmada:
+- `45% × 495.330 = R$222.898,50`;
+- `222.898,50 - 120.000 = R$102.898,50`.
 
-Nova mensagem comercial recebida:
-- Lance Livre: “você decide o valor; quem oferece o maior lance no grupo é contemplado”;
-- Lance Fixo: mesmo valor definido no regulamento;
-- Lance Embutido: até 30% da própria carta;
-- Lance Fidelidade: para adimplentes por pelo menos 12 meses;
-- se o lance não contemplar, nada é pago e pode-se tentar novamente no mês seguinte;
-- Michele também escreveu que, quando o lance resulta em contemplação, haveria “3 dias para pagar”.
+Logo, os R$105 mil próprios / R$225 mil totais do print não devem ser usados como teste oficial do motor. O print é internamente incompatível com a regra confirmada e deve ser tratado como memória/exemplo comercial com erro de cálculo/composição.
+
+ORDEM DE CLASSIFICAÇÃO
+`ranking = percentual_livre_descendente`
+
+com contemplação sucessiva enquanto houver capacidade no Fundo Comum.
+
+Pontos ainda abertos:
+- faixa/mínimo/máximo regulamentar do Lance Livre;
+- critério de desempate quando percentuais forem idênticos;
+- mecânica exata do modo “reduzir prazo”;
+- eventual detalhe operacional quando o saldo remanescente do Fundo Comum não comportar a próxima cota integralmente.
+
+Decisão:
+- não perguntar novamente qual é a base do Lance Livre;
+- não alterar o motor para reproduzir R$225 mil;
+- considerar a base “saldo devedor atualizado na data da assembleia” fechada para modelagem.
+
+
+2.4A. Histórico empírico do Lance Livre — Grupo 4012
+Status após incorporação da Ata 003 / junho:
+SÉRIE DOCUMENTAL COMPLETA DE ABRIL A SETEMBRO; DISTRIBUIÇÃO COMPLETA DE OFERTAS CONTINUA INACESSÍVEL.
+
+Atas incorporadas:
+- 27/04/2026 — Assembleia 001;
+- 18/05/2026 — Assembleia 002;
+- 18/06/2026 — Assembleia 003;
+- 20/07/2026 — Assembleia 004;
+- 18/08/2026 — Assembleia 005;
+- 18/09/2026 — Assembleia 006.
+
+Lances Livres vencedores observados:
+- abril: 60,1400% (1 vencedor);
+- maio: 60,9867% (1);
+- junho: nenhum vencedor por Lance Livre exibido;
+- julho: 73,0000% e 72,7300% (2);
+- agosto: 70,6877%, 70,5508%, 69,5200%, 68,9081% (4);
+- setembro: 73,0000%, 72,0000%, 72,0000%, 72,0000% (4).
+
+Ata 003 / junho:
+- 792 cotas ativas não contempladas aptas;
+- saldo para assembleia: R$ 501.927,02;
+- Lance Fixo vencedor: 30,0000%;
+- nenhum Lance Livre vencedor registrado;
+- 2 cotas ativas contempladas no total.
+
+Universo de cotas aptas:
+- abril: 473;
+- maio: 509;
+- junho: 792;
+- julho: 1.013;
+- agosto: 1.258;
+- setembro: 1.502.
 
 Leitura:
-- a existência de Livre, Fixo, Embutido e Fidelidade reforça as modalidades já identificadas;
-- “maior lance no grupo é contemplado” é simplificação comercial e NÃO substitui a regra anterior de múltiplas contemplações conforme recursos do Fundo Comum;
-- o prazo de “3 dias” precisa ser reconciliado com a ata do Grupo 4012 já analisada, que indicava vencimento no segundo dia útil;
-- a frase “caso você seja sorteado” ao explicar pagamento do lance parece imprecisa: sorteio e contemplação por lance são mecanismos distintos.
+- 45% permanece abaixo de TODOS os Lances Livres vencedores documentados;
+- junho não fornece um Lance Livre “baixo”; fornece ausência de vencedor Livre e um vencedor Fixo de 30%;
+- portanto, não misturar o 30% Fixo com a série do Livre;
+- a fala comercial de “média ~65%” e “tendência de queda” não é corroborada diretamente pela série de vencedores Livre;
+- o crescimento do número de cotas aptas foi forte e monotônico ao longo das seis assembleias.
 
-Como obter:
-- memória de cálculo oficial;
-- regulamento/ata do Grupo 4012;
-- confirmação escrita do prazo exato para pagamento de lance vencedor.
+Limitação estrutural:
+Michele informou que os lances individuais são sigilosos e que o conjunto completo de ofertas não é disponibilizado ao cliente.
+
+Logo, não podemos calcular:
+- % de lances que perderam;
+- taxa de sucesso;
+- distribuição de percentuais ofertados;
+- tendência no número total de ofertantes.
+
+Decisão:
+- encerrar a busca pelo denominador como limitação de dados;
+- usar vencedores oficiais apenas como calibração descritiva;
+- não criar probabilidade de contemplação;
+- manter Lance Fixo e Lance Livre separados.
 
 
 2.5. Combinação de várias cartas em um único imóvel
@@ -629,46 +710,46 @@ Na futura arquitetura, cada cota deve manter:
 - aporte próprio residual, se houver.
 
 
-2.7. Cashback com múltiplas cotas
-Status após resposta de 28/09/2026:
-PARCIALMENTE RESPONDIDO COMERCIALMENTE, MAS A RESPOSTA CONTRADIZ UMA EXCEÇÃO EXPRESSA DO REGULAMENTO DA CAMPANHA.
+2.7. Cashback com múltiplas cotas e lance embutido
+Status após resposta de 29/09/2026:
+RESOLVIDO COMERCIALMENTE PARA O CENÁRIO ATUAL.
 
-Michele informou:
-- cashback de 10% sobre o crédito efetivamente utilizado na compra;
-- em operação com várias cotas, a base seria a soma dos créditos efetivamente utilizados;
-- exemplo: R$ 900 mil de crédito líquido utilizado → R$ 90 mil de cashback;
-- não haveria teto monetário específico por CPF ou imóvel;
-- o pagamento seria em dinheiro de livre movimentação.
+Michele esclareceu expressamente que:
+- quando várias cartas são usadas para comprar um único imóvel, a operação é tratada de forma agregada/unificada para faturamento e garantia;
+- a comparação imóvel × crédito contratado é feita sobre a soma das cotas da operação;
+- no cenário de R$1 milhão de imóvel versus R$1,37 milhão nominais de cartas, o imóvel é inferior ao crédito agregado contratado;
+- com 30% de lance embutido, o crédito efetivamente faturado/liberado ao vendedor é R$959 mil;
+- o cashback é 10% desse valor líquido.
 
-Regulamento da Campanha QuintoAndar/Bamaq:
-Regra geral (item 4.1.3):
-- 10% sobre o montante total do valor da carta de crédito LIBERADO para aquisição do imóvel.
+Cálculo:
+`credito_nominal = R$ 1.370.000`
+`embutido = R$ 411.000`
+`credito_liquido_faturado = R$ 959.000`
+`cashback = 10% × 959.000 = R$ 95.900`
 
-Exceção vigente a partir de 16/06/2026 (item 4.1.3.1):
-- quando o imóvel adquirido tiver valor IGUAL OU SUPERIOR ao valor da carta de crédito CONTRATADA, a base do cashback passa a ser o VALOR TOTAL DO CRÉDITO CONTRATADO E DISPOSTO NA COTA, e não o valor efetivamente liberado.
+A hipótese de R$137 mil fica descartada para este cenário.
 
-Conclusão:
-A afirmação comercial “é sempre sobre o efetivamente utilizado” não está completa para adesões abrangidas pela exceção de 16/06/2026.
+Regra operacional:
+`Cashback = 10% × credito_liquido_efetivamente_faturado_e_liberado`
 
-Em cenário com lance embutido, essa diferença pode ser material:
-- crédito contratado nominal pode ser maior que o crédito líquido disponível após embutido;
-- se o imóvel preencher a condição da exceção, o cashback pode ser calculado sobre base superior ao crédito líquido efetivamente usado.
+No caso multi-cota:
+- a análise é agregada;
+- não avaliar a exceção cota por cota.
 
-Pontos ainda a confirmar:
-- Em operação multi-cota, a condição “imóvel >= crédito contratado” é testada:
-  a) cota por cota; ou
-  b) sobre a soma das cotas usadas na aquisição?
-- “Valor total do crédito contratado e disposto na cota” significa o crédito nominal contratado original ou o valor atualizado da carta no momento da utilização?
-- Se houver lance embutido, a exceção permite cashback sobre o valor contratado antes da redução do crédito pelo embutido?
-- Existe qualquer teto operacional interno além das regras da campanha?
-- A afirmação de “150 cotas por CPF” continua pendente de fonte e não deve ser usada como limite regulamentar.
+Ressalva:
+Antes do aceite definitivo, conferir o contrato/regulamento aplicável. Se houver cláusula conflitante, reabrir a interpretação.
 
-Impacto de modelagem:
-A V2.54 calcula cashback simplesmente como percentual do crédito usado. Isso representa apenas a regra geral e NÃO a exceção de 16/06/2026.
+Tratamento fiscal:
+Michele afirmou que o cashback é isento de IR. Para o motor:
+- considerar entrada líquida de R$95,9 mil;
+- não aplicar retenção de IR.
+Mas:
+- natureza fiscal;
+- obrigação de declaração;
+- eventual ajuste no custo de aquisição para ganho de capital
 
-Como obter:
-- perguntar ao QuintoAndar/Bamaq usando exemplo numérico com várias cotas e lance embutido;
-- pedir confirmação escrita de como o item 4.1.3.1 é aplicado em operação multi-cota.
+continuam fora do escopo até validação tributária específica.
+
 
 2.8. Compra antes de todas as cotas contemplarem
 Status após resposta de 28/09/2026:
@@ -1163,49 +1244,47 @@ Como obter:
 8. PRIORIDADE MÉDIA — CASHBACK: BASE, TIMING E TRATAMENTO FISCAL
 ============================================================
 
-Status após materiais de 28/09/2026:
-A natureza de livre movimentação está confirmada pelo Regulamento da Campanha. As novas COTAÇÕES INDIVIDUAIS reforçam a leitura de que, para esta proposta, o benefício está sendo vendido como 10% DO VALOR NOMINAL DE CADA CARTA:
+Status após resposta final de 29/09/2026:
+A REGRA MULTI-COTA FOI RECONCILIADA COMERCIALMENTE PARA O CENÁRIO ATUAL.
 
-- R$ 400 mil → R$ 40 mil;
-- R$ 400 mil → R$ 40 mil;
-- R$ 370 mil → R$ 37 mil;
-- R$ 200 mil → R$ 20 mil;
-- total nominal de cashback destacado: R$ 137 mil.
+As cotações exibem cashback nominal total de R$137 mil, mas a vendedora esclareceu que, quando várias cartas são usadas em um único imóvel, a operação é analisada de forma agregada.
 
-Isso é mais coerente com a exceção promocional vigente desde 16/06/2026 do que com a explicação verbal anterior de “10% do crédito efetivamente utilizado”.
+No cenário:
+- crédito nominal agregado = R$1,37 milhão;
+- 30% de lance embutido = R$411 mil;
+- crédito líquido efetivamente faturado/liberado = R$959 mil;
+- cashback = 10% × R$959 mil = R$95,9 mil.
 
-Ainda assim, a proposta não mostra um cenário com lance embutido efetivamente executado, então a aplicação exata da exceção continua a exigir confirmação formal.
+Portanto, R$137 mil não deve ser tratado como benefício fixo quando o embutido reduz o crédito efetivamente faturado.
 
+8.0. Interpretação agregada da exceção do regulamento
 
-8.0. Evidência nova da própria cotação
+Segundo a resposta comercial final:
+- a comparação imóvel × crédito contratado é feita sobre a operação agregada, e não cota por cota;
+- no exemplo, R$1 milhão de imóvel < R$1,37 milhão de crédito nominal agregado;
+- a base efetiva do cashback passa a ser o crédito líquido faturado/liberado de R$959 mil.
 
-As três cotações recebidas exibem o cashback como 10% exatos do valor nominal da carta.
-
-Isso fortalece o uso, como regra-alvo desta campanha, de uma base de cashback que pode ser superior ao crédito líquido efetivamente liberado após lance embutido.
-
-Pergunta crítica ainda aberta:
-Se uma carta de R$ 400 mil usar R$ 40 mil de lance embutido e liberar R$ 360 mil, a proposta continua garantindo os R$ 40 mil de cashback destacados no material?
-
-Essa resposta deve prevalecer sobre inferências.
+A antiga bifurcação R$95,9 mil versus R$137 mil fica encerrada comercialmente para este cenário. Reabrir apenas se contrato/regulamento final trouxer regra divergente.
 
 8.1. Momento do pagamento
 
-Michele informou:
-- pagamento em até 7 dias úteis após a conclusão integral da compra.
+Michele reiterou:
+- pagamento por PIX/conta;
+- até 7 dias úteis após a compra no cartório.
 
 Regulamento da Campanha, item 4.1.2:
-- pagamento em conta bancária do consorciado em até 5 DIAS ÚTEIS;
-- o prazo conta do registro da alienação na matrícula E do pagamento do crédito ao vendedor.
+- pagamento em conta bancária de titularidade do consorciado;
+- até 5 dias úteis;
+- contados do registro da alienação na matrícula E do pagamento do crédito ao vendedor.
 
 Conclusão:
-Para especificação contratual, usar 5 dias úteis como regra documental, salvo aditivo/regulamento mais novo.
+- comercialmente, 7 dias foi reiterado;
+- documentalmente, 5 dias continua sendo a regra disponível;
+- pedir eventual aditivo/regulamento mais novo;
+- para especificação contratual, manter 5 dias úteis até prova posterior.
 
 Impacto na V2.54:
-O modelo assume cashback como entrada ao fim do próprio mês da compra. Como a compra também é modelada no fim do mês, isso é temporalmente incompatível com um pagamento que ocorre até 5 dias úteis DEPOIS do registro/pagamento ao vendedor.
-
-Mudança desejável:
-- no modelo mensal simplificado, considerar cashback no mês seguinte à compra; ou
-- permitir defasagem configurável de 0/1 mês se quisermos acomodar diferentes posições do fechamento dentro do mês.
+O modelo ainda não deve ser alterado nesta etapa. Quando for revisado, cashback deve ocorrer após a compra/registro, e não antes.
 
 8.2. Livre movimentação
 
@@ -1238,35 +1317,56 @@ Até confirmação:
 - manter possível impacto na base fiscal da futura venda como pendência.
 
 8.4. Vigência da campanha / trava da proposta — URGENTE
+Status após resposta específica de 29/09/2026:
+MARCO OPERACIONAL COMERCIALMENTE RESOLVIDO.
 
-O Regulamento anexado estabelece vigência para adesões entre 01/09/2025 e 30/09/2026.
-As novas cotações comerciais também estão marcadas como válidas até 30/09/2026.
+O Regulamento/cotações indicam prazo até 30/09/2026.
+Michele agora esclareceu o fluxo necessário para efetivar a entrada dentro dessa condição:
 
-Michele agora propôs:
-- “alocar as cotas agora”;
-- “seguir com a emissão do contrato”;
-- com o objetivo de “travar esses valores e essa condição”.
+1. documentação/cadastro;
+2. emissão ou homologação do contrato pela administradora;
+3. recebimento do contrato por e-mail;
+4. aceite eletrônico pelo cliente;
+5. pagamento da primeira parcela até 30/09.
 
-Isso reforça a urgência temporal, mas NÃO esclarece qual ato efetivamente garante:
-- elegibilidade ao cashback;
-- preço/tabela atual;
-- número de parcelas;
-- demais condições comerciais.
+Segundo ela, após aceite + primeira parcela:
+- o cliente já entra no plano;
+- grupo e número de cota são alocados;
+- passa a ter acesso ao aplicativo;
+- fica apto a participar da assembleia seguinte;
+- preserva a condição de cashback dentro do prazo comercial atual.
 
-Precisamos distinguir:
-1. emissão do contrato;
-2. assinatura eletrônica;
-3. pagamento da primeira parcela;
-4. efetiva alocação/emissão das cotas no grupo;
-5. eventual aprovação/cadastro pela administradora.
+Regra operacional para esta proposta:
+`adesao_operacional = contrato_emitido AND aceite_eletronico AND primeira_parcela_paga`
 
-Os benefícios podem ser exercidos durante o prazo do consórcio por quem aderiu dentro da vigência.
+Deadline:
+`30/09/2026`
 
-Como a rodada atual ocorre em 28/09/2026, é necessário confirmar imediatamente:
-- qual ato caracteriza “adesão” para garantir a campanha;
-- se basta assinatura/proposta/pagamento inicial até 30/09/2026;
-- se a campanha foi ou será prorrogada;
-- se existe regulamento mais recente substituindo o documento atual.
+Cronologia informada:
+- primeira parcela: deve ser paga até 30/09 para efetivar a entrada;
+- segunda parcela: 15/11/2026.
+
+A emissão isolada do contrato não deve ser tratada como suficiente.
+
+Ressalva:
+Essa é confirmação comercial. Antes do aceite, conferir no contrato:
+- identificação das quatro cotas;
+- valores nominais;
+- parcelas;
+- prazo;
+- taxa de administração;
+- fundo de reserva;
+- cashback/campanha;
+- reajuste;
+- grupo;
+- demais condições relevantes.
+
+Estado:
+- validade comercial até 30/09: CONFIRMADA;
+- prorrogação: NÃO INFORMADA;
+- marco operacional de adesão/lock: RESPONDIDO COMERCIALMENTE;
+- segunda parcela em 15/11: INFORMADA COMERCIALMENTE.
+
 
 ============================================================
 9. PRIORIDADE BAIXA — PREMISSAS FISCAIS DO ALUGUEL [A18]
@@ -1425,43 +1525,58 @@ Ainda assim, custos transacionais de imóvel/garantia continuam relevantes e dev
 
 
 11.1. Base do lance
-Status após resposta de 28/09/2026:
-PARCIALMENTE RESOLVIDO COMERCIALMENTE E COM IMPACTO DIRETO NO SOFTWARE.
+Status após resposta direta de 29/09/2026:
+RESOLVIDO COMERCIALMENTE PARA A MODELAGEM.
 
-Michele distinguiu:
+Michele distinguiu e confirmou:
 - Fixo 30% → carta atualizada;
-- Livre → saldo devedor;
+- Livre → saldo devedor atualizado da cota na data da assembleia;
 - Embutido → até 30% da carta atualizada, por cota.
 
-Conclusão:
-A V2.54 não deve continuar tratando toda modalidade como percentual da carta na próxima revisão.
+Para o Lance Livre:
+`L_livre = pct_livre × D_assembleia`
 
-Pendente:
-- confirmação formal no regulamento/ata;
-- faixa do Lance Livre;
-- composição exata do exemplo;
-- modalidades adicionais.
+onde `D_assembleia` é o saldo devedor atualizado da própria cota no momento da assembleia.
+
+Ela confirmou também que:
+- os percentuais de 60%–73% das atas usam essa mesma base;
+- o sistema classifica do maior percentual para o menor;
+- a contemplação segue até o Fundo Comum disponível do mês se esgotar.
+
+A memória comercial que usava R$225 mil para 45% com saldo exibido de R$495.330 é incompatível com essa regra e não deve servir como referência matemática.
+
+Pendente apenas:
+- faixa formal permitida do Lance Livre;
+- critério de desempate;
+- eventual detalhe do corte quando o Fundo Comum residual não comporta outra contemplação.
 
 
 11.2. Significado de “Carta rende X% do CDB”
-Status após resposta de 28/09/2026:
-A FORMULAÇÃO ORIGINAL ESTÁ SUPERADA.
+Status após resposta de 29/09/2026:
+RESOLVIDO PARA A MODELAGEM-BASE.
 
 Não devemos mais descrever a regra como “a carta rende X% do CDB benchmark”.
 
-O que agora sabemos:
-- o crédito contemplado recebe os rendimentos líquidos financeiros das aplicações permitidas para os recursos do grupo;
-- a Bamaq comercialmente expressa esse resultado como uma faixa aproximada em % do CDI;
-- não é uma promessa de taxa fixa;
-- o resultado pode variar ao longo do tempo.
+Estrutura correta:
+- crédito contemplado recebe rendimentos líquidos das aplicações permitidas do grupo;
+- aplicação informada: Itaú Premium RF Referenciado DI, CNPJ 03.184.233/0001-80;
+- retorno bruto da aplicação é próximo ao CDI e pode oscilar;
+- orientação Bamaq para projeção líquida da carta: aproximadamente 80% do CDI;
+- benchmark CDB do usuário é variável independente.
 
-Verificação regulatória:
-A Resolução BCB nº 285/2023, arts. 10, 16 e 17, confirma a aplicação dos recursos vinculados à contemplação e o acréscimo dos rendimentos líquidos ao crédito.
+Verificação externa:
+A identidade do fundo e seu perfil CDI foram confirmados em fontes públicas do Itaú/CVM. A lâmina oficial de julho/2026 mostra retorno bruto próximo de 98% do CDI nas janelas recentes.
 
-Pendente:
-- esclarecer se a faixa correta é 98%–105% ou 80%–105% do CDI;
-- obter extrato real e/ou aplicação/CNPJ do Grupo 4012;
-- decidir como representar rendimento variável no software.
+Decisão:
+- input do simulador deve continuar separado do CDB benchmark;
+- default/preset base futuro da carta deve migrar para 80% do CDI;
+- 98%–105% não deve mais aparecer como faixa líquida;
+- preservar input manual e sensibilidade;
+- evitar dupla tributação do retorno que já é modelado como líquido.
+
+Pendente apenas:
+- extrato real do Grupo 4012, se desejarmos validar o veículo efetivamente utilizado e o repasse líquido observado.
+
 
 ============================================================
 12. DECISÕES DE MODELAGEM INTERNAS
@@ -1530,130 +1645,54 @@ Exibir uma explicação contextual, por exemplo:
 “TIR não definida para esta série de fluxos.”
 
 ============================================================
-13. CHECKLIST PARA A MICHELLE/BAMAQ
+12.8. CONFIABILIDADE DAS FONTES COMERCIAIS
 ============================================================
 
-1. [MAJORITARIAMENTE RESPONDIDA] Crédito contemplado recebe rendimentos líquidos das aplicações do grupo; falta reconciliar faixa CDI e detalhes do extrato/aplicação.
-2. [RESPONDIDA] Sim. Pode quitar até 100% da parcela da própria cota; excedente permanece no crédito; solicitação precisa ser feita mensalmente no app.
-3. [RESPONDIDA COMERCIALMENTE + RESPALDO REGULATÓRIO] Crédito recebe rendimentos líquidos; Michele afirma ausência de taxa adicional de gestão. Confirmar apenas eventual evento fiscal no saque.
-4. [RESPONDIDA] Até a utilização; Michele também informa até o encerramento do grupo. Regulamentação confirma rendimento até a efetiva utilização.
-5. [RESPONDIDA] 4 cotas: R$ 400 mil + R$ 400 mil + R$ 370 mil + R$ 200 mil.
-6. [RESPONDIDA COMERCIALMENTE] Podem ficar no mesmo grupo (ex.: 4012); confirmar na proposta final.
-7. [RESPONDIDA] Sim, número e apuração próprios.
-8. [RESPONDIDA] Sim, inclusive por lance, sujeito ao Fundo Comum.
-9. [RESPONDIDA] Sim. Créditos contemplados podem ser reunidos para um único imóvel, inclusive de grupos Bamaq diferentes; confirmado pelo Regulamento Geral da Bamaq.
-10. [RESPONDIDA] Não. O rendimento de cada cota só pode abater parcelas da própria cota.
-11. Como funciona o cashback com várias cotas?
-12. [MAJORITARIAMENTE RESPONDIDA/VERIFICADA] Residual pode, a critério do consorciado, ir para despesas vinculadas até 10%, antecipação de prestações conforme contrato ou devolução em dinheiro se obrigações estiverem quitadas. Falta regra específica do Grupo 4012 e cálculo multi-cota.
-13. O fundo de reserva não utilizado é devolvido?
-14. [RESPONDIDA PARA RESGATE PÓS-180 DIAS] Não há netting simples; obrigações precisam estar quitadas antes. [ABERTA NO ENCERRAMENTO] Michele diz que pode haver liquidação interna no fim do grupo; falta regra formal.
-15. [RESPONDIDA DOCUMENTALMENTE] Taxa de transferência = 1% do saldo devedor da cota, limitada a R$ 1.000; Regulamento 2026 também prevê taxa de cadastro de R$ 150. Falta confirmar aplicação exata do cadastro por operação.
-16. [MAJORITARIAMENTE RESPONDIDA] Sim, mas a substituição precisa ser concluída antes da liberação do imóvel original. Novo bem deve estar quitado e em nome do consorciado segundo a Central de Ajuda. Falta regra exata de valor, tarifário e SLA.
-17. [MAJORITARIAMENTE RESPONDIDA] Seguro prestamista é opcional; adesão/cadastro na entrada e análise de crédito pós-contemplação foram informados como gratuitos. Permanecem avaliação/vistoria, cartório/ITBI e custos eventuais de garantia/transferência.
-18. [MAJORITARIAMENTE RESPONDIDA] 24% de administração + 1% de reserva são integrais e diluídos no prazo remanescente de 214 meses; conferir proposta final e a questão das assembleias anteriores em caso de contemplação.
-19. [PARCIAL] Fixo 30% sobre carta atualizada; Livre sobre saldo devedor; embutido até 30% da carta. Falta formalização e faixa do Livre.
-20. [PARCIAL] Recebemos exemplo comercial de R$ 400 mil; falta memória oficial para reconciliar parcela reduzida, 209 meses e lance.
-21. [PARCIALMENTE RESPONDIDA] Seguro Prestamista é opcional. Michele diz que é percentual e distribuído nas parcelas vincendas, com teto de cobertura de R$ 800 mil/cota; falta base, taxa, certificado e regra etária formal.
-22. Para qualquer crédito usado para financiar o lance: a taxa é prefixada ou acrescida de TR/IPCA/CDI/outro indexador? Qual é o CET e a fórmula de atualização do saldo?
-23. Qual é exatamente o índice/regra de reajuste da carta, do saldo e das parcelas? Qual a data-base e o que acontece após a contemplação?
-24. [PARCIAL] Crédito não usado e fundo de reserva remanescente são disponibilizados no encerramento; falta confirmar se há compensação interna automática de eventual saldo devedor.
-25. [MAJORITARIAMENTE RESPONDIDA] Rendimentos são líquidos e sem taxa adicional de gestão segundo Michele; falta confirmar informe e eventual evento fiscal no recebimento em espécie.
+A investigação revelou divergências materiais entre afirmações comerciais e documentos oficiais.
 
-26. [ABERTA] A regra de “até 150 cotas por CPF” vem de qual norma ou política? A regulação atual e o regulamento Bamaq apontam limite de 10% por grupo.
-27. [ALTA] Uma cota contemplada posteriormente pode quitar TOTALMENTE uma ou mais cotas Bamaq já utilizadas para comprar o mesmo imóvel, conforme art. 8º, XII/XIII do Regulamento?
-28. [ALTA] Se uma carta posterior não cobrir o saldo total, posso reunir várias cartas posteriores para realizar essa quitação total?
+Caso mais relevante:
+- em mensagem anterior, a vendedora afirmou que, até a 6ª assembleia, o Lance Livre teria variado “em média entre 45% e 66%”;
+- as atas oficiais 001–006 mostram vencedores de Lance Livre em 60,14%, 60,99%, nenhum em junho, 72,73%–73% em julho, 68,91%–70,69% em agosto e 72%–73% em setembro;
+- após ser confrontada com as atas, a explicação mudou para “média didática” e para uma referência aproximada de ~65%.
 
-29. [ALTA] Cashback: como aplicar a exceção de 16/06/2026 em várias cotas e com lance embutido?
-30. [MÉDIA] O prazo oficial de cashback é 5 dias úteis (regulamento) ou existe aditivo atualizando para 7?
-31. [FISCAL] O cashback recebido altera o custo fiscal do imóvel ou precisa ser informado de forma específica no IRPF?
-32. [URGENTE] A campanha termina em 30/09/2026? O que precisa estar formalizado até essa data para garantir o cashback?
+Não é possível inferir intenção, mas a afirmação comercial original é materialmente incompatível ou, no mínimo, não verificável à luz dos documentos apresentados e foi posteriormente reformulada.
 
-33. [ALTA] Na substituição de garantia do Grupo 4012, qual é a fórmula objetiva do valor mínimo do novo imóvel: saldo devedor, crédito liberado/original ou saldo + margem?
-34. [MÉDIA] Confirmar formalmente que o imóvel substituto precisa estar quitado e registrado em nome do consorciado.
-35. [MÉDIA] Qual é o tarifário atual de vistoria/engenharia, custos administrativos e cartório na substituição?
-36. [MÉDIA] O prazo total de 15–30 dias úteis é SLA formal ou média operacional? Como se compatibiliza com os 5 dias úteis de análise documental do Regulamento?
-37. [MÉDIA] Na venda com quitação, comprador/financiador pode pagar diretamente a Bamaq como interveniente quitante? Qual é o procedimento formal?
+Hierarquia de fontes para o projeto:
+1. contrato/regulamento/norma oficial aplicável;
+2. atas e documentos operacionais oficiais;
+3. memórias de cálculo matematicamente reproduzíveis;
+4. respostas comerciais escritas;
+5. respostas comerciais verbais/áudios.
 
-38. [MÉDIA] Na transferência de cota contemplada sem bem adquirido, os R$ 150 de cadastro são cobrados por cota ou apenas uma vez por cessionário?
-39. [BAIXA] Quem é formalmente responsável pelas tarifas da transferência — cedente ou cessionário — ou isso pode ser negociado entre as partes?
-40. [MÉDIA] Qual é o prazo/SLA para análise e aprovação do cessionário de uma cota contemplada?
-41. [FISCAL] Qual é o tratamento tributário da venda/cessão da cota e a base de custo fiscal correta?
-
-42. [MÉDIA] Seguro Prestamista: qual é a taxa percentual e a base exata de cálculo do prêmio?
-43. [MÉDIA] A contratação do Seguro Prestamista pode ocorrer depois da adesão? Há carência/nova análise?
-44. [MÉDIA] Confirmar certificado/apólice, seguradora, teto de R$ 800 mil/cota e regra de idade >70 anos/avalista.
-45. [BAIXA] Confirmar na proposta oficial que taxa de adesão/cadastro inicial = R$ 0 e que não existe tarifa separada de liberação de crédito.
-
-46. [ALTA] Grupo em andamento: o art. 8º, VI, “a”, do Regulamento Bamaq 2025 ainda vale para a proposta 2026? Em caso de contemplação, haverá qualquer cobrança/dedução correspondente às assembleias anteriores à adesão?
-47. [ALTA] Confirmar documentalmente que a nova cota terá exatamente 214 parcelas contratuais e nenhum valor retroativo fora delas.
-
-48. [MÉDIA] Por que a parcela “reduzida 50%” usa coeficiente 0,2919% da carta e fica sistematicamente abaixo de metade da parcela integral?
-49. [ALTA] As cotações garantem cashback nominal de R$40k/R$37k/R$20k mesmo quando houver lance embutido reduzindo o crédito líquido liberado?
-50. [MÉDIA] De onde vem o valor de R$123,3 mil citado como teto de 10% para ITBI/cartório, se 10% de R$1,37 milhão são R$137 mil?
-51. [MÉDIA] O prazo para pagar lance vencedor é 3 dias, como na mensagem, ou 2º dia útil, como constava na ata analisada?
-
-52. [ALTA] Qual é a data exata do aniversário/reajuste do Grupo 4012? A assembleia “do dia 18” é esse aniversário?
-53. [ALTA] Se eu contratar/alocar agora, os R$3.999,03 e R$8.002,17 já sofrem 3% na próxima assembleia do dia 18 ou ficam travados até o aniversário seguinte?
-54. [URGENTE] Qual ato até 30/09 efetivamente garante a cotação/cashback: emissão do contrato, assinatura, pagamento da primeira parcela ou alocação efetiva das cotas?
-55. [BAIXA] Seguro contratado posteriormente: há carência/janela e qual é a fórmula usada na data de inclusão?
-
-
-
-
-
-
-
-
+Regra de governança:
+- afirmação comercial conflitante com fonte oficial NÃO vira premissa canônica;
+- se uma resposta comercial for a única fonte disponível, ela deve permanecer rotulada como comercial e sujeita a reabertura;
+- discrepâncias relevantes devem ser preservadas na trilha de auditoria.
 
 ============================================================
-14. ITENS JÁ RESOLVIDOS NA FERRAMENTA
+13. CHECKLIST RESIDUAL — SOMENTE QUESTÕES AINDA ABERTAS
 ============================================================
 
-- A1: base de preço de venda configurável.
-- A2: lance limitado ao saldo amortizável.
-- A3: custos do imóvel podem gerar fluxo negativo.
-- A4: motor financeiro unificado.
-- A5: patrimônio líquido de realização.
-- A6: compra no fim do mês; aluguel a partir do seguinte.
-- A7: múltiplo anualizado separado da TIR real.
-- A9: patrimônio pré-contemplação não é mais artificialmente exibido.
-- A10: ordem reajuste/contemplação configurável.
-- A11: base matemática dos rendimentos no resgate corrigida.
-- A13: cashback separado do caixa do mês da compra.
-- A15: limites do lance aplicados no motor.
-- A16: inputs manuais não são mais sobrescritos.
-- A17: uso direto do saldo real da carta.
-- R1: gráfico de sensibilidade ao rendimento da carta implementado.
+ALTA / PODE ALTERAR RESULTADO
+1. Confirmar documentalmente que as quatro cotas novas do Grupo 4012 não sofrem cobrança/dedução por assembleias anteriores à adesão, apesar da redação genérica do Regulamento 2025.
+2. Confirmar se uma cota contemplada posteriormente pode quitar integralmente uma ou mais cotas Bamaq já utilizadas no mesmo imóvel e se várias cartas posteriores podem ser combinadas para essa quitação.
+3. Confirmar regra de encerramento quando carta contemplada não utilizada ainda possui saldo devedor: existe compensação interna automática ou o crédito em espécie só é liberado após quitação externa?
+4. Confirmar fórmula objetiva do valor mínimo do imóvel em substituição de garantia e o procedimento de venda com interveniente quitante.
+5. Definir a trajetória/sensibilidade de CDI/CDB de longo prazo; não depende da Bamaq, mas altera fortemente o resultado econômico.
 
-Extensões posteriores à auditoria original:
-- V2.51: TR projetada opcional no empréstimo do lance, com default de 0%, separada da inflação.
-- V2.52: KPI explícito de “Aportes próprios acumulados em valores de hoje”.
-- V2.53: seção opcional de seguro/proteção financeira, com três bases de cálculo configuráveis e KPIs próprios.
-- V2.54 / B1: `N` voltou a ser devolvido pelo motor para os KPIs e warnings dependentes do horizonte.
-- V2.54 / B2: cenários hipotéticos do break-even recalculam o resgate para respeitar contemplação + 6 meses.
-- V2.54 / B3-B4: painel de venda da carta trata corretamente inexistência de janela válida e não usa mais `cfg.redeemRaw`.
-- V2.54 / B5: valor recebido na cessão da carta passa a render somente no mês seguinte, coerente com a convenção de fim de mês.
-- V2.54 / Q06: custos da cessão superiores à proposta viram aporte do bolso; a perda não é mais truncada em zero.
-- V2.54 / B7: interface avisa explicitamente que o modelo atual é de uma carta única equivalente.
+MÉDIA / CONTRATUAL-OPERACIONAL
+6. Cashback: confirmar se existe aditivo alterando o prazo documental de 5 dias úteis para os 7 dias úteis informados comercialmente.
+7. Confirmar tratamento tributário/declaratório do cashback e eventual impacto no custo fiscal do imóvel.
+8. Confirmar fórmula da parcela reduzida “50%”, que não coincide exatamente com metade da parcela integral nas cotações.
+9. Confirmar faixa regulamentar permitida do Lance Livre e critério de desempate em percentuais idênticos.
+10. Confirmar o dia exato do reajuste em abril/2027 e a ordem reajuste × contemplação se os eventos coincidirem.
+11. Confirmar custos e SLA de substituição de garantia, vistoria/engenharia e cartório.
+12. Confirmar regras completas do seguro prestamista: taxa, base, teto, idade e contratação posterior.
+13. Confirmar origem/política da alegação de limite de 150 cotas por CPF; a norma localizada aponta 10% das cotas ativas por grupo.
+14. Confirmar taxa de cadastro na transferência, responsável pelo pagamento, SLA de análise do cessionário e tratamento fiscal da cessão.
+15. Confirmar eventual evento fiscal adicional no resgate em espécie após 180 dias e existência de informe de rendimentos.
 
-============================================================
-15. PRÓXIMO MARCO
-============================================================
-
-Situação após a segunda auditoria:
-- o motor financeiro da V2.53 foi considerado adequado para análise exploratória nos invariantes testados;
-- a V2.54 corrige os principais bugs objetivos encontrados nos painéis auxiliares e na exibição;
-- as maiores incertezas agora estão nas premissas contratuais/macroeconômicas e na estrutura de múltiplas cotas.
-
-Próximos passos:
-1. Obter respostas formais sobre:
-   - rendimento da carta e possibilidade de pagar parcelas;
-   - tributação/custos dos rendimentos;
-   - índice/regra de reajuste;
-   - saída da carta não utilizada no encerramento;
-   - uso conjunto de créditos de múltiplas cotas.
-2. Definir cenários macroeconômicos explícitos para CDB e reajuste, idealmente com matriz de sensibilidade conjunta.
-3. Implementar a estrutura de N cotas independentes, com contemplação, lance, saldo, rendimento e compra/uso do crédito por cota.
-4. Reexecutar a suíte da segunda auditoria após cada mudança estrutural.
-
-Até lá, a V2.54 deve ser interpretada como uma simulação exploratória de “carta única equivalente”. A segunda auditoria mostrou que essa aproximação pode mudar inclusive o sinal do resultado quando as cotas reais são contempladas em momentos diferentes. Os campos de TR e seguro continuam sendo sensibilidades configuráveis e não devem ser lidos como confirmação das condições contratuais reais.
+BAIXA / UX E DOCUMENTAÇÃO
+16. Confirmar origem do valor de R$123,3 mil citado comercialmente para despesas vinculadas, pois 10% de R$1,37 milhão são R$137 mil.
+17. Obter, apenas se necessário, extrato/posição específica do Grupo 4012 no fundo Itaú Premium para elevar o grau de prova.
+18. Manter revisão contratual final como gate antes de transformar respostas comerciais em regras definitivas.
