@@ -36,7 +36,7 @@ Quando uma resposta:
 # Itens
 
 
-## Estado atual antes de novas perguntas — V3.11
+## Estado atual antes de novas perguntas — V3.14
 
 A numeração de perguntas permanece histórica e rastreável. Mudanças internas de software não consomem novos QNs.
 
