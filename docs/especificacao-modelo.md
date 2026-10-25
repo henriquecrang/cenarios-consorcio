@@ -2858,6 +2858,30 @@ Contemplações heterogêneas quebram essa equivalência.
 
 # 59. Sensibilidades prioritárias futuras
 
+## 59.5 CDI bruto separado do benchmark líquido
+
+Desde a V3.7, o modelo separa explicitamente:
+
+- `cdbAnnual`: retorno líquido projetado do benchmark;
+- `cdiAnnual`: CDI bruto de referência;
+- `cartaPctCdi`: fração do CDI usada como retorno líquido final da carta.
+
+Default da V3.7:
+- CDB benchmark líquido = 11,5% a.a.;
+- CDI bruto spot = 13,65% a.a., referência BCB/SGS 4389 em 23/10/2026;
+- carta = 80% do CDI.
+
+Essas taxas NÃO são economicamente equivalentes e não devem ser sincronizadas automaticamente.
+
+O CDI spot serve como referência inicial editável. O motor ainda assume taxa constante ao longo do horizonte; portanto, em cenários longos, o campo deve ser interpretado como hipótese/sensibilidade, não como previsão.
+
+Regra:
+`i_carta,a = i_CDI_bruto,a × p_carta_liquido`
+
+O parâmetro `p_carta_liquido` já representa o resultado líquido projetado da carta e não recebe um novo haircut de IR.
+
+
+
 Além da sensibilidade R1, o simulador deve futuramente priorizar:
 
 ## 59.1 Matriz CDB × reajuste
