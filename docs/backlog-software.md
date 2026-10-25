@@ -7,7 +7,7 @@
 
 **Estado canônico da documentação:** pós-rodada `pre_respostas30`.
 
-> P0 antes de nova decisão econômica: (1) recalibrar Lance Livre/defaults com o histórico real; (2) alterar a premissa-base líquida da carta de 98% para ~80% do CDI; (3) adicionar regressões para Lance Livre, embutido e cashback multi-cota.
+> P0 antes de nova decisão econômica: (1) alterar a premissa-base líquida da carta de 98% para ~80% do CDI; (2) adicionar regressões para Lance Livre, embutido e cashback multi-cota. A recalibração do Lance Livre foi implementada na V3.3.
 
 ## Regra de uso
 
@@ -2414,9 +2414,9 @@ Cenários com 1, 4 ou N cotas podem ser salvos, carregados, exportados e importa
 ---
 
 
-### SW-076 — Camada opcional de calibração por histórico real de lances
+### SW-076 — Camada de calibração por histórico real de lances
 
-**Status:** CANDIDATA — NÃO IMPLEMENTAR NESTA RODADA  
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.3  
 **Prioridade:** MÉDIA  
 **Tipo:** ANÁLISE / SENSIBILIDADE / EVIDÊNCIA EMPÍRICA  
 **Origem:** atas 001–006 do Grupo 4012 + resposta de Michele sobre sigilo dos lances  
@@ -2458,8 +2458,12 @@ O total de ofertas é sigiloso/inacessível ao cliente.
 **Critério de aceite:**  
 O histórico melhora interpretação sem produzir estatística inexistente.
 
-**Versão-alvo:**  
-futura, se útil para UX.
+**Implementado na V3.3:**  
+- default analítico do Lance Livre em 70%;
+- presets da matriz entre 60,1% e 73%;
+- contexto histórico explícito;
+- alerta para lances abaixo do histórico observado;
+- sem cálculo de probabilidade/taxa de sucesso.
 
 ---
 
