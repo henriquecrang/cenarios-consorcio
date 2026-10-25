@@ -2046,14 +2046,16 @@ function scenarioCaptureDecisionMatrix(){
     }));
   });
   return {
-    buyAtLastCont:!!$('decisionBuyAtLastCont')?.checked,
+    purchasePolicy:$('decisionPurchasePolicy')?.value || 'last',
+    pricePolicy:$('decisionPricePolicy')?.value || 'fixed',
+    propertyPrice:String($('decisionPropertyPrice')?.value || '1000000'),
     rows
   };
 }
 
 function scenarioCaptureState(){
   return {
-    stateVersion:1,
+    stateVersion:2,
     controls:scenarioCaptureControls(),
     decisionMatrix:scenarioCaptureDecisionMatrix()
   };
@@ -2093,7 +2095,11 @@ function scenarioSanitizeState(raw){
     stateVersion:1,
     controls,
     decisionMatrix:{
-      buyAtLastCont:decisionRaw.buyAtLastCont!==false,
+      purchasePolicy:['last','main','none'].includes(decisionRaw.purchasePolicy)
+        ? decisionRaw.purchasePolicy
+        : (decisionRaw.buyAtLastCont===false ? 'main' : 'last'),
+      pricePolicy:['fixed','credit'].includes(decisionRaw.pricePolicy) ? decisionRaw.pricePolicy : 'fixed',
+      propertyPrice:String(Math.max(0,+decisionRaw.propertyPrice || 1000000)),
       rows
     }
   };
@@ -2139,7 +2145,9 @@ function scenarioApplyControls(controls){
 
 function scenarioApplyDecisionMatrix(decision){
   if(!decision || typeof decision!=='object') return;
-  if($('decisionBuyAtLastCont')) $('decisionBuyAtLastCont').checked=decision.buyAtLastCont!==false;
+  if($('decisionPurchasePolicy')) $('decisionPurchasePolicy').value=decision.purchasePolicy || 'last';
+  if($('decisionPricePolicy')) $('decisionPricePolicy').value=decision.pricePolicy || 'fixed';
+  if($('decisionPropertyPrice')) $('decisionPropertyPrice').value=decision.propertyPrice || '1000000';
   const rows=decision.rows && typeof decision.rows==='object' ? decision.rows : {};
   Object.entries(rows).forEach(([key,items])=>{
     const row=document.querySelector(`#decisionScenarioBody tr[data-decision-row="${CSS.escape(key)}"]`);
