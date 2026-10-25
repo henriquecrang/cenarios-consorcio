@@ -7,7 +7,7 @@
 
 **Estado canônico da documentação:** pós-rodada `pre_respostas30`.
 
-> P0 antes de nova decisão econômica: adicionar regressões para Lance Livre, embutido e cashback multi-cota. Lance Livre foi recalibrado na V3.3 e o rendimento líquido-base da carta foi corrigido na V3.4.
+> P0 antes de nova decisão econômica: concluídos. V3.3 recalibrou o Lance Livre; V3.4 corrigiu o rendimento líquido-base; V3.5 extraiu o núcleo financeiro e adicionou regressões automatizadas.
 
 ## Regra de uso
 
@@ -2531,6 +2531,35 @@ Nenhum na matemática atual; melhora consistência do preset e evita cenários i
 
 **Versão-alvo:**  
 futura revisão de UX/presets.
+
+---
+
+
+### SW-079 — Núcleo financeiro testável e regressões automatizadas
+
+**Status:** IMPLEMENTADA — V3.5  
+**Prioridade:** P0  
+**Tipo:** ARQUITETURA / TESTES  
+**Origem:** issue #3
+
+**Implementado:**  
+- `model-core.js` com as regras puras de Lance Livre/embutido e cashback;
+- `index.html` passa a consumir o mesmo núcleo testado;
+- `tests/model-core.test.js` com regressões dos casos reconciliados;
+- `package.json` sem dependências externas;
+- GitHub Actions executa `npm test` em push/PR.
+
+**Casos protegidos:**  
+- 45% × R$495.330 = R$222.898,50;
+- embutido de 30% sobre carta de R$400 mil = R$120.000;
+- parte em dinheiro = R$102.898,50;
+- embutido limitado ao valor total do lance;
+- cashback de 10% sobre R$959 mil = R$95.900.
+
+**Critério de aceite:**  
+A aplicação e os testes usam as mesmas funções de núcleo; não há duplicação dessas fórmulas críticas.
+
+**Versão:** V3.5.
 
 ---
 
