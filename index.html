@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.17 · Lance individual por cota</title>
+<title>Consórcio x CDB x Imóvel — V3.18 · Reconciliação da cotação</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.17 · Lance individual por cota</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.18 · Reconciliação da cotação</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1408,6 +1408,22 @@ th:first-child,td:first-child{text-align:left}
 
     <div>
 <div class="kpi-section">
+        <div class="kpi-section-title">Reconciliação com a cotação comercial</div>
+        <div class="kpis compact">
+          <div class="kpi"><div class="l">Crédito nominal — cotação</div><div class="v" id="kQuoteCredit">—</div></div>
+          <div class="kpi"><div class="l">Crédito nominal — cenário</div><div class="v" id="kQuoteCreditCalc">—</div><div class="kpi-formula" id="kQuoteCreditDiff">—</div></div>
+          <div class="kpi"><div class="l">Parcela reduzida — cotação</div><div class="v" id="kQuoteReduced">—</div></div>
+          <div class="kpi"><div class="l">Parcela reduzida — motor</div><div class="v" id="kQuoteReducedCalc">—</div><div class="kpi-formula" id="kQuoteReducedDiff">—</div></div>
+          <div class="kpi"><div class="l">Parcela integral — cotação</div><div class="v" id="kQuoteFull">—</div></div>
+          <div class="kpi"><div class="l">Parcela integral — motor</div><div class="v" id="kQuoteFullCalc">—</div><div class="kpi-formula" id="kQuoteFullDiff">—</div></div>
+          <div class="kpi"><div class="l">Cashback nominal exibido na cotação</div><div class="v" id="kQuoteCashbackNominal">—</div></div>
+          <div class="kpi"><div class="l">Cashback efetivo do cenário</div><div class="v" id="kQuoteCashbackEffective">—</div><div class="kpi-formula" id="kQuoteCashbackDiff">—</div></div>
+          <div class="kpi"><div class="l">Prazo restante — cotação</div><div class="v" id="kQuoteTerm">—</div></div>
+        </div>
+        <div class="small">Os valores da cotação são evidência comercial para reconciliação. Eles <b>não substituem</b> os fluxos calculados pelo motor. Em particular, ainda não há base suficiente para distribuir uma diferença de parcela cotada entre cotas com contemplações em meses distintos.</div>
+      </div>
+
+<div class="kpi-section">
         <div class="kpi-section-title">Parcelas do consórcio</div>
         <div class="kpis compact">
           <div class="kpi"><div class="l">Parcela inicial reduzida — soma das cotas</div><div class="v" id="kRed">—</div></div>
@@ -1925,6 +1941,15 @@ const MAX_QUOTAS=50;
 const DEFAULT_QUOTA_CREDITS=[400000,400000,370000,200000];
 const DEFAULT_QUOTA_CONTS=[12,12,12,12];
 
+const OFFICIAL_QUOTE={
+  credit:1370000,
+  reducedInstallment:3999.03,
+  fullInstallment:8002.17,
+  nominalCashback:137000,
+  remainingTerm:214,
+  quotaCredits:[400000,400000,370000,200000]
+};
+
 function quotaLabel(index){
   let n=index+1, s='';
   while(n>0){
@@ -2103,7 +2128,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.17';
+const SCENARIO_APP_VERSION='3.18';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -3122,6 +3147,29 @@ function simulate(){
         ? 'O custo mensal será calculado a partir do aluguel efetivo no mês da compra. O campo manual acima foi preservado.'
         : `Custo mensal calculado na entrada do imóvel: ${money(ownerShown)}; depois acompanha o aluguel conforme a regra travada. O campo manual acima foi preservado.`)
     : `Modo manual: ${money(cfg.fixedOwnerInput)} por mês.`;
+
+  const initialFullCalculated=cfg.reduced>0 ? initialReduced/cfg.reduced : 0;
+  const quoteDiff=(actual,quoted)=>{
+    const delta=actual-quoted;
+    const pctDelta=quoted!==0 ? delta/quoted*100 : 0;
+    const sign=delta>0?'+':'';
+    return `${sign}${money(delta)} (${sign}${pctDelta.toFixed(3).replace('.',',')}%)`;
+  };
+  $('kQuoteCredit').textContent=money(OFFICIAL_QUOTE.credit);
+  $('kQuoteCreditCalc').textContent=money(cfg.credit0);
+  $('kQuoteCreditDiff').textContent=quoteDiff(cfg.credit0,OFFICIAL_QUOTE.credit);
+  $('kQuoteReduced').textContent=money(OFFICIAL_QUOTE.reducedInstallment);
+  $('kQuoteReducedCalc').textContent=money(initialReduced);
+  $('kQuoteReducedDiff').textContent=quoteDiff(initialReduced,OFFICIAL_QUOTE.reducedInstallment);
+  $('kQuoteFull').textContent=money(OFFICIAL_QUOTE.fullInstallment);
+  $('kQuoteFullCalc').textContent=money(initialFullCalculated);
+  $('kQuoteFullDiff').textContent=quoteDiff(initialFullCalculated,OFFICIAL_QUOTE.fullInstallment);
+  $('kQuoteCashbackNominal').textContent=money(OFFICIAL_QUOTE.nominalCashback);
+  $('kQuoteCashbackEffective').textContent=purchased ? money(purchaseCashback) : '—';
+  $('kQuoteCashbackDiff').textContent=purchased
+    ? `vs nominal da cotação: ${quoteDiff(purchaseCashback,OFFICIAL_QUOTE.nominalCashback)}`
+    : 'depende da compra e da base elegível do cenário';
+  $('kQuoteTerm').textContent=`${OFFICIAL_QUOTE.remainingTerm} meses`;
 
   $('kRed').textContent=money(initialReduced);
   $('kPos').textContent=(cont<N ? money(postInstall) : '—');
