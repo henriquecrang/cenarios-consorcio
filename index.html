@@ -757,7 +757,7 @@ th:first-child,td:first-child{text-align:left}
 </div>
 
 <div class="assump">
-  <b>Multi-cota + lance corrigido:</b> os meses de contemplação são independentes. Em cada cota, o <b>Lance Livre</b> usa o saldo devedor daquela cota no momento da contemplação; o <b>embutido</b> usa a carta atualizada, limitado a 30% e ao próprio valor do lance. O marcador principal dos gráficos usa a <b>última contemplação</b>.
+  <b>Multi-cota:</b> os meses de contemplação são independentes. Cada cota pode ser incluída ou não na compra do imóvel. A compra espera apenas as cotas selecionadas; as demais continuam independentes e, quando contempladas, permanecem como cartas no patrimônio até receberem outro destino. O marcador principal dos gráficos continua usando a <b>última contemplação de todas as cotas</b>.
 </div>
       <div class="field">
         <label>Mês em que a carta vira imóvel: <span id="imovelMesLabel" class="badge">18</span></label>
@@ -3550,7 +3550,10 @@ function makeDecisionCandidate(baseCfg,spec){
       fundPct:spec.finPct
     }
   }));
-  const lastCont=Math.max(...cotas.map(q=>q.cont));
+  const selectedForPurchase=cotas.filter(q=>q.useInPurchase);
+  const lastCont=selectedForPurchase.length
+    ? Math.max(...selectedForPurchase.map(q=>q.cont))
+    : baseCfg.N+1;
   const comparison=decisionComparisonPolicy(baseCfg,lastCont);
   return {
     ...baseCfg,
