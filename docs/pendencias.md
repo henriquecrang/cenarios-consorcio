@@ -242,6 +242,7 @@ Nível de evidência:
 Esta seção descreve o estado canônico atual. O histórico detalhado de versões anteriores fica no follow-up das auditorias e no Git.
 
 IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
+- compra com subconjunto selecionável de cotas; cotas não usadas continuam independentes;
 - arquitetura multi-cota configurável;
 - proposta QuintoAndar 400 / 400 / 370 / 200 como preset estrutural;
 - contemplação independente por cota;
@@ -261,7 +262,6 @@ IMPLEMENTADO E REAUDITADO NA LINHA ATUAL:
 - política anti-pooling verificada mês a mês por cota.
 
 PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
-- compra com subconjunto das cotas já contempladas;
 - override das parcelas oficiais cotadas;
 - trajetória temporal de CDI/CDB para horizontes longos;
 - dia exato e ordem do reajuste quando coincide com contemplação;
@@ -273,6 +273,27 @@ PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
 
 ESTADO DE QUALIDADE:
 A linha atual já passou pela auditoria posterior à V3.5 e pelas correções V3.6–V3.14. As regras críticas possuem testes automatizados, incluindo as correções de timing do cashback, taxa de transferência e crédito residual. O que permanece aberto está concentrado em premissas externas, documentação contratual e funcionalidades ainda não implementadas.
+
+============================================================
+AUDITORIA V3.16 — COMPRA COM SUBCONJUNTO DE COTAS
+============================================================
+
+Issue #16: IMPLEMENTADA; AGUARDANDO APENAS CI FINAL NO FECHAMENTO DA ISSUE.
+
+Implementado:
+- flag `useInPurchase` por cota, default verdadeiro;
+- mês mínimo da compra determinado apenas pelas cotas selecionadas;
+- compra consome apenas o crédito das cotas selecionadas;
+- cashback usa somente o principal/crédito dessas cotas;
+- cotas não usadas permanecem independentes após a compra;
+- cartas posteriores continuam rendendo e abatendo apenas a própria parcela;
+- passivo comparável não inclui cota não contemplada apenas porque outra cota já foi usada no imóvel;
+- matriz herda a seleção da simulação principal;
+- persistência inclui a seleção por cota;
+- regressão de integração cobre A+B comprando no mês 4 e C+D permanecendo independentes.
+
+Limite deliberado:
+A V3.16 modela uma única compra. Não presume quitação do imóvel/consórcio anterior por cotas posteriores nem uma segunda aquisição.
 
 ============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
