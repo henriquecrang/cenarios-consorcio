@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.7 · CDI separado do benchmark</title>
+<title>Consórcio x CDB x Imóvel — V3.8 · Presets versionados</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -593,6 +593,15 @@ th:first-child,td:first-child{text-align:left}
 .scenario-status.dirty .scenario-status-dot{background:#b66a00}
 .scenario-status.unsaved .scenario-status-dot{background:#667085}
 .scenario-storage-note{font-size:10px;color:var(--muted);line-height:1.25;max-width:220px}
+.scenario-migration-warning{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:-8px 0 14px;padding:10px 12px;border:1px solid #f0c36a;
+  background:#fff8e8;border-radius:12px;font-size:12px;line-height:1.4;color:#6f4d00
+}
+.scenario-migration-warning[hidden]{display:none}
+.scenario-migration-warning .actions{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}
+.scenario-migration-warning button{padding:7px 10px;border-radius:8px;border:1px solid #d9b05d;background:#fff;cursor:pointer;font-weight:700}
+.scenario-migration-warning button.primary{background:#8a5a00;color:#fff;border-color:#8a5a00}
 @media(max-width:760px){
   .scenario-menu{position:static}
   .scenario-menu .scenario-select-wrap{flex-basis:100%}
@@ -606,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.7 · CDI separado do benchmark</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.8 · Presets versionados</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -627,6 +636,13 @@ th:first-child,td:first-child{text-align:left}
       <span id="scenarioStatusText">Configuração não salva</span>
     </div>
     <div class="scenario-storage-note">Salvos no localStorage deste navegador. Use exportar/importar para transportar ou fazer backup.</div>
+  </div>
+  <div class="scenario-migration-warning" id="scenarioMigrationWarning" hidden>
+    <div><b>Preset de versão anterior:</b> <span id="scenarioMigrationText">—</span></div>
+    <div class="actions">
+      <button type="button" id="scenarioMigrationDismiss">Manter como está</button>
+      <button type="button" id="scenarioMigrationCopy" class="primary">Criar cópia migrada</button>
+    </div>
   </div>
 
   <div class="note" style="margin:-8px 0 18px">
@@ -2005,12 +2021,13 @@ const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
 const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
-const SCENARIO_FORMAT_VERSION=1;
-const SCENARIO_APP_VERSION='3.7';
+const SCENARIO_FORMAT_VERSION=2;
+const SCENARIO_APP_VERSION='3.8';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
 let scenarioApplying=false;
+let scenarioMigrationDismissedId=null;
 
 function scenarioNowIso(){ return new Date().toISOString(); }
 function scenarioNewId(){
@@ -2094,7 +2111,7 @@ function scenarioSanitizeState(raw){
   });
 
   return {
-    stateVersion:1,
+    stateVersion:2,
     controls,
     decisionMatrix:{
       purchasePolicy:['last','main','none'].includes(decisionRaw.purchasePolicy)
@@ -2190,9 +2207,80 @@ function scenarioSanitizePreset(raw){
     name,
     createdAt:(typeof raw.createdAt==='string' ? raw.createdAt : scenarioNowIso()),
     updatedAt:(typeof raw.updatedAt==='string' ? raw.updatedAt : scenarioNowIso()),
-    appVersion:String(raw.appVersion||SCENARIO_APP_VERSION).slice(0,20),
+    appVersion:String(raw.appVersion||'legacy').slice(0,20),
     state:scenarioSanitizeState(raw.state||{})
   };
+}
+
+function scenarioVersionParts(v){
+  const m=String(v||'').match(/^(\d+)(?:\.(\d+))?(?:\.(\d+))?/);
+  return m ? [+(m[1]||0),+(m[2]||0),+(m[3]||0)] : [0,0,0];
+}
+
+function scenarioVersionLt(a,b){
+  const aa=scenarioVersionParts(a),bb=scenarioVersionParts(b);
+  for(let i=0;i<3;i++){
+    if(aa[i]!==bb[i]) return aa[i]<bb[i];
+  }
+  return false;
+}
+
+function scenarioMigrationPlan(preset){
+  if(!preset) return [];
+  const controls=preset.state?.controls || {};
+  const value=id=>controls[id]?.value;
+  const plan=[];
+  if(scenarioVersionLt(preset.appVersion,'3.3') && Number(value('lanceTotal'))===30){
+    plan.push({id:'lanceTotal',from:'30%',to:'70%',value:'70',label:'Lance Livre'});
+  }
+  if(scenarioVersionLt(preset.appVersion,'3.4') && Number(value('cartaPctCdi'))===98){
+    plan.push({id:'cartaPctCdi',from:'98%',to:'80%',value:'80',label:'Carta / CDI'});
+  }
+  if(scenarioVersionLt(preset.appVersion,'3.7') && Number(value('cdi'))===11.5){
+    plan.push({id:'cdi',from:'11,5%',to:'13,65%',value:'13.65',label:'CDI bruto'});
+  }
+  return plan;
+}
+
+function scenarioRenderMigrationWarning(){
+  const box=$('scenarioMigrationWarning');
+  const txt=$('scenarioMigrationText');
+  const preset=scenarioSelectedPreset();
+  if(!box || !txt || !preset || preset.id===scenarioMigrationDismissedId){
+    if(box) box.hidden=true;
+    return;
+  }
+  const plan=scenarioMigrationPlan(preset);
+  if(!plan.length){
+    box.hidden=true;
+    return;
+  }
+  txt.textContent=`${preset.name} foi salvo na versão ${preset.appVersion}. Defaults antigos detectados: ${plan.map(x=>`${x.label} ${x.from} → ${x.to}`).join('; ')}. O original não será alterado.`;
+  box.hidden=false;
+}
+
+function scenarioCreateMigratedCopy(){
+  const preset=scenarioSelectedPreset();
+  const plan=scenarioMigrationPlan(preset);
+  if(!preset || !plan.length) return;
+  const clone=JSON.parse(JSON.stringify(preset));
+  clone.id=scenarioNewId();
+  clone.name=scenarioEnsureUniqueImportedName(`${preset.name} — migrado V${SCENARIO_APP_VERSION}`,clone.id);
+  clone.createdAt=scenarioNowIso();
+  clone.updatedAt=clone.createdAt;
+  clone.appVersion=SCENARIO_APP_VERSION;
+  clone.state=scenarioSanitizeState(clone.state||{});
+  plan.forEach(item=>{
+    if(!clone.state.controls[item.id]) clone.state.controls[item.id]={kind:'value',value:item.value};
+    else clone.state.controls[item.id].value=item.value;
+  });
+  scenarioLibrary.push(clone);
+  scenarioSelectedId=clone.id;
+  scenarioMigrationDismissedId=null;
+  scenarioPersistLibrary();
+  scenarioApplyState(clone.state,{simulateNow:true});
+  scenarioMarkClean();
+  scenarioRenderSelect();
 }
 
 function scenarioLoadLibrary(){
@@ -2269,6 +2357,7 @@ function scenarioRenderSelect(){
   sel.value=scenarioLibrary.some(p=>p.id===current) ? current : '';
   $('scenarioDelete').disabled=!scenarioSelectedPreset();
   scenarioUpdateStatus();
+  scenarioRenderMigrationWarning();
 }
 
 function scenarioEscapeHtml(v){
@@ -2355,6 +2444,7 @@ function scenarioSelectPreset(id){
     if(!leave){scenarioRenderSelect();return false;}
   }
   scenarioSelectedId=preset.id;
+  scenarioMigrationDismissedId=null;
   scenarioApplyState(preset.state,{simulateNow:true});
   scenarioPersistLibrary();
   scenarioMarkClean();
@@ -2484,6 +2574,11 @@ function initScenarioManager(){
   if(!select || select.dataset.ready==='1') return;
   select.dataset.ready='1';
   scenarioLoadLibrary();
+  $('scenarioMigrationDismiss')?.addEventListener('click',()=>{
+    scenarioMigrationDismissedId=scenarioSelectedId;
+    scenarioRenderMigrationWarning();
+  });
+  $('scenarioMigrationCopy')?.addEventListener('click',scenarioCreateMigratedCopy);
   scenarioRenderSelect();
 
   $('scenarioSave').addEventListener('click',()=>scenarioSaveCurrent(false));
