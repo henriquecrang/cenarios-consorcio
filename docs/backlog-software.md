@@ -1,3 +1,24 @@
+### SW-085 — Timing mensal do cashback
+
+**Status:** IMPLEMENTADA — V3.12  
+**Prioridade:** P0 CONCLUÍDA  
+**Tipo:** CRONOLOGIA / CASHBACK  
+**Origem:** limpeza canônica / issue #12
+
+**Implementado:**
+- `cashbackDelayMonths` configurável;
+- default = 1;
+- recebimento agendado para M+1;
+- delay 0 somente como sensibilidade;
+- KPI do mês de recebimento;
+- histórico mensal registra o recebimento;
+- regressão de integração protege compra M4 → recebimento M5.
+
+**Pendência externa:**
+5 versus 7 dias úteis permanece documental, sem exigir granularidade diária do motor atual.
+
+---
+
 ### SW-084 — Motor completo sem DOM + regressões de integração
 
 **Status:** IMPLEMENTADA — V3.11  
