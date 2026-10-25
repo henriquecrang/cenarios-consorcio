@@ -1,4 +1,20 @@
 ============================================================
+AUDITORIA V3.9 — FINANCIAMENTO DO LANCE
+============================================================
+
+Issue #6: RESOLVIDA.
+
+Implementado:
+- três linhas dedicadas na matriz: Financiamento 0%, 50% e 100%;
+- contemplação, Lance Livre e rendimento são herdados da Base comparável;
+- política de compra/preço permanece comum à matriz.
+
+Resultado que motivou a mudança:
+No cenário auditado de imóvel-alvo de R$1 milhão, compra no mês 12 e Lance Livre de 70%, a diferença contra o CDB piorava fortemente conforme aumentava a alavancagem.
+
+A matriz agora permite visualizar esse efeito isoladamente sem confundi-lo com outras mudanças de cenário.
+
+============================================================
 AUDITORIA V3.8 — PRESETS DE VERSÕES ANTIGAS
 ============================================================
 
