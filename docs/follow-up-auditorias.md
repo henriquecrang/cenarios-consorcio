@@ -2223,6 +2223,93 @@ Não é possível inferir intenção, mas a afirmação comercial original é ma
 
 ---
 
+
+### AUDIT-V3.5 — Auditoria independente após recalibração dos P0s
+
+Data: 24/10/2026.
+
+Escopo:
+- integridade técnica e CI;
+- coerência das regras críticas;
+- reprodução do motor fora da interface;
+- efeito econômico dos novos defaults;
+- comparabilidade da matriz.
+
+#### 1. Regressões críticas
+
+Confirmadas:
+- 45% × R$495.330 = R$222.898,50;
+- embutido 30% × R$400 mil = R$120 mil;
+- dinheiro = R$102.898,50;
+- cashback 10% × R$959 mil = R$95.900.
+
+A suíte automatizada está verde, mas ainda é predominantemente unitária; abriu-se a issue #8 para regressões de integração do motor multi-cota.
+
+#### 2. Efeito da correção do Lance Livre
+
+Cenário de compra de imóvel fixo de R$1 milhão no mês 12:
+- antigo: Lance Livre 30%, carta 98% CDI → Δ vs CDB ≈ -R$1,31 mi;
+- atual: Lance Livre 70%, carta 80% CDI → Δ vs CDB ≈ -R$4,70 mi.
+
+A piora de aproximadamente R$3,39 mi decorre essencialmente do Lance Livre:
+- parte em dinheiro antiga ≈ R$91 mil;
+- parte em dinheiro atual ≈ R$777 mil.
+
+Como a compra ocorre imediatamente após contemplar, a mudança 98% → 80% do CDI praticamente não altera esse cenário específico.
+
+#### 3. Matriz não é atualmente apples-to-apples
+
+Default:
+- linha Atual: compra após o horizonte;
+- linhas alternativas: checkbox força compra na última contemplação.
+
+Com preço travado ao crédito, cada alternativa compra imóvel diferente:
+- Todas cedo: ≈ R$959 mil;
+- Duas ondas: ≈ R$993,7 mil;
+- Escalonada: ≈ R$1,012 mi;
+- Stress: ≈ R$1,044 mi.
+
+Aberta issue #5 (P0).
+
+#### 4. Financiamento do lance é extremamente material
+
+Imóvel fixo R$1 milhão, compra mês 12, Lance Livre 70%:
+- 0% financiado: Δ ≈ -R$3,05 mi;
+- 50% financiado: Δ ≈ -R$3,87 mi;
+- 100% financiado: Δ ≈ -R$4,70 mi.
+
+Com 100% financiado:
+- principal ≈ R$776,8 mil;
+- juros totais ≈ R$938,9 mil.
+
+Aberta issue #6.
+
+#### 5. Cashback em carta com rendimento acumulado
+
+O motor usa letterBalance na compra e aplica cashback sobre creditUsed. Isso faz o cashback crescer com rendimentos acumulados, chegando a mais de R$100 mil em alguns presets. Não há evidência documental consolidada de que rendimento financeiro faça parte da base promocional.
+
+Aberta issue #7.
+
+#### 6. CDI de referência
+
+O app usa 11,5% a.a. tanto como CDB líquido quanto como CDI de referência. São grandezas diferentes.
+
+Na data da auditoria, CDI anualizado estava em 13,65% e Selic meta em 13,75%. Mantendo CDB líquido em 11,5%, elevar apenas o CDI de 11,5% para 13,65% melhora o cenário de carta carregada até o fim em aproximadamente R$1,07 mi.
+
+Aberta issue #9 (P0).
+
+#### 7. Presets antigos
+
+O localStorage persiste appVersion, porém não migra nem alerta presets de versões antigas. Um preset V3.2 pode restaurar 30% de Lance Livre e/ou 98% de CDI silenciosamente.
+
+Aberta issue #10 (P0).
+
+#### Conclusão da auditoria
+
+A correção das premissas comerciais tornou o modelo muito mais conservador e enfraqueceu fortemente a tese econômica da contratação. O motor crítico está mais seguro que na V3.2, mas a matriz ainda não deve ser usada como comparação final até resolver #5, #9 e #10.
+
+---
+
 # PARTE IX — FONTES E RASTREABILIDADE
 
 
