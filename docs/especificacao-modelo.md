@@ -1383,6 +1383,28 @@ O valor líquido recebido entra no caixa somente quando efetivamente transferido
 
 ---
 
+
+## 22.X Default conservador da V3.20
+
+No resgate voluntário pós-180 dias, a interface NÃO deve assumir compensação automática entre carta e saldo devedor.
+
+Default:
+
+`fonteQuitacaoResgate = ponte`
+
+Interpretação:
+- as obrigações precisam estar quitadas antes da liberação em dinheiro;
+- a ponte representa uma fonte explícita e temporária para essa quitação;
+- taxa, IOF e prazo da ponte são sensibilidades, não condições Bamaq confirmadas.
+
+A opção:
+
+`compensarComPropriaCarta`
+
+permanece apenas como sensibilidade avançada/não confirmada e deve gerar warning explícito.
+
+Resgate voluntário pós-180 dias e liquidação no encerramento do grupo continuam sendo eventos conceitualmente distintos.
+
 # 23. Compra do imóvel
 
 A compra ocorre no **fim do mês configurado**.
