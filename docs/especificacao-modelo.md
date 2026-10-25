@@ -1,6 +1,6 @@
 # Especificação canônica do modelo — Simulador Consórcio × CDB × Imóvel
 
-**Baseline de implementação atual:** V3.14  
+**Baseline de implementação atual:** V3.15  
 **Status:** especificação funcional e financeira canônica do comportamento esperado do simulador  
 **Documentos complementares:**  
 - `docs/pendencias.md` — premissas externas, regras contratuais e funcionalidades ainda abertas;  
@@ -548,7 +548,11 @@ Ela também confirmou que:
 - podem contemplar de 1 a 4 cotas no mesmo mês;
 - o resultado depende também do saldo financeiro disponível no Fundo Comum.
 
-A arquitetura atual implementa Lance Livre e embutido com bases distintas, por cota. A modalidade Lance Fixo permanece especificada, mas ainda não possui seletor explícito na interface.
+Desde a V3.15, a arquitetura implementa explicitamente as duas modalidades:
+- Lance Livre: percentual sobre saldo devedor atualizado;
+- Lance Fixo: percentual sobre carta atualizada, default 30%.
+
+O lance embutido mantém base própria na carta atualizada e é limitado ao próprio lance efetivo.
 
 ## 11.2 Lance Fixo
 
@@ -559,6 +563,34 @@ Para Lance Fixo de 30%:
 onde `C` é o valor atualizado da carta da cota.
 
 A confirmação documental da modalidade ainda é desejável.
+
+## 11.2.1 Implementação V3.15
+
+A simulação principal possui seletor explícito de modalidade.
+
+Parâmetros:
+- `lanceMode ∈ {free, fixed}`;
+- `lancePct` para Livre;
+- `fixedLancePct` para Fixo, default 30%.
+
+O núcleo usa:
+
+`base = D_assembleia` para Livre;
+
+`base = C_atualizada` para Fixo.
+
+Em ambos:
+
+`L_efetivo = min(L_solicitado, D_assembleia)`
+
+O embutido continua:
+
+`L_emb = min(C × pct_emb, L_efetivo)`.
+
+A matriz de cenários exibe modalidade por linha:
+- cenários calibrados por atas permanecem explicitamente Livre;
+- linhas de financiamento herdam a modalidade da Base comparável;
+- modalidade e percentual são persistidos nos presets.
 
 ## 11.3 Regra canônica — Lance Livre
 
@@ -2549,7 +2581,7 @@ Isso vale especialmente para:
 
 ---
 
-# 51. Defaults atuais — V3.14
+# 51. Defaults atuais — V3.15
 
 Os defaults abaixo descrevem a configuração atual do simulador. Eles são **premissas de cenário**, não recomendações financeiras nem garantias contratuais.
 
@@ -3164,7 +3196,7 @@ E uma limitação estrutural deve ser apresentada ao usuário antes que o result
 
 ---
 
-# PARTE XI — ARQUITETURA DE IMPLEMENTAÇÃO ATUAL — V3.14
+# PARTE XI — ARQUITETURA DE IMPLEMENTAÇÃO ATUAL — V3.15
 
 # 71. Arquitetura de cotas
 
@@ -3409,8 +3441,7 @@ Essa regra é de UX e não altera o motor financeiro.
 Continuam pendentes no produto ou na documentação externa:
 
 1. compra usando apenas subconjunto das cotas contempladas;
-2. seletor explícito Lance Fixo × Lance Livre;
-3. override das parcelas oficiais cotadas;
+2. override das parcelas oficiais cotadas;
 4. trajetória temporal de CDI/CDB em vez de taxa constante;
 5. dia exato e ordem do reajuste em mês coincidente com contemplação;
 6. reconciliação documental da ausência de cobrança por assembleias anteriores à adesão;
@@ -3448,7 +3479,7 @@ O histórico mensal do motor expõe, para auditoria/teste:
 - rendimento por cota;
 - rendimento usado por cota.
 
-# 80. Estado de qualidade atual — V3.14
+# 80. Estado de qualidade atual — V3.15
 
 A linha atual já passou pela auditoria independente posterior à V3.5 e pelas correções V3.6–V3.14.
 
