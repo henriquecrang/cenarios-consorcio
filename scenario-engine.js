@@ -186,7 +186,7 @@ function runScenario(cfg,overrides={}){
   const externalCashFlowsReal=[0];
 
   let postInstall=0, creditAtBuy=0, principalCreditAtBuy=0, complement=0;
-  let purchaseCostsGross=0, cashbackEligibleBase=0, purchaseCashback=0, purchaseTransactionNet=0;
+  let purchaseCostsGross=0, cashbackEligibleBase=0, purchaseCashback=0, purchaseCashbackReceiptMonth=N+1, purchaseTransactionNet=0;
   let initialNetRent=0, initialPostCashFlow=0;
   let finalSettlement=0;
   let firstFullConsortiumPayment=0, firstFullLoanPayment=0, firstFullNetRent=0;
@@ -492,12 +492,16 @@ function runScenario(cfg,overrides={}){
         cfg.cashbackBasePolicy
       );
       purchaseCashback=calculateCashback(cashbackEligibleBase,cfg.cashbackPct);
+      purchaseCashbackReceiptMonth=Math.min(N+1,buy+Math.max(0,Math.round(cfg.cashbackDelayMonths ?? 1)));
       purchaseTransactionNet=complement+purchaseCostsGross-purchaseCashback;
 
       cashObrigacoes += complement+purchaseCostsGross;
-      purchaseCashbackThisMonth=purchaseCashback;
       propertyValue=price;
       cotas.forEach(q=>{q.letterBalance=0;});
+    }
+
+    if(purchased && purchaseCashback>0 && m===purchaseCashbackReceiptMonth){
+      purchaseCashbackThisMonth=purchaseCashback;
     }
 
     let netRent=0;
@@ -678,6 +682,7 @@ function runScenario(cfg,overrides={}){
       monthlyYieldUsedByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.monthlyYieldUsedForInstallment])),
       monthlyNetRent:netRent,
       monthlyStrategyCdbYield:monthlyStrategyCdbYieldThisMonth,
+      purchaseCashbackReceived:purchaseCashbackThisMonth,
       contemplatedCount:cotas.filter(q=>q.contemplated).length,
       allContemplated
     });
@@ -775,7 +780,7 @@ function runScenario(cfg,overrides={}){
     totalYieldUsedForInstallments,totalLetterYieldAccrued,firstYieldUsedForInstallment,firstGrossLetterYield,
     firstPostContConsortiumPayment,firstPostContLoanPayment,firstPostContGrossConsortiumPayment,firstPostContYieldUsed,
 
-    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCashback,purchaseTransactionNet,
+    creditAtBuy,principalCreditAtBuy,cashbackEligibleBase,complement,purchaseCostsGross,purchaseCashback,purchaseCashbackReceiptMonth,purchaseTransactionNet,
     initialNetRent,initialPostCashFlow,firstFullConsortiumPayment,firstFullLoanPayment,firstFullNetRent,totalNetRent,
 
     redeemCredit,redeemConsortiumPayoff,redeemLanceLoanPayoff,redeemBridgeCost,redeemTaxCost,
