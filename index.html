@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.8 · Presets versionados</title>
+<title>Consórcio x CDB x Imóvel — V3.9 · Sensibilidade de financiamento</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.8 · Presets versionados</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.9 · Sensibilidade de financiamento</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1724,6 +1724,7 @@ th:first-child,td:first-child{text-align:left}
           Não há probabilidades implícitas: os presets são hipóteses de sensibilidade e todos os campos das linhas alternativas são editáveis.
           Os Lances Livres sugeridos foram recalibrados para a faixa dos vencedores documentados do Grupo 4012 (aprox. 60%–73%); isso não significa que a faixa se repetirá.
           Para rendimento líquido da carta, os presets usam 70% / 80% / 90% do CDI como sensibilidades; 80% é a hipótese-base atual.
+          Três linhas adicionais isolam a alavancagem do lance em 0% / 50% / 100%, mantendo as demais premissas da Base comparável.
         </div>
 
         <div class="decision-toolbar">
@@ -2022,7 +2023,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.8';
+const SCENARIO_APP_VERSION='3.9';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -4035,6 +4036,9 @@ const decisionScenarioDefs=[
   {key:'staggered',name:'Escalonada',lancePct:69,yieldMode:'current'},
   {key:'stress',name:'Stress de prazo + rendimento',lancePct:73,yieldPct:70},
   {key:'fastHighYield',name:'Rápida + rendimento otimista',lancePct:70,yieldPct:90},
+  {key:'finance0',name:'Financiamento 0%',finPct:0},
+  {key:'finance50',name:'Financiamento 50%',finPct:50},
+  {key:'finance100',name:'Financiamento 100%',finPct:100},
   {key:'custom',name:'Histórico / custom',lancePct:60.1,yieldMode:'current'}
 ];
 
@@ -4061,6 +4065,9 @@ function decisionPresetDescription(key,conts){
   if(key==='staggered') return `Contemplações escalonadas: ${months}, com Lance Livre de 69% (próximo ao piso recente de agosto).`;
   if(key==='stress') return `Prazo mais lento (${months}), Lance Livre de 73% e carta a 70% do CDI líquido.`;
   if(key==='fastHighYield') return `Contemplação rápida (${months}), Lance Livre de 70% e carta a 90% do CDI líquido.`;
+  if(key==='finance0') return 'Isola o efeito da alavancagem: mesmos meses, Lance Livre e rendimento da Base comparável; 0% do dinheiro do lance financiado.';
+  if(key==='finance50') return 'Isola o efeito da alavancagem: mesmos meses, Lance Livre e rendimento da Base comparável; 50% do dinheiro do lance financiado.';
+  if(key==='finance100') return 'Isola o efeito da alavancagem: mesmos meses, Lance Livre e rendimento da Base comparável; 100% do dinheiro do lance financiado.';
   return 'Linha livre iniciada em 60,1%, próxima ao menor vencedor documentado; edite para testar outra combinação.';
 }
 
@@ -4101,7 +4108,7 @@ function buildDecisionRows(){
         desc:decisionPresetDescription(def.key,conts),
         lancePct:(def.lancePct ?? currentLance),
         yieldPct:(def.yieldPct ?? currentYield),
-        finPct:currentFin
+        finPct:(def.finPct ?? currentFin)
       };
     })
   ];
