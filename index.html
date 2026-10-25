@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.12 · Cashback pós-compra</title>
+<title>Consórcio x CDB x Imóvel — V3.13 · Transferência por saldo</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.12 · Cashback pós-compra</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.13 · Transferência por saldo</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1147,12 +1147,12 @@ th:first-child,td:first-child{text-align:left}
         <div class="field">
           <label>Taxa de transferência</label>
           <input id="taxaTransferenciaVenda" type="number" value="1" step=".1" min="0">
-          <div class="small">% da proposta</div>
+          <div class="small">% do saldo devedor de cada cota no mês da cessão</div>
         </div>
         <div class="field">
-          <label>Teto da taxa</label>
+          <label>Teto da taxa por cota</label>
           <input id="tetoTransferenciaVenda" type="number" value="1000" step="100" min="0">
-          <div class="small">R$; defaults conforme informação da vendedora, confirmar</div>
+          <div class="small">R$ por cota; default documental Bamaq 2026. A taxa de cadastro de R$150 continua separada até confirmar cobrança por cota ou por cessionário.</div>
         </div>
       </div>
 
@@ -2043,7 +2043,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.12';
+const SCENARIO_APP_VERSION='3.13';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
