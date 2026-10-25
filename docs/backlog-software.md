@@ -108,13 +108,12 @@ O motor ainda não possui curva temporal de CDI. Para horizontes longos, testar 
 # Backlog de possíveis mudanças no software — Simulador Consórcio × CDB × Imóvel
 
 **Criado em:** 28/09/2026  
-**Baseline atual:** V3.2  
-**Baseline auditada histórica:** V2.54  
-**Objetivo:** registrar mudanças de software potencialmente necessárias a partir de novas evidências operacionais, contratuais ou comerciais recebidas da QuintoAndar/Bamaq.
+**Baseline atual:** V3.11  
+**Objetivo:** registrar mudanças de software, decisões implementadas e gaps ainda relevantes.
 
-**Estado canônico da documentação:** pós-rodada `pre_respostas30`.
+**Estado canônico da documentação:** V3.11, após auditoria e correções V3.6–V3.11.
 
-> P0 antes de nova decisão econômica: concluídos. V3.3 recalibrou o Lance Livre; V3.4 corrigiu o rendimento líquido-base; V3.5 extraiu o núcleo financeiro e adicionou regressões automatizadas.
+> Os tickets antigos preservam contexto histórico de implementação. Para o estado funcional vigente, prevalecem os status mais recentes, a especificação canônica e as seções SW-080 em diante.
 
 ## Regra de uso
 
@@ -128,9 +127,9 @@ Antes de promover um item deste backlog para implementação, classificar a evid
 - `DECISÃO INTERNA DE MODELAGEM`
 
 Mudanças que alterem fórmulas, cronologia ou significado econômico devem também:
-1. atualizar `especificacao_modelo_simulador.md`;
-2. registrar a decisão no `follow_up_auditorias_simulador.md`;
-3. atualizar/remover a pendência correspondente;
+1. atualizar `docs/especificacao-modelo.md`;
+2. registrar a decisão em `docs/follow-up-auditorias.md`;
+3. atualizar/remover a pendência em `docs/pendencias.md`;
 4. ganhar teste de regressão.
 
 ## Status possíveis
@@ -166,34 +165,34 @@ Mudanças que alterem fórmulas, cronologia ou significado econômico devem tamb
 # Itens
 
 
-## Reconciliação de status com a linha principal V3.2 — 29/09/2026
+## Reconciliação com a linha atual V3.11
 
-As entradas SW-001–SW-070 foram criadas quando a baseline era V2.54. O texto histórico de cada ticket é preservado, mas os status abaixo refletem o software atual.
+Os tickets SW-001 em diante foram criados ao longo de várias versões. O corpo histórico de cada ticket é preservado para rastreabilidade; o **status mais recente** e a especificação V3.11 descrevem o software vigente.
 
-Já incorporados de forma material:
-- SW-001 — motor multi-cota; desde V3.2 generalizado para 1–50 cotas;
-- SW-002 — CDI/carta separado do CDB benchmark;
-- SW-004 — remuneração da carta como input/sensibilidade;
-- SW-006 — bases diferentes para Livre e embutido;
-- SW-013 — proibição de pooling;
-- SW-015 — parcialmente: rendimento aferido/usado por cota já aparece;
-- SW-061 — parcialmente: composição 400/400/370/200 existe, mas não há override completo da cotação oficial;
-- SW-064 — parcialmente: há resumo e detalhe multi-cota, mas não um card de reconciliação exata da proposta.
+Principais capacidades atuais:
+- motor multi-cota configurável;
+- Lance Livre sobre saldo e embutido sobre carta;
+- no-pooling por cota;
+- tranches de financiamento;
+- CDI bruto separado do benchmark líquido;
+- carta em 80% do CDI como default líquido;
+- matriz comparável com imóvel-alvo comum;
+- sensibilidades de financiamento 0% / 50% / 100%;
+- cashback conservador sem rendimentos acumulados por default;
+- presets versionados/migração explícita;
+- motor compartilhado pelo navegador e testes;
+- regressões unitárias e de integração no GitHub Actions.
 
-Parcial importante:
-- SW-005 — o motor está correto para **Lance Livre**, mas ainda não há modalidade explícita **Fixo × Livre**.
+Gaps principais ainda abertos:
+- Lance Fixo × Livre como modalidade explícita;
+- compra com subconjunto de cotas;
+- override das parcelas oficiais;
+- trajetória temporal de CDI/CDB;
+- timing do cashback posterior ao registro/pagamento;
+- crédito residual pós-compra;
+- regras contratuais ainda pendentes de seguro, cessão, resgate, encerramento e garantia.
 
-Continuam sem implementação contratual definitiva, entre outros:
-- SW-018 compra com subconjunto de cotas;
-- SW-060 assembleias anteriores — NÃO IMPLEMENTAR para o preset atual após resposta comercial específica de 29/09; manter apenas como guardrail histórico até conferência contratual;
-- SW-062 override da parcela oficial;
-- SW-063 cashback por cota conforme regra promocional definitiva;
-- SW-067 calendário real do aniversário do grupo;
-- SW-068 início posterior do seguro por cota;
-- SW-069 metadados formais de validade/trava;
-- SW-070 separação explícita entre tabela comercial e reajuste contratual.
-
-Novas features implementadas depois do backlog original são registradas em SW-071–SW-075 ao final deste documento.
+---
 
 ### SW-001 — Motor multi-cota com preset real de 4 cotas
 
