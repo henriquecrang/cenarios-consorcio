@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.19 · Guardrails operacionais</title>
+<title>Consórcio x CDB x Imóvel — V3.20 · Resgate conservador</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.19 · Guardrails operacionais</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.20 · Resgate conservador</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -1015,15 +1015,15 @@ th:first-child,td:first-child{text-align:left}
         <label>Como quitar o saldo do consórcio para liberar o resgate?</label>
         <div class="lock-options" role="radiogroup" aria-label="Forma de quitação para resgate">
           <label class="radio-option">
-            <input type="radio" name="regraQuitacaoResgate" id="resgateCompensar" value="compensar" checked>
-            <span>Compensar com a própria carta</span>
+            <input type="radio" name="regraQuitacaoResgate" id="resgateCompensar" value="compensar">
+            <span>Compensar com a própria carta — sensibilidade não confirmada</span>
           </label>
           <label class="radio-option">
-            <input type="radio" name="regraQuitacaoResgate" id="resgatePonte" value="ponte">
-            <span>Usar empréstimo-ponte</span>
+            <input type="radio" name="regraQuitacaoResgate" id="resgatePonte" value="ponte" checked>
+            <span>Quitação prévia via empréstimo-ponte — default conservador</span>
           </label>
         </div>
-        <div class="small">A compensação direta é uma hipótese de modelagem baseada em práticas públicas de outras administradoras. O regulamento Bamaq exige quitação, mas não explicita online se o saldo pode ser abatido da própria carta. Confirmar com a Bamaq.</div>
+        <div class="small">No resgate voluntário pós-180 dias, a obrigação precisa estar quitada antes da liberação. A ponte é apenas uma forma explícita de financiar essa quitação. A compensação direta com a própria carta permanece disponível somente como sensibilidade não confirmada para a Bamaq.</div>
       </div>
 
       <div class="row">
@@ -2133,7 +2133,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.19';
+const SCENARIO_APP_VERSION='3.20';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -3419,6 +3419,9 @@ if(loanBody){
   if(embeddedWasLimitedByTotal){
     const detalhe=(embeddedLimitedCotas||[]).map(x=>`${x.id}: solicitado ${money(x.requested)}, efetivo ${money(x.effective)} (lance efetivo ${money(x.lance)})`).join('; ');
     warnings.push(`Em uma ou mais cotas, o embutido solicitado era maior que o próprio Lance Livre. O embutido foi limitado corretamente. ${detalhe}`);
+  }
+  if(cfg.resgateAtivo && !cfg.resgateComPonte){
+    warnings.push('Resgate pós-180 dias configurado com compensação direta da própria carta. Essa mecânica NÃO está confirmada para a Bamaq e deve ser tratada apenas como sensibilidade; a regra documental disponível exige quitação prévia das obrigações.');
   }
   if(purchased && purchaseCashback>0) warnings.push(`O cashback de ${money(purchaseCashback)} entra no caixa no ${purchaseCashbackReceiptMonth>N?'período posterior ao horizonte modelado':`mês ${purchaseCashbackReceiptMonth}`}. Base elegível: ${money(cashbackEligibleBase)} (${cfg.cashbackBasePolicy==='principal'?'principal líquido pós-embutido, sem rendimentos acumulados':'todo crédito usado, incluindo rendimentos — sensibilidade não confirmada'}). Ele não reduz retroativamente as obrigações do mês da compra.`);
   if(purchased && cfg.cashbackBasePolicy==='available' && creditAtBuy>principalCreditAtBuy+0.01) warnings.push('A base de cashback está incluindo rendimentos financeiros acumulados da carta. Essa hipótese NÃO foi confirmada documentalmente e existe apenas como sensibilidade.');
