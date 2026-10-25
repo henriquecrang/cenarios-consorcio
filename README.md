@@ -4,7 +4,7 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estado atual
 
-- **Aplicação:** V3.20 em `index.html`, servida diretamente pelo GitHub Pages.
+- **Aplicação:** V3.21 em `index.html`, servida diretamente pelo GitHub Pages.
 - **Documentação canônica:** consolidada a partir da rodada `pre_respostas30`, com limpeza de inconsistências residuais e a divergência posterior sobre o histórico de lances.
 - **Histórico:** preservado pelo Git; não mantemos cópias versionadas redundantes na árvore atual.
 
@@ -54,9 +54,10 @@ As issues #5–#10 abertas pela auditoria foram concluídas nas versões V3.6–
 - **V3.17 / #17:** modalidade, percentual de lance e embutido passam a ser configuráveis por cota; campos globais viram defaults copiáveis;
 - **V3.18 / #18:** painel reconcilia a cotação comercial com os valores calculados pelo motor sem transformar a cotação em override financeiro;
 - **V3.19 / #19:** interface explicita prazo de 2 dias úteis para o lance vencedor e a necessidade de solicitação mensal para usar rendimento na parcela;
-- **V3.20 / #20:** resgate pós-180 dias deixa de sugerir compensação interna como default; quitação prévia/ponte passa a ser o cenário conservador.
+- **V3.20 / #20:** resgate pós-180 dias deixa de sugerir compensação interna como default; quitação prévia/ponte passa a ser o cenário conservador;
+- **V3.21 / #22:** venda com substituição de garantia exige aprovação explícita da Bamaq; custo da substituição é input manual e patrimônio externo continua fora da estratégia.
 
-A documentação canônica foi saneada na **#11** e continua sincronizada com V3.20; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
+A documentação canônica foi saneada na **#11** e continua sincronizada com V3.21; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
 
 Os gaps ainda reais ficam concentrados em `docs/pendencias.md` e em novas issues de implementação quando necessário.
 
