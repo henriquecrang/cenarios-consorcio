@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.18 · Reconciliação da cotação</title>
+<title>Consórcio x CDB x Imóvel — V3.19 · Guardrails operacionais</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.18 · Reconciliação da cotação</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.19 · Guardrails operacionais</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -809,6 +809,9 @@ th:first-child,td:first-child{text-align:left}
         <b>Multi-cota:</b> os campos acima funcionam como configuração padrão. Cada cota pode ter modalidade, percentual e embutido próprios na tabela de cotas.
       </div>
       <button type="button" id="copyBidTerms" class="preset-btn">Copiar configuração de lance para todas as cotas</button>
+      <div class="assump">
+        <b>Liquidez do lance vencedor:</b> para esta proposta/grupo, a referência operacional confirmada é pagamento em até <b>2 dias úteis</b> após a contemplação/assembleia. A expressão comercial “48 horas” não deve ser interpretada como 48 horas corridas quando houver fim de semana ou feriado. O motor mensal não modela esse prazo em resolução diária.
+      </div>
 
       <div class="section">2. Empréstimo para o lance</div>
 
@@ -980,7 +983,8 @@ th:first-child,td:first-child{text-align:left}
         <div class="small">
           No segundo modo, o rendimento mensal de <b>cada cota</b> é usado primeiro para reduzir exclusivamente a parcela daquela mesma cota.
           Não existe pooling entre cotas: rendimento excedente de uma cota não pode cobrir a parcela de outra. Se o rendimento superar a própria parcela, o excedente continua capitalizando na carta daquela cota.
-          Esta possibilidade foi informada pela vendedora, mas ainda precisa de confirmação operacional por escrito da Bamaq.
+          <br><br>
+          <b>Hipótese operacional:</b> a vendedora informou que o abatimento precisa ser <b>solicitado mensalmente pelo aplicativo</b>. Quando este modo está ativo, o simulador assume que você faz corretamente essa solicitação em todos os meses elegíveis; ele não modela esquecimento, cutoff diário ou solicitação tardia.
         </div>
       </div>
 
@@ -2129,7 +2133,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.18';
+const SCENARIO_APP_VERSION='3.19';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
