@@ -183,6 +183,7 @@ function runScenario(cfg,overrides={}){
   let residualCredit=0, residualGross=0, residualAppliedToCosts=0, residualUnallocated=0, residualComparableAsset=0;
 
   let propertySalePrice=0, propertySaleBrokerage=0, propertySaleTax=0, propertySaleOtherCosts=0;
+  let propertySaleGuaranteeCost=0, propertySaleBlockedByGuarantee=false;
   let propertySaleTotalCosts=0, propertySaleConsortiumPayoff=0, propertySaleLoanPayoff=0;
   let propertySaleNetCash=0, propertySaleTopUp=0;
   let finalPropertyMarketValue=0, finalPropertyNetRealization=0, finalPropertyExitCosts=0, finalPropertyExitTax=0;
@@ -571,10 +572,15 @@ function runScenario(cfg,overrides={}){
     }
 
     if(purchased && !propertySold && sellMonth<=N && m===sellMonth){
+      const guaranteeMode=!cfg.sellPropertyPayoff;
+      if(guaranteeMode && !cfg.substituteGuaranteeApproved){
+        propertySaleBlockedByGuarantee=true;
+      }else{
       const saleBaseValue=cfg.propertySaleBase==='market' ? propertyValue : price;
       propertySalePrice=saleBaseValue*cfg.propertySalePctOfPurchase;
       propertySaleBrokerage=propertySalePrice*cfg.sellerBrokeragePct;
-      propertySaleOtherCosts=cfg.sellerOtherCosts;
+      propertySaleGuaranteeCost=guaranteeMode ? Math.max(0,cfg.substituteGuaranteeCost||0) : 0;
+      propertySaleOtherCosts=cfg.sellerOtherCosts+propertySaleGuaranteeCost;
       const simplifiedTaxBasis=price+purchaseCostsGross;
       const simplifiedCapitalGain=Math.max(0,propertySalePrice-simplifiedTaxBasis);
       propertySaleTax=simplifiedCapitalGain*cfg.sellerCapitalGainTaxPct;
@@ -601,6 +607,7 @@ function runScenario(cfg,overrides={}){
       propertyValue=0;
       currentRent=0;
       propertySold=true;
+      }
     }
 
     // Nesta versão, a cessão representa a venda conjunta do conjunto de cotas
@@ -855,7 +862,7 @@ function runScenario(cfg,overrides={}){
     redeemCredit,redeemConsortiumPayoff,redeemLanceLoanPayoff,redeemBridgeCost,redeemTaxCost,
     redeemNetCash,redeemTopUp,redeemAportesAte,redeemNetPosition,
 
-    propertySalePrice,propertySaleBrokerage,propertySaleTax,propertySaleOtherCosts,propertySaleTotalCosts,
+    propertySalePrice,propertySaleBrokerage,propertySaleTax,propertySaleOtherCosts,propertySaleGuaranteeCost,propertySaleBlockedByGuarantee,propertySaleTotalCosts,
     propertySaleConsortiumPayoff,propertySaleLoanPayoff,propertySaleNetCash,propertySaleTopUp,
     finalPropertyMarketValue,finalPropertyNetRealization,finalPropertyExitCosts,finalPropertyExitTax,
 
