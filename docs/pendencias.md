@@ -1,4 +1,22 @@
 ============================================================
+AUDITORIA V3.13 — TAXA DE TRANSFERÊNCIA
+============================================================
+
+Issue #13: RESOLVIDA.
+
+Implementado:
+- base = saldo devedor de cada cota no mês da cessão;
+- default = 1%;
+- teto = R$1.000 por cota;
+- cessão conjunta soma as tarifas individuais;
+- oferta de compra não altera a tarifa;
+- motor expõe saldo e tarifa por cota para auditoria;
+- regressão compara ofertas diferentes com os mesmos saldos e exige tarifa idêntica.
+
+Pendência residual:
+A taxa de cadastro de R$150 ainda precisa de confirmação sobre cobrança por cota versus por cessionário e não foi misturada à tarifa de transferência.
+
+============================================================
 AUDITORIA V3.12 — TIMING DO CASHBACK
 ============================================================
 
@@ -1213,17 +1231,18 @@ Logo:
 - para a venda promocional de COTA NÃO CONTEMPLADA diretamente ao QuintoAndar nos termos da campanha, existe isenção expressa.
 
 Estado atual do software:
-O módulo de cessão ainda calcula a taxa sobre a OFERTA de compra da cota:
-`taxa = min(oferta × pct_taxa, teto)`
+RESOLVIDO NA V3.13.
 
-Isso está incorreto para a regra documental da Bamaq.
+A cessão agora calcula, para cada cota:
 
-A próxima versão deve usar:
-`taxaTransferencia = min(saldoDevedorCota × 1%, R$ 1.000)`
+`taxa_j = min(saldoDevedorCota_j × pct_taxa, teto_por_cota)`
 
-e separar:
+e soma as tarifas das cotas transferidas.
+
+A oferta de compra não participa da base da tarifa.
+
+Ainda permanece separado:
 - taxa de cadastro;
-- taxa de transferência;
 - demais custos;
 - eventual isenção promocional específica.
 
