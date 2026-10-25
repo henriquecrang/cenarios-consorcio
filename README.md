@@ -33,9 +33,11 @@ URL esperada após a publicação:
 
 ## P0 antes de nova decisão econômica
 
-1. **Lance Livre:** recalibrar defaults e matriz com o histórico real do Grupo 4012; 30%/45% não são referências competitivas suportadas pelas atas.
-2. **Rendimento da carta:** alterar a premissa-base líquida de 98% para aproximadamente 80% do CDI.
-3. **Regressão:** proteger por testes a base do Lance Livre, o lance embutido e o cashback multi-cota.
+1. **Rendimento da carta:** alterar a premissa-base líquida de 98% para aproximadamente 80% do CDI.
+2. **Regressão:** proteger por testes a base do Lance Livre, o lance embutido e o cashback multi-cota.
+
+Concluído na V3.3:
+- Lance Livre recalibrado: default analítico de 70%, presets históricos de 60,1%–73% e alertas quando o lance configurado fica abaixo do histórico observado.
 
 ## Governança de evidências
 
