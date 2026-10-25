@@ -1,10 +1,92 @@
-# Backlog de software — Simulador Consórcio × CDB × Imóvel
+# Backlog de possíveis mudanças no software — Simulador Consórcio × CDB × Imóvel
 
-**Estado canônico da documentação:** pós-rodada `pre_respostas30`  
-**Baseline funcional do app:** V3.2  
-**Regra de leitura:** itens marcados como “implementados” descrevem a V3.2; itens “prontos/candidatos” ainda não foram aplicados ao HTML atual.
+**Criado em:** 28/09/2026  
+**Baseline atual:** V3.2  
+**Baseline auditada histórica:** V2.54  
+**Objetivo:** registrar mudanças de software potencialmente necessárias a partir de novas evidências operacionais, contratuais ou comerciais recebidas da QuintoAndar/Bamaq.
 
-> Antes de usar a V3.2 para uma nova decisão econômica, tratar como P0: (1) recalibrar o Lance Livre/defaults com o histórico real; (2) alterar a premissa-base líquida da carta de 98% para ~80% do CDI; (3) adicionar regressões para Lance Livre, embutido e cashback multi-cota.
+**Estado canônico da documentação:** pós-rodada `pre_respostas30`.
+
+> P0 antes de nova decisão econômica: (1) recalibrar Lance Livre/defaults com o histórico real; (2) alterar a premissa-base líquida da carta de 98% para ~80% do CDI; (3) adicionar regressões para Lance Livre, embutido e cashback multi-cota.
+
+## Regra de uso
+
+Uma resposta da vendedora **não deve alterar automaticamente o simulador**.
+
+Antes de promover um item deste backlog para implementação, classificar a evidência como:
+
+- `INFORMAÇÃO COMERCIAL NÃO CONFIRMADA`
+- `CONFIRMAÇÃO OPERACIONAL`
+- `DOCUMENTO/REGULAMENTO`
+- `DECISÃO INTERNA DE MODELAGEM`
+
+Mudanças que alterem fórmulas, cronologia ou significado econômico devem também:
+1. atualizar `especificacao_modelo_simulador.md`;
+2. registrar a decisão no `follow_up_auditorias_simulador.md`;
+3. atualizar/remover a pendência correspondente;
+4. ganhar teste de regressão.
+
+## Status possíveis
+
+- `CANDIDATA`
+- `AGUARDANDO CONFIRMAÇÃO`
+- `PRONTA PARA ESPECIFICAR`
+- `APROVADA PARA IMPLEMENTAÇÃO`
+- `IMPLEMENTADA`
+- `REAUDITADA`
+- `DESCARTADA`
+
+## Tipo
+
+- `REGRA FINANCEIRA`
+- `CRONOLOGIA`
+- `MÚLTIPLAS COTAS`
+- `UX / EXPLICAÇÃO`
+- `NOVO INPUT`
+- `NOVO OUTPUT / KPI`
+- `VALIDAÇÃO / WARNING`
+- `TESTE`
+- `DOCUMENTAÇÃO`
+
+## Prioridade
+
+- `ALTA` — muda materialmente o resultado, a arquitetura ou pode induzir decisão errada;
+- `MÉDIA` — melhora fidelidade do modelo;
+- `BAIXA` — UX, clareza ou conveniência.
+
+---
+
+# Itens
+
+
+## Reconciliação de status com a linha principal V3.2 — 29/09/2026
+
+As entradas SW-001–SW-070 foram criadas quando a baseline era V2.54. O texto histórico de cada ticket é preservado, mas os status abaixo refletem o software atual.
+
+Já incorporados de forma material:
+- SW-001 — motor multi-cota; desde V3.2 generalizado para 1–50 cotas;
+- SW-002 — CDI/carta separado do CDB benchmark;
+- SW-004 — remuneração da carta como input/sensibilidade;
+- SW-006 — bases diferentes para Livre e embutido;
+- SW-013 — proibição de pooling;
+- SW-015 — parcialmente: rendimento aferido/usado por cota já aparece;
+- SW-061 — parcialmente: composição 400/400/370/200 existe, mas não há override completo da cotação oficial;
+- SW-064 — parcialmente: há resumo e detalhe multi-cota, mas não um card de reconciliação exata da proposta.
+
+Parcial importante:
+- SW-005 — o motor está correto para **Lance Livre**, mas ainda não há modalidade explícita **Fixo × Livre**.
+
+Continuam sem implementação contratual definitiva, entre outros:
+- SW-018 compra com subconjunto de cotas;
+- SW-060 assembleias anteriores — NÃO IMPLEMENTAR para o preset atual após resposta comercial específica de 29/09; manter apenas como guardrail histórico até conferência contratual;
+- SW-062 override da parcela oficial;
+- SW-063 cashback por cota conforme regra promocional definitiva;
+- SW-067 calendário real do aniversário do grupo;
+- SW-068 início posterior do seguro por cota;
+- SW-069 metadados formais de validade/trava;
+- SW-070 separação explícita entre tabela comercial e reajuste contratual.
+
+Novas features implementadas depois do backlog original são registradas em SW-071–SW-075 ao final deste documento.
 
 ### SW-001 — Motor multi-cota com preset real de 4 cotas
 
@@ -1900,10 +1982,12 @@ nenhuma enquanto não houver evidência formal contraditória
 - 400k / idem;
 - 370k / integral 2.161,17 / reduzida 1.080,03;
 - 200k / integral 1.168,20 / reduzida 583,80;
-- cashback nominal: 10% por cota;
+- cashback nominal exibido na cotação: 10% por cota;
+- no cenário com 30% de lance embutido em todas as cotas, cashback efetivo comercialmente confirmado: R$95.900 sobre R$959 mil faturados/liberados;
 - total reduzido: R$3.999,03;
 - total integral: R$8.002,17;
-- cotação agregada confirma explicitamente R$1,37 mi / R$137 mil / R$3.999,03 / R$8.002,17;
+- cotação agregada confirma explicitamente R$1,37 mi / R$137 mil nominais / R$3.999,03 / R$8.002,17;
+- R$137 mil é valor nominal da cotação, não o cashback final do cenário com embutido;
 - proposta atual sem Seguro Prestamista;
 - validade comercial mostrada: 30/09/2026.
 
@@ -1944,7 +2028,7 @@ junto com SW-061
 
 ### SW-063 — Cashback por cota com base nominal/promocional
 
-**Status:** PRONTA PARA ESPECIFICAR, COM REGRA FINAL PENDENTE  
+**Status:** SUPERADA PELA RECONCILIAÇÃO DE SW-028 — NÃO IMPLEMENTAR COMO REGRA FINAL  
 **Prioridade:** ALTA  
 **Tipo:** MÚLTIPLAS COTAS / CASHBACK  
 **Origem:** cotações exibem 10% exatos do valor nominal por cota  
@@ -1963,20 +2047,20 @@ Para o preset atual:
 - 370k → 37k;
 - 200k → 20k.
 
-**Dependência:**  
-QN-058 para confirmar comportamento com lance embutido.
+**Resultado posterior:**  
+QN-058 foi respondida: para o cenário atual, o cashback é calculado sobre o crédito líquido efetivamente faturado/liberado. Com R$1,37 milhão nominal e 30% de embutido, a base é R$959 mil e o cashback é R$95,9 mil.
 
-**Critério de aceite:**  
-O motor não reduz automaticamente cashback só porque o crédito líquido caiu, quando a regra promocional/cotação indicar base nominal.
+**Decisão:**  
+Não implementar esta issue como exceção nominal. Preservar apenas os campos por cota para auditoria da cotação e usar SW-028 como regra financeira canônica.
 
 **Versão-alvo:**  
-próxima arquitetura multi-cota
+nenhuma; item superseded
 
 ---
 
 ### SW-064 — Painel-resumo da proposta multi-cota
 
-**Status:** PARCIALMENTE IMPLEMENTADA — RESUMOS E DETALHE MULTI-COTA EXISTEM; CONFERÊNCIA COMERCIAL 3.999,03/8.002,17/137 MIL AINDA NÃO É UM CARD ÚNICO
+**Status:** PARCIALMENTE IMPLEMENTADA — RESUMOS E DETALHE MULTI-COTA EXISTEM; FALTA CARD ÚNICO DE CONFERÊNCIA DA COTAÇÃO E DO CENÁRIO EFETIVO
 **Prioridade:** MÉDIA  
 **Tipo:** UX / NOVO OUTPUT  
 **Origem:** material comercial apresenta a proposta de forma simples por carta  
@@ -1988,12 +2072,13 @@ Mostrar no topo:
 - quantidade de cotas;
 - parcela reduzida total;
 - parcela integral total;
-- cashback nominal total;
+- cashback nominal total da cotação;
+- cashback efetivo do cenário após embutido/uso do crédito;
 - prazo remanescente;
 - distribuição das cotas.
 
 **Critério de aceite:**  
-O usuário consegue conferir em segundos que o simulador está reproduzindo a proposta de R$1,37 mi / R$3.999,03 / R$8.002,17 / R$137 mil.
+O usuário consegue conferir em segundos tanto a proposta nominal (R$1,37 mi / R$3.999,03 / R$8.002,17 / R$137 mil nominais) quanto o cenário efetivo; com 30% de embutido, o cashback deve aparecer como R$95,9 mil.
 
 **Versão-alvo:**  
 primeira versão multi-cota
