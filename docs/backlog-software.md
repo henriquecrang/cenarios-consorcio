@@ -2192,7 +2192,7 @@ primeira versão multi-cota
 
 ### SW-062 — Permitir override de parcela inicial por cotação oficial
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** PARCIALMENTE IMPLEMENTADA — V3.18 EXIBE RECONCILIAÇÃO; OVERRIDE DE FLUXO AGUARDA REGRA POR COTA  
 **Prioridade:** MÉDIA  
 **Tipo:** REGRA FINANCEIRA / UX / AUDITORIA  
 **Origem:** parcela reduzida não é exatamente 50% da integral  
@@ -2251,7 +2251,7 @@ nenhuma; item superseded
 
 ### SW-064 — Painel-resumo da proposta multi-cota
 
-**Status:** PARCIALMENTE IMPLEMENTADA — RESUMOS E DETALHE MULTI-COTA EXISTEM; FALTA CARD ÚNICO DE CONFERÊNCIA DA COTAÇÃO E DO CENÁRIO EFETIVO
+**Status:** IMPLEMENTADA — V3.18
 **Prioridade:** MÉDIA  
 **Tipo:** UX / NOVO OUTPUT  
 **Origem:** material comercial apresenta a proposta de forma simples por carta  
@@ -2804,6 +2804,27 @@ Uma compra apenas. Cotas posteriores não quitam automaticamente obrigações an
 Cotas contempladas no mesmo mês podem usar bases/modalidades diferentes e os agregados reconciliam com a soma individual.
 
 **Versão:** V3.17.
+
+---
+
+### SW-082 — Reconciliação explícita da cotação comercial
+
+**Status:** IMPLEMENTADA — V3.18  
+**Prioridade:** P1  
+**Tipo:** UX / AUDITORIA / COTAÇÃO  
+**Origem:** issue #18
+
+**Implementado:**
+- painel com valor cotado × valor calculado;
+- diferença em R$ e percentual;
+- centavos preservados;
+- cashback nominal da proposta separado do efetivo;
+- nenhum override silencioso do fluxo financeiro.
+
+**Limite:**  
+O override de parcela permanece bloqueado até existir regra/documento suficiente para decomposição por cota.
+
+**Versão:** V3.18.
 
 ---
 
