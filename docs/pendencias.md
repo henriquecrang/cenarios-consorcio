@@ -1,4 +1,26 @@
 ============================================================
+AUDITORIA V3.12 — TIMING DO CASHBACK
+============================================================
+
+Issue #12: RESOLVIDA NO MOTOR MENSAL.
+
+Problema:
+O cashback era calculado e adicionado ao caixa no mesmo mês da compra, embora a compra seja convencionada no fim do mês e o benefício dependa de registro/pagamento posterior.
+
+Implementado na V3.12:
+- defasagem configurável em meses;
+- default = 1 mês;
+- compra em M não adiciona cashback ao caixa em M;
+- default recebe em M+1;
+- delay 0 permanece apenas como sensibilidade;
+- KPI mostra o mês de recebimento;
+- histórico mensal expõe `purchaseCashbackReceived`;
+- regressão protege compra M4 → cashback M5.
+
+Pendência documental residual:
+O regulamento disponível indica 5 dias úteis; a fala comercial indicou 7. Essa diferença continua aberta, mas não muda o default mensal de M+1 sob a convenção de compra no fim do mês.
+
+============================================================
 AUDITORIA V3.11 — TESTES DE INTEGRAÇÃO
 ============================================================
 
@@ -1417,7 +1439,7 @@ Conclusão:
 - para especificação contratual, manter 5 dias úteis até prova posterior.
 
 Estado atual do software:
-O cashback ainda entra no fim do mesmo mês da compra. Isso permanece desalinhado com o timing documental, que exige evento posterior de registro/pagamento.
+Desde a V3.12, o cashback entra por default no mês seguinte à compra. A divergência documental residual é apenas 5 versus 7 dias úteis.
 
 8.2. Livre movimentação
 
