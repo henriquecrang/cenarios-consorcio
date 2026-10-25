@@ -1,6 +1,6 @@
 # Especificação canônica do modelo — Simulador Consórcio × CDB × Imóvel
 
-**Baseline de implementação atual:** V3.20  
+**Baseline de implementação atual:** V3.21  
 **Status:** especificação funcional e financeira canônica do comportamento esperado do simulador  
 **Documentos complementares:**  
 - `docs/pendencias.md` — premissas externas, regras contratuais e funcionalidades ainda abertas;  
@@ -2495,6 +2495,42 @@ Benchmark:
 Só é definido quando:
 
 `Aportes_reais > 0`
+
+---
+
+# 42A. Gate de substituição de garantia — V3.21
+
+A venda do imóvel com manutenção do consórcio por substituição de garantia exige uma confirmação explícita de cenário:
+
+`substituteGuaranteeApproved = true`
+
+Sem essa flag:
+- a venda NÃO é executada no motor;
+- o imóvel permanece na estratégia;
+- a interface exibe warning de aprovação pendente.
+
+A V3.21 não inventa fórmula de suficiência do imóvel substituto.
+
+Campo de custo:
+
+`substituteGuaranteeCost ≥ 0`
+
+Esse custo:
+- é manual;
+- default = R$0;
+- é somado aos custos de venda somente quando a modalidade é substituição de garantia aprovada.
+
+A garantia externa:
+- pode existir fora da estratégia;
+- não entra no patrimônio calculado;
+- não cria ganho econômico artificial.
+
+Continuam pendentes:
+- valor mínimo/razão de cobertura da nova garantia;
+- requisitos de titularidade;
+- SLA;
+- tabela real de vistoria/cartório;
+- regra de aprovação da administradora.
 
 ---
 
