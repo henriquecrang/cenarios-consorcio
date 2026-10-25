@@ -2867,7 +2867,9 @@ function collectScenarioConfig(){
     firstAdj:Math.max(1,+$('primeiroReajuste').value||12),
     adjustmentBeforeContemplation:$('reajAntesCont').checked,
 
+    lanceMode:$('lanceFixoMode').checked ? 'fixed' : 'free',
     lancePct:clamp(pct($('lanceTotal').value),0,1),
+    fixedLancePct:clamp(pct($('lanceFixoPct').value),0,1),
     embMaxPct:clamp(pct($('lanceEmb').value),0,0.30),
 
     usarEmprestimoLance:$('comEmprestimoLance').checked,
@@ -2952,6 +2954,8 @@ function collectScenarioConfig(){
   $('emprestimoTrAnual').disabled = !cfg.usarEmprestimoLance;
   $('emprestimoPrazo').disabled = !cfg.usarEmprestimoLance;
   $('emprestimoSistema').disabled = !cfg.usarEmprestimoLance;
+  $('lanceTotal').disabled = cfg.lanceMode!=='free';
+  $('lanceFixoPct').disabled = cfg.lanceMode!=='fixed';
   $('emprestimoTermosIguais').disabled = !cfg.usarEmprestimoLance;
   $('emprestimoTermosPorCota').disabled = !cfg.usarEmprestimoLance;
   syncLoanTermsUI(cfg);
@@ -3277,10 +3281,14 @@ if(loanBody){
   const warning=$('warning');
   const warnings=[];
   const lancePctDisplayed=cfg.lancePct*100;
-  if(lancePctDisplayed<60.14){
-    warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está abaixo do menor vencedor documentado nas atas disponíveis do Grupo 4012 (60,14%). Nos meses recentes com vencedor, os pisos ficaram entre 68,91% e 72,73%. Histórico não é garantia de resultado.`);
-  }else if(lancePctDisplayed<68.9081){
-    warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está acima do menor vencedor histórico documentado, mas abaixo do menor piso observado entre julho e setembro (68,91%). Histórico não é garantia de resultado.`);
+  if(cfg.lanceMode==='free'){
+    if(lancePctDisplayed<60.14){
+      warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está abaixo do menor vencedor documentado nas atas disponíveis do Grupo 4012 (60,14%). Nos meses recentes com vencedor, os pisos ficaram entre 68,91% e 72,73%. Histórico não é garantia de resultado.`);
+    }else if(lancePctDisplayed<68.9081){
+      warnings.push(`O Lance Livre configurado (${lancePctDisplayed.toFixed(2).replace('.',',')}%) está acima do menor vencedor histórico documentado, mas abaixo do menor piso observado entre julho e setembro (68,91%). Histórico não é garantia de resultado.`);
+    }
+  }else{
+    warnings.push(`Lance Fixo configurado em ${(cfg.fixedLancePct*100).toFixed(1).replace('.',',')}% da carta atualizada. O histórico de 60%–73% exibido para Lance Livre NÃO se aplica a esta modalidade.`);
   }
   const contemplationCoincidesWithAdjustment = cont>=cfg.firstAdj && (cont-cfg.firstAdj)%12===0;
   if(contemplationCoincidesWithAdjustment) warnings.push(cfg.adjustmentBeforeContemplation
