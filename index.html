@@ -1424,7 +1424,7 @@ th:first-child,td:first-child{text-align:left}
         <div class="kpi-section-title">Detalhamento das cotas</div>
         <div class="quota-detail-wrap">
           <table class="stacked-detail-table cota-result-table">
-            <thead><tr><th>Cota</th><th>Carta inicial</th><th>Contemplação</th><th>Lance Livre efetivo</th><th>Embutido</th><th>Dinheiro</th><th>Crédito líquido</th><th>Parcela pós-cont.</th><th>Rend. aferido acum.</th><th>Rend. usado na própria parcela</th></tr></thead>
+            <thead><tr><th>Cota</th><th>Carta inicial</th><th>Contemplação</th><th>Modalidade</th><th>Lance %</th><th>Lance efetivo</th><th>Embutido</th><th>Dinheiro</th><th>Crédito líquido</th><th>Parcela pós-cont.</th><th>Rend. aferido acum.</th><th>Rend. usado na própria parcela</th></tr></thead>
             <tbody id="cotaDetailBody"></tbody>
           </table>
         </div>
@@ -1457,7 +1457,7 @@ th:first-child,td:first-child{text-align:left}
         <div class="kpi-section-title">Empréstimo para o lance</div>
         <div class="kpis compact">
           <div class="kpi">
-            <div class="l">Lance Livre efetivo — total das cotas</div>
+            <div class="l">Lance efetivo — total das cotas</div>
             <div class="v" id="kLanceTotalEfetivo">—</div>
             <div class="kpi-formula" id="kLanceTotalFormula">—</div>
           </div>
@@ -3134,6 +3134,8 @@ if(cotaBody){
     <td><b>${q.id}</b></td>
     <td>${money(q.credit0)}</td>
     <td>mês ${q.cont}</td>
+    <td>${q.lanceMode==='fixed' ? 'Fixo' : 'Livre'}</td>
+    <td>${(q.bidPct*100).toFixed(1).replace('.',',')}%</td>
     <td>${money(q.effectiveLanceAtCont)}</td>
     <td>${money(q.embeddedLanceAtCont)}</td>
     <td>${money(q.cashLanceAtCont)}</td>
@@ -3169,9 +3171,11 @@ if(loanBody){
   $('kYieldParcelaTotal').textContent=cfg.rendimentoPagaParcela ? money(totalYieldUsedForInstallments) : '—';
 
   $('kLanceTotalEfetivo').textContent=money(effectiveLanceAtCont);
-  $('kLanceTotalFormula').textContent=`Σ ${(r.lancePct*100).toFixed(2).replace('.',',')}% × saldo devedor de cada cota no respectivo mês de contemplação`;
+  $('kLanceTotalFormula').textContent=cotaDetails.map(q=>
+    `${q.id}: ${q.lanceMode==='fixed'?'Fixo':'Livre'} ${(q.bidPct*100).toFixed(1).replace('.',',')}% → ${money(q.effectiveLanceAtCont)}`
+  ).join(' · ');
   $('kLanceEmbutidoEfetivo').textContent=money(embeddedLanceAtCont);
-  $('kLanceEmbutidoFormula').textContent=`solicitado ${money(requestedEmbeddedAtCont)}; até ${(r.embPct*100).toFixed(2).replace('.',',')}% × carta atualizada de cada cota, limitado ao próprio Lance Livre`;
+  $('kLanceEmbutidoFormula').textContent=`solicitado ${money(requestedEmbeddedAtCont)}; ${cotaDetails.map(q=>`${q.id}: ${(q.embPct*100).toFixed(1).replace('.',',')}%`).join(' · ')} da carta atualizada, sempre limitado ao próprio lance efetivo`;
   $('kLanceDinheiro').textContent=money(cashLanceTotal);
   $('kEmprestimoPrincipal').textContent=(cfg.usarEmprestimoLance ? money(loanPrincipal) : money(0));
   $('kLanceProprio').textContent=money(ownCashLance);
