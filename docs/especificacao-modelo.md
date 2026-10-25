@@ -1989,16 +1989,26 @@ A Bamaq:
 
 ## 31.3 Taxa de transferência — regra Bamaq 2026
 
-O Regulamento Geral Bamaq 2026 estabelece:
+O Regulamento Geral Bamaq 2026 estabelece, por cota:
 
-`TaxaTransferencia = min(1% × SaldoDevedorCota, R$ 1.000)`
+`TaxaTransferencia_j = min(pct_taxa × SaldoDevedorCota_j, teto_por_cota)`
+
+Defaults documentais:
+
+`pct_taxa = 1%`
+
+`teto_por_cota = R$ 1.000`
+
+Em cessão conjunta de várias cotas:
+
+`TaxaTransferenciaTotal = Σ TaxaTransferencia_j`
 
 A base NÃO é:
 - oferta de compra;
 - valor da carta;
 - crédito atualizado.
 
-Isso substitui a fórmula antiga baseada na oferta de compra.
+Desde a V3.13, essa é a fórmula implementada no motor. A oferta só afeta o valor bruto recebido e custos explicitamente definidos como percentuais da oferta; não altera a tarifa de transferência.
 
 ## 31.4 Taxa de cadastro
 
