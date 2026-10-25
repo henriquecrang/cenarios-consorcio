@@ -169,6 +169,18 @@ function makeConfig({
     r.totalYieldUsedForInstallments,
     r.cotaDetails.reduce((sum,q)=>sum+q.totalYieldUsedForInstallments,0)
   );
+
+  // Invariante anti-pooling: em todo mês, cada cota só usa o próprio rendimento
+  // e nunca mais do que a própria parcela daquele mês.
+  for(const h of r.hist){
+    for(const q of r.cotaDetails){
+      const y=h.monthlyLetterYieldByQuota?.[q.id] || 0;
+      const inst=h.monthlyConsortiumInstallmentByQuota?.[q.id] || 0;
+      const used=h.monthlyYieldUsedByQuota?.[q.id] || 0;
+      assert.ok(used<=y+0.01,`cota ${q.id}, mês ${h.m}: abatimento excedeu rendimento próprio`);
+      assert.ok(used<=inst+0.01,`cota ${q.id}, mês ${h.m}: abatimento excedeu parcela própria`);
+    }
+  }
 }
 
 // A sensibilidade inclusiva pode usar rendimentos, mas é explicitamente distinta.
