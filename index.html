@@ -1839,7 +1839,8 @@ th:first-child,td:first-child{text-align:left}
                 <th>Cont. B</th>
                 <th>Cont. C</th>
                 <th>Cont. D</th>
-                <th>Lance Livre</th>
+                <th>Modalidade</th>
+                <th>Lance %</th>
                 <th>Carta / CDI</th>
                 <th>Financia lance</th>
                 <th>Δ vs CDB</th>
@@ -3344,15 +3345,15 @@ let decisionMatrixTimer=null;
 let decisionMatrixInitialized=false;
 
 const decisionScenarioDefs=[
-  {key:'earlyAll',name:'Todas cedo',lancePct:73,yieldMode:'current'},
-  {key:'twoWaves',name:'Duas ondas',lancePct:72,yieldMode:'current'},
-  {key:'staggered',name:'Escalonada',lancePct:69,yieldMode:'current'},
-  {key:'stress',name:'Stress de prazo + rendimento',lancePct:73,yieldPct:70},
-  {key:'fastHighYield',name:'Rápida + rendimento otimista',lancePct:70,yieldPct:90},
+  {key:'earlyAll',name:'Todas cedo',lanceMode:'free',lancePct:73,yieldMode:'current'},
+  {key:'twoWaves',name:'Duas ondas',lanceMode:'free',lancePct:72,yieldMode:'current'},
+  {key:'staggered',name:'Escalonada',lanceMode:'free',lancePct:69,yieldMode:'current'},
+  {key:'stress',name:'Stress de prazo + rendimento',lanceMode:'free',lancePct:73,yieldPct:70},
+  {key:'fastHighYield',name:'Rápida + rendimento otimista',lanceMode:'free',lancePct:70,yieldPct:90},
   {key:'finance0',name:'Financiamento 0%',finPct:0},
   {key:'finance50',name:'Financiamento 50%',finPct:50},
   {key:'finance100',name:'Financiamento 100%',finPct:100},
-  {key:'custom',name:'Histórico / custom',lancePct:60.1,yieldMode:'current'}
+  {key:'custom',name:'Histórico / custom',lanceMode:'free',lancePct:60.1,yieldMode:'current'}
 ];
 
 function decisionPresetConts(key,count,N,currentConts){
@@ -3378,9 +3379,9 @@ function decisionPresetDescription(key,conts){
   if(key==='staggered') return `Contemplações escalonadas: ${months}, com Lance Livre de 69% (próximo ao piso recente de agosto).`;
   if(key==='stress') return `Prazo mais lento (${months}), Lance Livre de 73% e carta a 70% do CDI líquido.`;
   if(key==='fastHighYield') return `Contemplação rápida (${months}), Lance Livre de 70% e carta a 90% do CDI líquido.`;
-  if(key==='finance0') return 'Isola o efeito da alavancagem: mesmos meses, Lance Livre e rendimento da Base comparável; 0% do dinheiro do lance financiado.';
-  if(key==='finance50') return 'Isola o efeito da alavancagem: mesmos meses, Lance Livre e rendimento da Base comparável; 50% do dinheiro do lance financiado.';
-  if(key==='finance100') return 'Isola o efeito da alavancagem: mesmos meses, Lance Livre e rendimento da Base comparável; 100% do dinheiro do lance financiado.';
+  if(key==='finance0') return 'Isola o efeito da alavancagem: mesmos meses, modalidade/percentual de lance e rendimento da Base comparável; 0% do dinheiro do lance financiado.';
+  if(key==='finance50') return 'Isola o efeito da alavancagem: mesmos meses, modalidade/percentual de lance e rendimento da Base comparável; 50% do dinheiro do lance financiado.';
+  if(key==='finance100') return 'Isola o efeito da alavancagem: mesmos meses, modalidade/percentual de lance e rendimento da Base comparável; 100% do dinheiro do lance financiado.';
   return 'Linha livre iniciada em 60,1%, próxima ao menor vencedor documentado; edite para testar outra combinação.';
 }
 
@@ -3401,7 +3402,8 @@ function buildDecisionRows(){
   const cfg=collectScenarioConfig();
   const base=runScenario(cfg);
   const currentYield=cfg.cartaPctCdi*100;
-  const currentLance=cfg.lancePct*100;
+  const currentLanceMode=cfg.lanceMode || 'free';
+  const currentLance=(currentLanceMode==='fixed' ? cfg.fixedLancePct : cfg.lancePct)*100;
   const currentFin=decisionMainFinancePct(cfg,base);
   const currentConts=cfg.cotas.map(c=>c.cont);
   const count=cfg.cotas.length;
@@ -3410,7 +3412,7 @@ function buildDecisionRows(){
     {
       key:'current',name:'Base comparável',
       desc:'Valores atuais de contemplação/lance/rendimento/financiamento sob a política comum de compra e preço da matriz.',
-      readonly:true,conts:currentConts,lancePct:currentLance,yieldPct:currentYield,finPct:currentFin
+      readonly:true,conts:currentConts,lanceMode:currentLanceMode,lancePct:currentLance,yieldPct:currentYield,finPct:currentFin
     },
     ...decisionScenarioDefs.map(def=>{
       const conts=decisionPresetConts(def.key,count,cfg.N,currentConts);
@@ -3419,6 +3421,7 @@ function buildDecisionRows(){
         readonly:false,
         conts,
         desc:decisionPresetDescription(def.key,conts),
+        lanceMode:(def.lanceMode ?? currentLanceMode),
         lancePct:(def.lancePct ?? currentLance),
         yieldPct:(def.yieldPct ?? currentYield),
         finPct:(def.finPct ?? currentFin)
@@ -3438,10 +3441,17 @@ function buildDecisionRows(){
     const contCells=row.conts.map((value,i)=>
       `<td class="decision-input-cell" data-label="Cont. ${quotaLabel(i)}">${valueCell(value,'cont')}</td>`
     ).join('');
+    const modeCell=row.readonly
+      ? `<span class="decision-input-readonly">${row.lanceMode==='fixed'?'Fixo':'Livre'}</span>`
+      : `<select data-decision-key="${row.key}" data-decision-field="mode">
+          <option value="free" ${row.lanceMode==='free'?'selected':''}>Livre</option>
+          <option value="fixed" ${row.lanceMode==='fixed'?'selected':''}>Fixo</option>
+        </select>`;
     return `<tr class="${cls}" data-decision-row="${row.key}">
       <td><span class="decision-name">${row.name}</span><span class="decision-desc">${row.desc}</span></td>
       ${contCells}
-      <td class="decision-input-cell" data-label="Lance Livre">${valueCell(row.lancePct,'lance','%')}</td>
+      <td class="decision-input-cell" data-label="Modalidade">${modeCell}</td>
+      <td class="decision-input-cell" data-label="Lance %">${valueCell(row.lancePct,'lance','%')}</td>
       <td class="decision-input-cell" data-label="Carta / CDI">${valueCell(row.yieldPct,'yield','%')}</td>
       <td class="decision-input-cell" data-label="Financia lance">${valueCell(row.finPct,'fin','%')}</td>
       <td class="decision-primary-output" data-label="Δ vs CDB" data-out="delta">—</td>
@@ -3459,8 +3469,9 @@ function buildDecisionRows(){
     </tr>`;
   }).join('');
 
-  body.querySelectorAll('input[data-decision-key]').forEach(el=>{
+  body.querySelectorAll('[data-decision-key]').forEach(el=>{
     el.addEventListener('input',scheduleDecisionMatrix);
+    el.addEventListener('change',scheduleDecisionMatrix);
   });
   decisionMatrixInitialized=true;
 }
