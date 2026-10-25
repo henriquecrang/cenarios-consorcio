@@ -687,7 +687,7 @@ th:first-child,td:first-child{text-align:left}
   <label>Cotas da proposta</label>
   <div class="quota-detail-wrap">
     <table class="quota-setup" id="quotaConfigTable">
-      <thead><tr><th>Cota</th><th>Crédito inicial</th><th class="quota-cont-head">Mês da contemplação</th></tr></thead>
+      <thead><tr><th>Cota</th><th>Crédito inicial</th><th class="quota-cont-head">Mês da contemplação</th><th>Usar nesta compra</th></tr></thead>
       <tbody id="quotaConfigBody"></tbody>
     </table>
   </div>
@@ -699,7 +699,7 @@ th:first-child,td:first-child{text-align:left}
   </div>
 
   <button type="button" id="presetCotas" class="preset-btn">Restaurar proposta QuintoAndar — 400 / 400 / 370 / 200</button>
-  <div class="small" style="margin-top:7px">Cada cota contempla de forma independente. Com várias cotas, a compra só pode ocorrer depois do maior mês de contemplação configurado.</div>
+  <div class="small" style="margin-top:7px">Cada cota contempla de forma independente. A compra só precisa esperar a última contemplação entre as cotas marcadas em “Usar nesta compra”. Cotas não usadas continuam independentes no consórcio.</div>
 </div>
 <input id="mesCont" type="hidden" value="12">
 
@@ -1951,7 +1951,8 @@ function snapshotQuotaStructure(){
     const i=+row.dataset.quotaIndex;
     return {
       credit:$(`cota${i+1}Credito`)?.value ?? '0',
-      cont:$(`cota${i+1}Cont`)?.value ?? '12'
+      cont:$(`cota${i+1}Cont`)?.value ?? '12',
+      useInPurchase:$(`cota${i+1}UseCompra`)?.checked !== false
     };
   });
   const loans=rows.map((row,i)=>{
@@ -1995,11 +1996,13 @@ function renderQuotaStructure({count=null,credits=null,conts=null,loanTerms=null
     const contRaw=(conts && conts[i]!==undefined) ? conts[i]
       : (prevQ.cont!==undefined ? prevQ.cont : (DEFAULT_QUOTA_CONTS[i] ?? 12));
     const cont=Math.min(N,Math.max(1,+contRaw||1));
+    const useInPurchase=prevQ.useInPurchase!==undefined ? !!prevQ.useInPurchase : true;
 
     quotaRows.push(`<tr data-quota-index="${i}">
       <td>${label}</td>
       <td><input class="quota-credit-input" id="cota${i+1}Credito" type="number" value="${credit}" step="10000" min="0"></td>
       <td class="quota-cont-cell"><input class="quota-cont-input" id="cota${i+1}Cont" type="number" value="${cont}" step="1" min="1" max="${N}"></td>
+      <td><label class="decision-check"><input id="cota${i+1}UseCompra" type="checkbox" ${useInPurchase?'checked':''}> sim</label></td>
     </tr>`);
 
     const prevL=previous.loans[i] || {};
@@ -2057,7 +2060,7 @@ function dynamicQuotaControlIds(){
   const n=getQuotaCount();
   for(let i=0;i<n;i++){
     const label=quotaLabel(i);
-    ids.push(`cota${i+1}Credito`,`cota${i+1}Cont`);
+    ids.push(`cota${i+1}Credito`,`cota${i+1}Cont`,`cota${i+1}UseCompra`);
     ids.push(`emp${label}_pct`,`emp${label}_rate`,`emp${label}_tr`,`emp${label}_term`,`emp${label}_system`);
   }
   return ids;
@@ -2150,7 +2153,7 @@ function scenarioAllowedControlIds(){
 function scenarioSanitizeState(raw){
   const allowed=scenarioAllowedControlIds();
   const isDynamicAllowed=id =>
-    /^cota\d+(?:Credito|Cont)$/.test(id) ||
+    /^cota\d+(?:Credito|Cont|UseCompra)$/.test(id) ||
     /^emp[A-Z]+_(?:pct|rate|tr|term|system)$/.test(id);
   const controls={};
   const source=raw && typeof raw==='object' && raw.controls && typeof raw.controls==='object' ? raw.controls : {};
