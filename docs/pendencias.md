@@ -195,7 +195,7 @@ Pendência removida:
 A matriz deixa de ter como problema estrutural a falta de comparabilidade entre política de compra e tamanho do ativo.
 
 PENDÊNCIAS — SIMULADOR CONSÓRCIO x CDB x IMÓVEL
-Base atual de software: V3.11
+Base atual de software: V3.14
 Estado: documento canônico de incertezas e gaps ainda reais
 
 Objetivo: registrar tudo o que ainda não está suficientemente confirmado ou modelado, deixando explícito:
@@ -213,7 +213,7 @@ Nível de evidência:
 - O histórico de versões e auditorias permanece no Git e em `docs/follow-up-auditorias.md`. Este arquivo deve registrar prioritariamente o que ainda está aberto na V3.11; referências históricas só são mantidas quando explicam a origem de uma pendência.
 
 ============================================================
-0. ESTADO ATUAL DO SOFTWARE — V3.11
+0. ESTADO ATUAL DO SOFTWARE — V3.14
 ============================================================
 
 Esta seção descreve o estado canônico atual. O histórico detalhado de versões anteriores fica no follow-up das auditorias e no Git.
@@ -250,7 +250,7 @@ PENDÊNCIAS DE MODELAGEM / DOCUMENTAÇÃO AINDA REAIS:
 - módulos de seguro, cessão, resgate, encerramento e substituição de garantia ainda dependentes de regras documentais.
 
 ESTADO DE QUALIDADE:
-A V3.11 já passou pela auditoria posterior à V3.5 e pelas correções V3.6–V3.11. As regras críticas possuem testes automatizados. O que permanece aberto está concentrado em premissas externas, documentação contratual e funcionalidades ainda não implementadas.
+A V3.11 já passou pela auditoria posterior à V3.5 e pelas correções V3.6–V3.11. As regras críticas possuem testes automatizados, e as correções V3.12–V3.14 cobrem timing do cashback, taxa de transferência e crédito residual. O que permanece aberto está concentrado em premissas externas, documentação contratual e funcionalidades ainda não implementadas.
 
 ============================================================
 1. PRIORIDADE ALTA — PREMISSAS QUE PODEM MUDAR O RESULTADO
