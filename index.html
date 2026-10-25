@@ -2122,7 +2122,7 @@ function scenarioCaptureDecisionMatrix(){
   document.querySelectorAll('#decisionScenarioBody tr[data-decision-row]').forEach(row=>{
     const key=row.dataset.decisionRow;
     if(!key || key==='current') return;
-    rows[key]=[...row.querySelectorAll('input[data-decision-field]')].map(el=>({
+    rows[key]=[...row.querySelectorAll('[data-decision-field]')].map(el=>({
       field:el.dataset.decisionField || '',
       value:String(el.value)
     }));
@@ -2196,6 +2196,14 @@ function scenarioApplyControls(controls){
   if($('numeroCotas')) $('numeroCotas').value=targetCount;
   renderQuotaStructure({count:targetCount,preserve:false});
 
+  // Presets anteriores à V3.15 não conheciam modalidade. Para evitar herdar
+  // silenciosamente o estado da tela, eles são determinísticos como Lance Livre.
+  if(!controls.lanceLivreMode && !controls.lanceFixoMode){
+    if($('lanceLivreMode')) $('lanceLivreMode').checked=true;
+    if($('lanceFixoMode')) $('lanceFixoMode').checked=false;
+    if($('lanceFixoPct')) $('lanceFixoPct').value='30';
+  }
+
   const ranges=[];
   Object.entries(controls).forEach(([id,item])=>{
     const el=$(id);
@@ -2234,7 +2242,7 @@ function scenarioApplyDecisionMatrix(decision){
   Object.entries(rows).forEach(([key,items])=>{
     const row=document.querySelector(`#decisionScenarioBody tr[data-decision-row="${CSS.escape(key)}"]`);
     if(!row || !Array.isArray(items)) return;
-    const inputs=[...row.querySelectorAll('input[data-decision-field]')];
+    const inputs=[...row.querySelectorAll('[data-decision-field]')];
     inputs.forEach((el,idx)=>{
       const item=items[idx];
       if(item && item.value!==undefined) el.value=String(item.value);
