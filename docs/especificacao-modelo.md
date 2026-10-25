@@ -2530,41 +2530,47 @@ Isso vale especialmente para:
 
 ---
 
-# 51. Defaults da V2.54 — núcleo do cenário
+# 51. Defaults atuais — V3.11
 
-Os defaults abaixo descrevem a interface da V2.54. Eles NÃO devem ser confundidos com recomendações financeiras ou fatos contratuais.
+Os defaults abaixo descrevem a configuração atual do simulador. Eles são **premissas de cenário**, não recomendações financeiras nem garantias contratuais.
 
 ## 51.1 Macroeconomia
 
-| Campo | Default |
+| Campo | Default atual |
 |---|---:|
 | Inflação projetada | 4,0% a.a. |
-| CDB | 11,5% a.a. |
-| Carta | legado V2.54: 98% do CDB; regra-alvo: rendimento líquido da aplicação, separado do benchmark e referenciado ao CDI |
+| CDB benchmark | 11,5% a.a. líquido projetado |
+| CDI de referência | 13,65% a.a. bruto — spot BCB/SGS 4389 de 23/10/2026 |
+| Carta contemplada | 80% do CDI como retorno líquido projetado |
 | Inflação para valores de hoje | segue inflação projetada |
 | Reajuste do aluguel | segue inflação projetada |
 | Valorização do imóvel | segue inflação projetada |
 
+O CDI spot é uma referência editável, não uma previsão constante para os 214 meses.
+
 ## 51.2 Consórcio
 
-| Campo | Default |
+| Campo | Default atual |
 |---|---:|
-| Carta bruta | R$ 1.370.000 |
+| Cotas | R$400 mil + R$400 mil + R$370 mil + R$200 mil |
+| Carta bruta agregada | R$1.370.000 |
 | Prazo restante | 214 meses |
+| Contemplação | mês 12 em cada cota |
 | Parcela reduzida | 50% |
 | Taxa administrativa | 24% |
 | Fundo de reserva | 1% |
-| Reajuste | 3% a.a. fixos — confirmado comercialmente para a proposta; data-base ainda pendente |
+| Reajuste | 3% a.a. |
 | Primeiro reajuste | mês 7 |
 | Ordem no mesmo mês | reajuste antes da contemplação |
-| Contemplação | mês 12 |
-| Compra do imóvel | após o horizonte |
-| Lance total | 30% da carta — representa o Lance Fixo na V2.54; Lance Livre exige base saldo devedor e ainda não está implementado corretamente |
-| Embutido | até 30% da carta atualizada |
+| Compra na simulação principal | após o horizonte |
+| Lance Livre | 70% do saldo devedor da própria cota |
+| Lance embutido | até 30% da carta atualizada da própria cota |
+
+O 70% é hipótese analítica calibrada pelo histórico oficial, não probabilidade nem corte garantido.
 
 ## 51.3 Empréstimo do lance
 
-| Campo | Default |
+| Campo | Default atual |
 |---|---:|
 | Usar empréstimo | sim |
 | Parte do lance em dinheiro financiada | 100% |
@@ -2573,110 +2579,119 @@ Os defaults abaixo descrevem a interface da V2.54. Eles NÃO devem ser confundid
 | Prazo | 120 meses |
 | Sistema | Price |
 
+A matriz contém linhas específicas de 0%, 50% e 100% financiado para isolar o efeito da alavancagem.
+
 ## 51.4 Seguro
 
-| Campo | Default |
+| Campo | Default atual |
 |---|---:|
-| Seguro ativo | não — confirmado como opcional para a proposta |
-| Base | valor fixo — sensibilidade genérica, não fórmula Bamaq |
-| Valor | R$ 0 |
+| Seguro ativo | não |
+| Base | valor fixo |
+| Valor | R$0 |
 
 ## 51.5 Carta contemplada
 
-| Campo | Default |
+| Campo | Default atual |
 |---|---:|
-| Uso do rendimento | pagar parcela |
+| Rendimento | 80% do CDI bruto de referência, tratado como líquido final |
+| Uso do rendimento | abater parcela da própria cota |
+| Pooling entre cotas | proibido |
 | Resgate | desativado |
-| IR/custo do resgate | 0% |
+| IR/custo adicional do resgate | 0% como sensibilidade |
 
 ## 51.6 Compra do imóvel
 
-| Campo | Default |
+| Campo | Default atual |
 |---|---:|
-| Preço | travado ao crédito disponível |
+| Preço na simulação principal | travado ao crédito disponível |
 | ITBI | 3% |
-| RGI | travado em 0,6% do imóvel |
-| Outros custos | R$ 0 |
-| Cashback | 10%; base depende da regra geral/exceção da campanha de 16/06/2026 |
+| RGI | 0,6% do imóvel |
+| Outros custos | R$0 |
+| Cashback | 10% |
+| Base do cashback | principal líquido pós-embutido, sem rendimentos acumulados |
 
-## 51.7 Venda/cessão da carta
+A inclusão de rendimentos acumulados na base existe apenas como sensibilidade não confirmada.
 
-| Campo | Default |
+## 51.7 Matriz de cenários
+
+| Campo | Default atual |
 |---|---:|
-| Mês mostrado inicialmente | 24 |
-| Oferta de teste | R$ 100.000 |
-| Taxa de transferência | 1% |
-| Teto da taxa | R$ 1.000 |
-| Custo adicional | 0% |
-| Quitar empréstimo na cessão | sim |
+| Política de compra | comprar na última contemplação |
+| Preço comparável | imóvel-alvo fixo de R$1.000.000 |
+| Lance Livre | presets entre 60,1% e 73% |
+| Carta/CDI | sensibilidades 70% / 80% / 90% |
+| Financiamento | inclui linhas isoladas 0% / 50% / 100% |
 
-## 51.8 Locação
+## 51.8 Persistência e testes
 
-| Campo | Default |
+| Item | Estado atual |
+|---|---|
+| Formato de presets | `formatVersion = 2` |
+| Estado financeiro | `stateVersion = 2` |
+| Migração de antigos defaults | explícita, cria cópia e preserva original |
+| Núcleo financeiro | `model-core.js` |
+| Motor de cenários | `scenario-engine.js` sem DOM |
+| Testes | unitários + integração em GitHub Actions |
+
+## 51.9 Locação e venda
+
+| Campo | Default atual |
 |---|---:|
-| Aluguel | travado em 0,5% do preço |
+| Aluguel | 0,5% do preço / mês |
 | Vacância | 8,3% |
 | Administração | 8% |
 | Manutenção | 5% |
-| IR efetivo | 27,5% |
-| Custos fixos | travados em 7% do aluguel |
-
-## 51.9 Venda do imóvel
-
-| Campo | Default |
-|---|---:|
-| Venda | após horizonte |
-| Base | valor de mercado corrente |
-| Percentual sobre a base | 100% |
-| Quitar consórcio | sim |
-| Quitar empréstimo | sim |
-| Corretagem | 5% |
+| IR estimado do aluguel | 27,5% |
+| Custos fixos | 7% do aluguel |
+| Venda do imóvel | após horizonte |
+| Corretagem na venda | 5% |
 | IR simplificado sobre ganho | 15% |
-| Outros custos | R$ 0 |
-
----
 
 # 52. Defaults que são sensibilidades, não fatos
 
-Os seguintes defaults NÃO devem ser tratados como “regra real” sem documentação:
+Não tratar como “regra real” sem documentação ou cenário explícito:
 
-- 98% do CDB na carta — premissa legada da V2.54, agora superada como descrição conceitual; a regra real é rendimento líquido da aplicação vinculada;
-- possibilidade de usar rendimento para pagar parcelas;
-- reajuste de 3% a.a. — regra econômica principal confirmada comercialmente; permanecem pendentes data-base, primeiro reajuste e ordem em mês coincidente com contemplação;
-- CDB de 11,5% a.a. por todo o horizonte;
+- CDI spot de 13,65% constante por todo o horizonte;
+- CDB líquido de 11,5% a.a. constante por todo o horizonte;
+- 80% do CDI como rendimento líquido futuro da carta;
+- Lance Livre de 70%;
 - TR de 0%;
+- juros bancários de 1,55% a.m.;
 - ausência de seguro;
 - IR/custo de resgate de 0%;
 - IR de 15% na venda do imóvel;
-- taxa de transferência de 1% com teto R$ 1.000;
 - tributação simplificada do aluguel;
-- cashback de 10% em todas as situações;
-- base do lance como percentual da carta para qualquer modalidade — agora sabemos comercialmente que isso só é adequado ao Lance Fixo; o Lance Livre usa saldo devedor.
+- cashback de 10% fora das condições formais da campanha;
+- inclusão de rendimentos acumulados na base de cashback;
+- valorização do imóvel e reajuste de aluguel iguais à inflação projetada.
 
----
+Regras confirmadas que NÃO são meras sensibilidades:
+- Lance Livre usa saldo devedor atualizado;
+- embutido usa a carta e é limitado a 30%;
+- rendimento de uma cota só pode abater a parcela da própria cota;
+- operação multi-cota pode reunir créditos;
+- para o cenário comercial confirmado com R$959 mil líquidos, cashback = R$95,9 mil.
 
 # 53. Premissas propositalmente NÃO resolvidas dentro do motor
 
-Enquanto constarem no arquivo de pendências, o simulador NÃO deve inventar regras para:
+Enquanto constarem em `docs/pendencias.md`, o simulador não deve inventar regras definitivas para:
 
-- remuneração efetiva da carta contemplada;
-- duração dessa remuneração;
-- tributação real dos rendimentos;
-- uso contratual do rendimento para parcelas;
-- índice real de reajuste;
-- encerramento de carta contemplada não utilizada;
-- devolução do fundo de reserva;
-- destino/remuneração de crédito residual;
-- base contratual do lance;
-- tributação da cessão;
-- seguro real;
-- CET/indexador real do empréstimo;
+- trajetória temporal de CDI/CDB em horizonte longo;
+- dia exato e ordem contratual do reajuste quando coincidente com contemplação;
+- cobrança/dedução ligada a assembleias anteriores à adesão, ainda pendente de reconciliação documental;
+- fórmula oficial da parcela reduzida da cotação;
+- modalidade explícita Lance Fixo × Lance Livre em todos os fluxos;
+- compra usando subconjunto das cotas contempladas;
+- elegibilidade de rendimentos acumulados para cashback;
+- destino/remuneração do crédito residual depois da compra;
+- encerramento e compensação interna de carta contemplada não utilizada;
+- regras finais do fundo de reserva;
+- tributação do cashback, resgate e cessão;
+- seguro contratual;
 - substituição de garantia;
-- regras de múltiplas cotas ainda não esclarecidas, **exceto** os pontos já informados comercialmente: estrutura de quatro cotas, possibilidade de mesmo grupo, identificação própria, contemplação individual e possibilidade de múltiplas contemplações do mesmo CPF na mesma assembleia.
+- custos/SLA de engenharia, cartório e transferência.
 
----
-
-
+Quando uma hipótese for necessária para simulação, ela deve ser identificada como sensibilidade configurável.
 
 # 54. Carta mantida até o horizonte / encerramento do grupo
 
@@ -3392,20 +3407,22 @@ A V3.2 deve permanecer utilizável apenas com rolagem vertical nas larguras de t
 
 Essa regra é de UX e não altera o motor financeiro.
 
-# 79. Gaps conhecidos entre V3.2 e a especificação-alvo
+# 79. Gaps conhecidos — estado atual V3.11
 
-Continuam pendentes, entre outros:
+Continuam pendentes no produto ou na documentação externa:
 
 1. compra usando apenas subconjunto das cotas contempladas;
-2. modalidade explícita Lance Fixo × Lance Livre;
+2. seletor explícito Lance Fixo × Lance Livre;
 3. override das parcelas oficiais cotadas;
-4. regra definitiva do cashback em cenário com embutido;
-5. calendário real do aniversário do grupo e primeiro reajuste;
-6. reconciliação documental residual da ausência de cobrança por assembleias anteriores à adesão;
-7. destino formal do residual após compra;
-8. módulos contratuais de seguro, cessão, resgate, encerramento e substituição de garantia ainda dependentes das pendências documentais já registradas.
+4. trajetória temporal de CDI/CDB em vez de taxa constante;
+5. dia exato e ordem do reajuste em mês coincidente com contemplação;
+6. reconciliação documental da ausência de cobrança por assembleias anteriores à adesão;
+7. destino formal do crédito residual depois da compra;
+8. confirmação documental sobre rendimentos acumulados na base de cashback;
+9. módulos contratuais de seguro, cessão, resgate, encerramento e substituição de garantia;
+10. detalhes operacionais do pedido mensal de uso do rendimento para pagar parcela.
 
-A V3.2 não deve inventar regras para preencher esses gaps.
+Esses gaps devem permanecer explícitos; o motor não deve preencher lacunas contratuais silenciosamente.
 
 # 80A. Arquitetura de testes de integração
 
@@ -3434,7 +3451,28 @@ O histórico mensal do motor expõe, para auditoria/teste:
 - rendimento por cota;
 - rendimento usado por cota.
 
-# 80. Estado de qualidade da V3.2
+# 80. Estado de qualidade atual — V3.11
+
+A linha atual já passou pela auditoria independente posterior à V3.5 e pelas correções V3.6–V3.11.
+
+Estado:
+- fórmulas críticas de Lance Livre/embutido/cashback possuem testes unitários;
+- `runScenario` está fora do DOM e é compartilhado por navegador e testes;
+- operação multi-cota possui regressões de integração;
+- no-pooling é testado mês a mês por cota;
+- matriz usa política comum de compra/preço;
+- CDI bruto e benchmark líquido estão separados;
+- presets antigos possuem migração explícita;
+- cashback exclui rendimentos acumulados por default.
+
+A suíte do GitHub Actions deve permanecer como gate de regressão a cada push/PR.
+
+Riscos restantes são majoritariamente:
+- premissas macro de longo prazo;
+- regras contratuais/documentais ainda abertas;
+- funcionalidades ainda não implementadas listadas na seção 79.
+
+
 
 A V3.2 deriva da V2.54, mas houve mudança arquitetural substancial desde a última auditoria independente.
 
