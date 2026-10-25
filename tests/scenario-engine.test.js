@@ -20,7 +20,11 @@ function makeConfig({
   residualCreditPolicy='unallocated',
   residualExpenseCapPct=0.10,
   useInPurchase=[true,true,true,true],
-  perQuotaBids=null
+  perQuotaBids=null,
+  sellMonth=215,
+  sellPropertyPayoff=true,
+  substituteGuaranteeApproved=false,
+  substituteGuaranteeCost=0
 }={}){
   const credits=[400000,400000,370000,200000];
   const loanTerms={fundPct:financedPct,rateMonthly:0.0155,trAnnual:0,term:120,system:'price'};
@@ -47,7 +51,7 @@ function makeConfig({
     cont:lastCont,
     buyRaw,
     buy:buyRaw,
-    sellMonth:215,
+    sellMonth,
 
     reduced:0.50,
     adm:0.24,
@@ -116,7 +120,9 @@ function makeConfig({
     ownerCostsPctOfRent:0.07,
     propAdj:0.04,
 
-    sellPropertyPayoff:true,
+    sellPropertyPayoff,
+    substituteGuaranteeApproved,
+    substituteGuaranteeCost,
     payLanceLoanOnPropertySale:true,
     propertySaleBase:'market',
     propertySalePctOfPurchase:1,
@@ -300,6 +306,36 @@ function makeConfig({
   close(h5.comparableDebt,(h5.debtByQuota.A||0)+(h5.debtByQuota.B||0));
   assert.ok(h5.debt>h5.comparableDebt); // C+D ainda não contempladas ficam fora do passivo comparável.
   assert.ok(h5.comparableAsset>0);
+}
+
+// Substituição de garantia exige aprovação explícita antes da venda.
+{
+  const blocked=runScenario(makeConfig({
+    conts:[4,4,4,4],
+    buyRaw:4,
+    price:1000000,
+    sellMonth:24,
+    sellPropertyPayoff:false,
+    substituteGuaranteeApproved:false
+  }));
+  assert.equal(blocked.propertySold,false);
+  assert.equal(blocked.propertySaleBlockedByGuarantee,true);
+  close(blocked.propertySaleNetCash,0);
+
+  const approved=runScenario(makeConfig({
+    conts:[4,4,4,4],
+    buyRaw:4,
+    price:1000000,
+    sellMonth:24,
+    sellPropertyPayoff:false,
+    substituteGuaranteeApproved:true,
+    substituteGuaranteeCost:7500
+  }));
+  assert.equal(approved.propertySold,true);
+  assert.equal(approved.propertySaleBlockedByGuarantee,false);
+  close(approved.propertySaleConsortiumPayoff,0);
+  close(approved.propertySaleGuaranteeCost,7500);
+  assert.ok(approved.propertySaleOtherCosts>=7500);
 }
 
 // Residual sem política explícita é rastreado, mas não vira ativo comparável.
