@@ -36,26 +36,31 @@ Quando uma resposta:
 # Itens
 
 
-## Sincronização de software antes da próxima rodada — 29/09/2026
+## Estado atual antes de novas perguntas — V3.11
 
-A linha principal do simulador evoluiu para a V3.2.
+A numeração de perguntas permanece histórica e rastreável. Mudanças internas de software não consomem novos QNs.
 
-Essa evolução **não cria, por si só, novas perguntas comerciais à Michele**. Portanto:
-- a numeração existente é preservada;
-- a próxima pergunta nova, após incorporar QN-065, QN-066 e QN-067, passa a ser **QN-068**;
-- não consumir um novo QN apenas para documentar feature interna de software;
-- a capacidade da V3.2 de trabalhar com 1–50 cotas é uma decisão de produto para comparar propostas e NÃO deve ser reinterpretada como regra da Bamaq;
-- quando respostas futuras forem processadas, elas devem ser comparadas com o comportamento atual da V3.2, não mais com a V2.54;
-- diferenças de software já resolvidas (multi-cota, Lance Livre, CDI separado, sem pooling, tranches e matriz) só devem reabrir perguntas se a nova resposta comercial trouxer regra incompatível.
+A próxima pergunta genuinamente nova continua sendo **QN-068**.
 
-Perguntas comerciais ainda abertas continuam válidas, especialmente as ligadas a:
-- cashback com embutido;
-- primeiro reajuste/aniversário do grupo;
-- assembleias anteriores;
-- prazo operacional do lance;
-- faixa real de remuneração da carta;
-- evento que trava a condição comercial;
-- regras de seguro que não são prioritárias para a decisão imediata.
+Perguntas já respondidas permanecem neste arquivo para auditoria, mas NÃO devem ser reenviadas sem nova evidência contraditória.
+
+Pontos comerciais/documentais que ainda podem justificar novas perguntas, se voltarmos a negociar com a Bamaq:
+- confirmação documental de que as quatro cotas novas do Grupo 4012 não recebem cobrança/dedução por assembleias anteriores;
+- memória/fórmula oficial da parcela reduzida cotada;
+- prazo formal do cashback: 5 versus 7 dias úteis;
+- tratamento tributário/declaratório do cashback;
+- critério de desempate no Lance Livre e tratamento de saldo residual do Fundo Comum, se operacionalmente relevante;
+- dia exato do reajuste e ordem reajuste × contemplação no mês coincidente;
+- elegibilidade de rendimentos financeiros acumulados na base do cashback, caso queiramos usar a sensibilidade inclusiva;
+- regras ainda abertas de substituição de garantia, resgate, cessão e seguro.
+
+Não reabrir apenas por rotina:
+- base do Lance Livre;
+- ranking do Lance Livre;
+- teto de R$400 mil no produto QuintoAndar;
+- cashback de R$95,9 mil no cenário canônico com 30% embutido;
+- 80% do CDI como premissa líquida-base de modelagem;
+- marco operacional histórico de adesão até 30/09.
 
 ### QN-001 — Como é determinado o rendimento da carta contemplada?
 
