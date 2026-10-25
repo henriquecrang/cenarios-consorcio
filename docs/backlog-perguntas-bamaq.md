@@ -3,6 +3,8 @@
 **Criado em:** 28/09/2026  
 **Objetivo:** registrar novas perguntas que surgirem a partir das respostas da vendedora, sem misturá-las com as pendências já existentes do simulador.
 
+**Estado canônico:** rodada `pre_respostas30`, com reconciliações posteriores de confiabilidade incorporadas. Perguntas respondidas permanecem no arquivo para rastreabilidade, mas não devem ser reenviadas sem nova evidência contraditória.
+
 ## Regra de uso
 
 Este backlog deve receber apenas perguntas **novas ou refinadas** que surjam durante o processamento das respostas.
@@ -40,7 +42,7 @@ A linha principal do simulador evoluiu para a V3.2.
 
 Essa evolução **não cria, por si só, novas perguntas comerciais à Michele**. Portanto:
 - a numeração existente é preservada;
-- a próxima pergunta nova continua em **QN-065**;
+- a próxima pergunta nova, após incorporar QN-065, QN-066 e QN-067, passa a ser **QN-068**;
 - não consumir um novo QN apenas para documentar feature interna de software;
 - a capacidade da V3.2 de trabalhar com 1–50 cotas é uma decisão de produto para comparar propostas e NÃO deve ser reinterpretada como regra da Bamaq;
 - quando respostas futuras forem processadas, elas devem ser comparadas com o comportamento atual da V3.2, não mais com a V2.54;
@@ -55,89 +57,117 @@ Perguntas comerciais ainda abertas continuam válidas, especialmente as ligadas 
 - evento que trava a condição comercial;
 - regras de seguro que não são prioritárias para a decisão imediata.
 
-### QN-001 — Como é determinado o rendimento de 98% a 105% do CDI?
+### QN-001 — Como é determinado o rendimento da carta contemplada?
 
-**Status:** RESPONDIDA PARCIALMENTE  
+**Status:** RESPONDIDA COMERCIALMENTE — CAMADAS BRUTA E LÍQUIDA RECONCILIADAS  
 **Prioridade:** ALTA  
-**Origem:** resposta de Michele em 28/09/2026 sobre cotas contempladas em momentos diferentes  
+**Origem:** respostas sucessivas de Michele em 28–29/09/2026  
 **Destinatário:** Michele / Bamaq
 
-**O que ela respondeu:**  
-A cota contemplada primeiro fica com o crédito em uma “conta de investimento exclusiva”, rendendo de 98% a 105% do CDI de forma líquida enquanto aguarda as demais.
+**Resposta consolidada:**  
+Michele distinguiu agora duas camadas:
 
-**O que já tínhamos nos documentos:**  
-A V2.54 usa uma hipótese pontual de 98% do rendimento líquido do CDB. A pendência R1 já registrava que a remuneração real era uma das premissas mais sensíveis do modelo.
+1. **Rentabilidade bruta das aplicações do grupo:** geralmente entre **98% e 105% do CDI**;
+2. **Rentabilidade líquida efetivamente repassada à cota:** para projeção financeira, orientação interna de usar aproximadamente **80% do CDI**.
 
-**Nova dúvida gerada:**  
-O que determina o ponto da faixa 98%–105% do CDI? É uma taxa contratada, uma remuneração variável ou apenas o resultado efetivo da carteira?
+Segundo ela, o crédito contemplado permanece em aplicação conservadora de renda fixa/alta liquidez e o repasse ao consorciado ocorre já líquido dos efeitos tributários/custos da aplicação.
 
-**Por que importa:**  
-O resultado financeiro é altamente sensível à remuneração da carta. Uma faixa variável exige modelagem diferente de um percentual fixo.
+**Interpretação:**  
+A aparente contradição anterior passa a ser entendida como:
+- 98%–105% = desempenho bruto da aplicação/fundo em relação ao CDI;
+- ~80% = premissa líquida de caixa para a carta contemplada.
 
-**Pergunta sugerida:**  
-> Quando você fala em 98% a 105% do CDI, o que determina qual percentual a carta recebe? Esse percentual fica definido para a cota, pode variar ao longo do tempo ou é apenas uma referência do rendimento efetivo das aplicações?
+**Verificação externa do fundo informado:**  
+O Itaú Premium RF Referenciado DI, CNPJ 03.184.233/0001-80, existe e acompanha CDI. A lâmina oficial do Itaú de julho/2026 mostra:
+- 2026 até julho: 97,88% do benchmark;
+- 12 meses: 97,53%;
+- 24 meses: 98,01%;
+- 36 meses: 100,49%.
+
+Isso é compatível com a ordem de grandeza bruta informada comercialmente.
+
+**Decisão de modelagem:**  
+Para uma projeção-base realista, usar **80% do CDI como rendimento líquido da carta**, sem aplicar novo IR/haircut sobre esse rendimento dentro do fluxo-base.
+
+Manter input editável/sensibilidade, pois não é taxa contratualmente garantida.
 
 **Relação com arquivos:**  
 - Pendência: 1.1 / R1  
-- Especificação: seções 5, 52, 59.4  
-- Follow-up: AUD-DEC-019 / EVID-003
+- Especificação: 19.2–19.3 / 59.4  
+- Software: SW-002 / SW-004  
+- Follow-up: EVID-003 / EVID-008 / EVID-038
 
 **Resultado posterior:**  
-Michele esclareceu que não há taxa fixa garantida; a faixa é apenas referência do rendimento efetivo das aplicações. Depois informou uma faixa diferente (80%–105%), por isso a questão da faixa exata permanece aberta.
+Questão conceitualmente resolvida em 29/09/2026. A única ressalva residual é que a expressão comercial “80% do CDI líquido” é imprecisa; para o simulador, o número deve ser tratado como retorno líquido final equivalente a ~80% da referência CDI, sem nova tributação.
 
 ---
 
 ### QN-002 — Onde fica aplicado o crédito contemplado e qual é a política de investimento?
 
-**Status:** RESPONDIDA PARCIALMENTE  
+**Status:** RESPONDIDA COMERCIALMENTE; IDENTIDADE DO FUNDO VERIFICADA EXTERNAMENTE  
 **Prioridade:** ALTA  
-**Origem:** expressão “conta de investimento exclusiva” usada por Michele  
-**Destinatário:** Bamaq, preferencialmente com documento
+**Origem:** resposta de Michele em 29/09/2026  
+**Destinatário:** Bamaq, se quisermos prova específica do Grupo 4012
 
-**O que ela respondeu:**  
-O crédito contemplado não utilizado fica em conta de investimento exclusiva e rende de 98% a 105% do CDI líquido.
+**Resposta recebida:**  
+Michele informou:
+- instituição: Itaú;
+- fundo: **Itaú Premium**;
+- CNPJ: **03.184.233/0001-80**;
+- natureza: renda fixa conservadora e de alta liquidez;
+- recursos ficam vinculados à conta/aplicação do grupo enquanto o crédito não é utilizado.
 
-**Nova dúvida gerada:**  
-Onde exatamente o dinheiro é aplicado, quem administra/custodia, quais ativos podem ser usados e qual política de risco/liquidez rege essas aplicações?
+**Verificação externa:**  
+O CNPJ informado corresponde ao **Itaú Premium Renda Fixa Referenciado DI**, fundo existente e administrado/gerido pelo Itaú. A documentação pública o classifica como fundo de renda fixa que busca acompanhar o CDI e informa liquidez diária.
 
-**Por que importa:**  
-Além da rentabilidade, isso define risco de crédito/mercado, liquidez e a natureza econômica do ativo que estamos modelando.
+**O que ainda não foi provado documentalmente:**  
+Não recebemos extrato do Grupo 4012 mostrando que esse é de fato o veículo em que os recursos daquele grupo estão aplicados hoje.
 
-**Pergunta sugerida:**  
-> Você consegue me dizer onde exatamente fica aplicado o crédito contemplado? Existe um fundo, conta ou carteira específica? Quem é o custodiante/gestor e qual é a política da Bamaq para escolher os ativos, especialmente em relação a risco, liquidez e diversificação? Se houver um documento sobre essa política, melhor ainda.
+**Conclusão:**  
+A identidade do fundo deixou de ser apenas uma referência vaga e passa a ser uma premissa comercial concreta e verificável. Para auditoria contratual máxima, ainda seria desejável um extrato/posição do Grupo 4012.
 
 **Relação com arquivos:**  
 - Pendência: 1.1 / 11.2  
-- Especificação: seção 5  
-- Follow-up: EVID-003
+- Especificação: 19.3A  
+- Follow-up: EVID-003 / EVID-038
 
 **Resultado posterior:**  
-Michele descreveu aplicações em bancos de primeira linha, títulos públicos/compromissadas e fundos RF. A Resolução BCB nº 285/2023 confirma o universo regulatório. Falta identificar a aplicação efetiva do Grupo 4012 e esclarecer se “conta exclusiva” é conta bancária individual ou segregação contábil.
+Nome e CNPJ recebidos e identidade do fundo confirmada em fontes públicas. Uso efetivo pelo Grupo 4012 permanece confirmado apenas comercialmente.
 
 ---
 
-### QN-003 — O que significa “líquido” na remuneração de 98% a 105% do CDI?
+### QN-003 — O que significa “líquido” na remuneração da carta?
 
-**Status:** RESPONDIDA PARCIALMENTE  
+**Status:** RESPONDIDA COMERCIALMENTE  
 **Prioridade:** ALTA  
-**Origem:** Michele qualificou a remuneração como “de forma líquida”  
+**Origem:** respostas de Michele em 28–29/09/2026  
 **Destinatário:** Michele / Bamaq
 
-**Nova dúvida gerada:**  
-“Líquido” já é líquido de IR, IOF, taxa de gestão, taxa administrativa da aplicação e qualquer outra retenção para o consorciado?
+**Resposta consolidada:**  
+Michele esclareceu que:
+- 98%–105% do CDI se refere à rentabilidade **bruta** típica das aplicações;
+- o que efetivamente é repassado à cota já é tratado de forma **líquida**;
+- para projeção de caixa, a Bamaq orienta aproximadamente **80% do CDI**;
+- não deve haver nova cobrança de IR sobre esse rendimento quando ele é creditado à carta, segundo a explicação comercial.
 
-**Por que importa:**  
-A segunda auditoria mostrou que eventual tributação/custo sobre grandes rendimentos pode alterar materialmente o resultado.
+**Implicação para o simulador:**  
+O parâmetro de 80% deve representar o retorno **já líquido** da carta. Portanto, não aplicar simultaneamente:
+- `80% do CDI`; e
+- outro desconto de IR sobre esse mesmo rendimento,
 
-**Pergunta sugerida:**  
-> Quando você diz que os 98% a 105% do CDI são líquidos, isso já significa o rendimento efetivamente creditado para mim depois de IR, IOF, taxa de gestão e qualquer outro desconto? Ou existe alguma tributação/custo em outro momento?
+pois isso produziria dupla penalização.
+
+**Ressalva:**  
+O tratamento fiscal de eventual recebimento em espécie/saque continua sendo uma questão separada (QN-014).
 
 **Relação com arquivos:**  
 - Pendência: 1.4 / R1 / B6  
-- Follow-up: AUD-DEC-019 / AUD-DEC-025
+- Especificação: 19 / 59.3–59.4  
+- Software: SW-011  
+- Follow-up: EVID-003 / EVID-038
 
 **Resultado posterior:**  
-Michele afirmou que o retorno é líquido de IR das aplicações e sem taxa adicional de gestão. A Resolução BCB nº 285/2023, art. 17, confirma que o crédito recebe rendimentos líquidos. Resta apenas eventual evento fiscal adicional no saque/recebimento em espécie.
+Respondida para modelagem: 80% do CDI é uma premissa líquida de caixa, não uma taxa bruta que ainda receberá novo haircut tributário.
 
 ---
 
@@ -165,99 +195,184 @@ Michele informou que a carta pode render até a utilização ou até o encerrame
 
 ### QN-005 — Capacidade do Fundo Comum para contemplar vários lances no mesmo mês
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA COMERCIALMENTE QUANTO À ORDEM; DESEMPATE AINDA ABERTO  
 **Prioridade:** MÉDIA  
-**Origem:** Michele condicionou a contemplação simultânea à existência de saldo no Fundo Comum  
-**Destinatário:** Bamaq
+**Origem:** respostas de Michele + atas reais do Grupo 4012  
+**Destinatário:** Bamaq, apenas se quisermos fechar desempate
 
-**Nova dúvida gerada:**  
-Como o Fundo Comum determina o número de contemplações por lance em cada assembleia e o que acontece se as quatro ofertas forem competitivas mas não houver recurso para todas?
+**Nova resposta de 29/09/2026:**  
+Michele explicou que o Lance Livre é uma disputa percentual e que o sistema:
+1. calcula cada oferta como percentual do saldo devedor atualizado da respectiva cota na data da assembleia;
+2. ordena os lances do maior percentual para o menor;
+3. contempla nessa ordem até esgotar o saldo disponível no Fundo Comum do mês.
 
-**Pergunta sugerida:**  
-> Você comentou que as quatro cotas podem ser contempladas na mesma assembleia se os lances forem vencedores e houver saldo no Fundo Comum. Como é definido quantos lances podem ser contemplados em cada mês? Se minhas quatro ofertas estiverem entre as melhores, mas o fundo não comportar todas, qual é o critério para escolher quais entram?
+**O que isso resolve:**  
+A lógica principal de priorização por Lance Livre passa a ser:
+
+`ranking = pct_livre sobre saldo_devedor_atualizado`
+
+em ordem decrescente, limitada pela capacidade financeira do Fundo Comum.
+
+**Histórico compatível:**  
+As atas mostram quantidades variáveis de vencedores por Lance Livre conforme o mês, coerentes com a existência de uma restrição financeira por Fundo Comum.
+
+**O que ainda pode permanecer aberto:**  
+- critério de desempate quando duas ou mais cotas ofertam exatamente o mesmo percentual;
+- eventual regra adicional se o saldo restante do Fundo Comum não comportar integralmente a próxima contemplação;
+- eventual tratamento especial para múltiplas cotas do mesmo CPF, se existir.
+
+**Pergunta residual opcional:**  
+> Entendi que o sistema ordena os Lances Livres do maior percentual para o menor até esgotar o Fundo Comum. Se houver empate exato de percentual, qual é o critério de desempate?
 
 **Relação com arquivos:**  
 - Pendência: 2.4  
-- Especificação futura: múltiplas cotas
+- Especificação: 11.3 / 11.10 / 11.11  
+- Follow-up: EVID-042
 
 **Resultado posterior:**  
-—
-
+A regra principal de ordenação/capacidade foi respondida. A única lacuna relevante é o desempate.
 
 ---
 
 ### QN-006 — Qual é a faixa permitida do Lance Livre?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA PARCIALMENTE POR EVIDÊNCIA EMPÍRICA  
 **Prioridade:** ALTA  
-**Origem:** Michele informou que o Lance Livre usa percentual do saldo devedor e exemplificou 45%  
+**Origem:** Michele informou que o Lance Livre usa percentual do saldo devedor + atas do Grupo 4012  
 **Destinatário:** Michele / Bamaq
 
-**Nova dúvida gerada:**  
-45% é apenas o percentual escolhido no exemplo ou existe alguma regra/faixa do grupo? Qual é o mínimo e existe máximo?
+**Nova evidência:**  
+As atas oficiais recebidas mostram Lance Livre vencedor de até **73,0000%**, portanto percentuais nessa faixa são operacionalmente aceitos pelo grupo.
 
-**Por que importa:**  
-O break-even de lance e a probabilidade de contemplação dependem da faixa realmente ofertável.
+Percentuais vencedores observados:
+- abril: 60,1400%;
+- maio: 60,9867%;
+- julho: 73,0000% e 72,7300%;
+- agosto: 70,6877%, 70,5508%, 69,5200% e 68,9081%;
+- setembro: 73,0000%, 72,0000%, 72,0000% e 72,0000%.
 
-**Pergunta sugerida:**  
-> No lance livre, esses 45% foram só um exemplo de oferta ou existe alguma faixa específica do grupo? Qual é o percentual mínimo permitido e existe algum máximo?
+**Conclusão:**  
+45% era apenas um exemplo de estratégia, não uma faixa competitiva observada até aqui. Ainda não sabemos o mínimo/máximo regulamentar permitido, mas sabemos documentalmente que 73% é aceito.
+
+**Pergunta sugerida, se ainda quisermos fechar a regra formal:**  
+> Pelas atas vi lances livres vencedores de até 73%. Existe algum mínimo ou máximo regulamentar para ofertar Lance Livre, ou qualquer percentual até o saldo devedor pode ser ofertado?
 
 **Relação com arquivos:**  
 - Pendência: 2.4 / 11.1  
-- Especificação: seção 11.3
+- Especificação: 11.3 / 11.11  
+- Follow-up: EVID-036
 
 **Resultado posterior:**  
-—
+Faixa formal ainda aberta; histórico prova admissibilidade de pelo menos 73%.
 
 ---
 
-### QN-007 — Reconciliar a composição “45% total, 10% embutido, 35% do bolso”
+### QN-007 — Reconciliar a base efetiva do Lance Livre na memória de cálculo
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA COMERCIALMENTE DE FORMA INEQUÍVOCA  
 **Prioridade:** ALTA  
-**Origem:** memória de cálculo da cota de R$ 400 mil  
+**Origem:** pergunta direta + resposta específica de Michele em 29/09/2026  
 **Destinatário:** Michele / Bamaq
 
-**Nova dúvida gerada:**  
-Como o Lance Livre é percentual do saldo devedor e o embutido é percentual da carta, os “35% do bolso” não podem ser obtidos simplesmente por 45%-10% sobre a mesma base.
+**Resposta recebida:**  
+Michele afirmou expressamente que, no sistema da Bamaq:
 
-**Por que importa:**  
-A fórmula da parte em dinheiro do lance muda materialmente o capital necessário e qualquer eventual empréstimo.
+> a base de cálculo da oferta de Lance Livre é **sempre o saldo devedor da cota na data da assembleia**.
 
-**Pergunta sugerida:**  
-> Só para eu conferir a memória: no exemplo dos 45%, entendi agora que os 45% são sobre o saldo devedor, enquanto os 10% embutidos são sobre a carta. Então a parte em dinheiro seria “45% do saldo devedor menos R$ 40 mil”, correto? Quando você escreveu 35% do bolso, foi uma simplificação de linguagem e não 35% da carta?
+Ela também confirmou que os percentuais de 60%–73% publicados nas atas são calculados sobre essa mesma base:
+- saldo devedor atualizado da cota;
+- no mês específico da assembleia.
+
+**Regra operacional confirmada:**  
+
+`L_livre = pct_livre × saldo_devedor_atualizado_na_data_da_assembleia`
+
+O sistema classifica os vencedores do maior percentual para o menor até esgotar o Fundo Comum do mês.
+
+**Reconciliação da memória de R$ 400 mil:**  
+A memória anterior exibia:
+- saldo devedor = R$ 495.330;
+- percentual Livre = 45%;
+- embutido = R$ 120.000;
+- recursos próprios = R$ 105.000.
+
+Pela regra agora confirmada:
+
+`45% × 495.330 = R$ 222.898,50`
+
+e:
+
+`R$ 222.898,50 - R$ 120.000 = R$ 102.898,50`
+
+Portanto, os R$ 105.000 de recursos próprios / R$ 225.000 totais daquela memória NÃO reproduzem a regra oficial/comercial agora explicitamente confirmada.
+
+**Decisão:**  
+- tratar a memória de R$225 mil como exemplo/calculadora inconsistente, arredondamento indevido ou erro de composição;
+- NÃO alterar a fórmula do simulador para reproduzi-la;
+- usar a resposta direta sobre o sistema como regra de modelagem;
+- se um contrato ou memória oficial futura contradisser isso, reabrir a questão.
 
 **Relação com arquivos:**  
 - Pendência: 2.4 / 11.1  
-- Especificação: seção 11.5
+- Especificação: 11.3 / 11.5  
+- Follow-up: EVID-004 / EVID-005 / EVID-035 / EVID-042  
+- Software: SW-005 / SW-006
 
 **Resultado posterior:**  
-—
+Base do Lance Livre fechada para modelagem: saldo devedor atualizado da cota na data da assembleia.
 
 ---
 
-### QN-008 — Por que restam 209 meses após contemplação na 4ª parcela?
+### QN-008 — Por que a memória mostra “209 meses” após contemplação na 4ª parcela?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA PARA MODELAGEM — RÓTULO DA MEMÓRIA É INCONSISTENTE COM O PRÓPRIO CÁLCULO  
 **Prioridade:** ALTA  
-**Origem:** memória de cálculo da cota de R$ 400 mil  
-**Destinatário:** Michele / Bamaq
+**Origem:** nova memória de cálculo enviada em 29/09/2026  
+**Destinatário:** Michele / Bamaq, apenas se quisermos corrigir/confirmar o rótulo documental
 
-**Nova dúvida gerada:**  
-Com prazo informado de 214 meses, contemplação na 4ª parcela sugeriria 210 parcelas restantes pela contagem simples, mas a memória usa 209.
+**Nova evidência:**  
+A memória mostra:
+- prazo inicial: 214 meses;
+- 4 parcelas pagas;
+- saldo final pós-lance: R$ 270.330;
+- “Nova Parcela (209 meses): R$ 1.287”.
 
-**Por que importa:**  
-Pode indicar diferença importante na cronologia da parcela do mês da contemplação e no recálculo pós-lance.
+**Reconciliação matemática:**  
 
-**Pergunta sugerida:**  
-> Outra continha que eu queria conferir: se o prazo é de 214 meses e a contemplação acontece na 4ª parcela, de onde vêm os 209 meses usados para a nova parcela? Existe alguma parcela adicional considerada antes do recálculo?
+`R$ 270.330 / 209 = R$ 1.293,44`
+
+Isso NÃO reproduz a parcela exibida.
+
+Já:
+
+`R$ 270.330 / 210 = R$ 1.287,29`
+
+reproduz exatamente, por arredondamento, os R$ 1.287 mostrados.
+
+Além disso:
+
+`214 - 4 = 210`
+
+**Conclusão para o simulador:**  
+A própria memória numérica sustenta a convenção já usada no motor:
+
+`P_pos = saldo_remanescente / (N - mesCont)`
+
+para contemplação na 4ª parcela, resultando em 210 parcelas restantes.
+
+O texto “209 meses” deve ser tratado como provável erro de rótulo/contagem no material comercial até que exista documento que demonstre outra convenção.
+
+**Pergunta opcional de saneamento documental:**  
+> Notei que o print escreve “209 meses”, mas R$ 270.330 / 209 dá R$ 1.293,44, enquanto a parcela mostrada de R$ 1.287 bate com 210 meses (R$ 270.330 / 210 = R$ 1.287,29). Posso considerar que são 210 parcelas restantes e que “209” no print é apenas um erro de rótulo?
 
 **Relação com arquivos:**  
-- Pendência: 1.3  
-- Especificação: seção 10
+- Pendência: 1.3 / 2.4  
+- Especificação: seção 10  
+- Software: SW-007  
+- Follow-up: EVID-005 / EVID-035
 
 **Resultado posterior:**  
-—
+Resolvida para fins de modelagem: manter 210 meses. Não alterar o motor para 209 com base nesse print.
 
 ---
 
@@ -288,52 +403,64 @@ A diferença é pequena, mas pode revelar uma base de cálculo diferente da divi
 
 ### QN-010 — O lance reduz parcela, prazo ou pode escolher?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA COMERCIALMENTE  
 **Prioridade:** ALTA  
-**Origem:** Michele disse que o lance “amortizou no valor da parcela” e apresentou nova parcela de R$ 1.302  
+**Origem:** áudio de Michele em 29/09/2026  
 **Destinatário:** Michele / Bamaq
 
-**Nova dúvida gerada:**  
-É sempre redução de valor da parcela ou o consorciado pode escolher reduzir prazo / parcelas finais / ordem inversa?
+**Resposta recebida:**  
+Michele afirmou que tanto o Lance Livre quanto o Lance Embutido amortizam o saldo e que o efeito pode ser direcionado:
+- para redução do valor da parcela; OU
+- para redução do prazo.
 
-**Por que importa:**  
-As duas formas geram cronologias e aportes muito diferentes no simulador.
+**Conclusão:**  
+A possibilidade de escolher entre parcela e prazo passa a ser confirmação comercial suficiente para a arquitetura do simulador.
 
-**Pergunta sugerida:**  
-> Nesse exemplo vocês usaram o lance para reduzir o valor das parcelas. Essa é a regra obrigatória do grupo ou eu posso escolher entre reduzir parcela, reduzir prazo ou amortizar parcelas em ordem inversa?
+Ainda falta, para reprodução contratual exata:
+- saber como a redução de prazo é operacionalizada (quantas parcelas finais são abatidas / regra de ordem);
+- confirmar se a opção é feita no momento do lance e se pode variar por cota.
 
 **Relação com arquivos:**  
 - Pendência: 2.4  
-- Especificação: seção 11.8
+- Especificação: seção 11  
+- Software: SW-008  
+- Follow-up: EVID-030 / EVID-035
 
 **Resultado posterior:**  
-—
+Respondida comercialmente em 29/09/2026: há opção entre reduzir parcela e reduzir prazo.
 
 ---
 
 ### QN-011 — Qual faixa de rentabilidade está correta: 98%–105% ou 80%–105% do CDI?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA / RECONCILIADA  
 **Prioridade:** ALTA  
-**Origem:** duas respostas sucessivas de Michele  
+**Origem:** esclarecimento de Michele em 29/09/2026  
 **Destinatário:** Michele / Bamaq
 
-**O que mudou:**  
-Na primeira resposta, a faixa informada foi 98%–105% do CDI líquido. Na resposta seguinte, apareceu aproximadamente 80%–105% do CDI líquido.
+**Reconciliação recebida:**  
+As duas referências tratavam de grandezas diferentes:
+- **98%–105% do CDI:** rentabilidade bruta típica do fundo/aplicações;
+- **~80% do CDI:** rentabilidade líquida que a Bamaq orienta usar em projeções da carta contemplada.
 
-**Por que importa:**  
-A diferença entre piso de 98% e 80% é material e afeta diretamente a sensibilidade R1.
+Logo, não existe mais uma faixa única “80%–105% líquida”.
 
-**Pergunta sugerida:**  
-> Em uma mensagem você falou em 98% a 105% do CDI líquido e na seguinte apareceu 80% a 105%. Qual é a faixa correta? Existe algum histórico/extrato que mostre quanto o Grupo 4012 efetivamente tem rendido em % do CDI?
+**Regra de modelagem:**  
+- cenário-base líquido: **80% do CDI**;
+- 98%–105% NÃO deve ser usado como faixa líquida da carta;
+- manter sensibilidade editável para não transformar 80% em garantia.
+
+**Verificação externa:**  
+A lâmina oficial do Itaú Premium de julho/2026 mostra rentabilidade bruta acumulada de 97,88% do benchmark no ano e 97,53% nos últimos 12 meses, reforçando que a ordem de grandeza bruta fica próxima de 98% do CDI.
 
 **Relação com arquivos:**  
 - Pendência: 1.1 / R1  
-- Especificação: 19.3  
-- Follow-up: EVID-008
+- Especificação: 19.3 / 59.4  
+- Software: SW-004  
+- Follow-up: EVID-008 / EVID-038
 
 **Resultado posterior:**  
-—
+Resolvida em 29/09/2026. Usar 80% do CDI como referência líquida de projeção.
 
 ---
 
@@ -364,26 +491,29 @@ Não muda necessariamente a rentabilidade, mas muda a compreensão jurídica/ope
 
 ### QN-013 — Qual aplicação/fundo o Grupo 4012 usa hoje?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA COMERCIALMENTE  
 **Prioridade:** MÉDIA  
-**Origem:** Michele citou “Itaú Premium ou equivalentes”  
-**Destinatário:** Bamaq
+**Origem:** resposta de Michele em 29/09/2026  
+**Destinatário:** Bamaq apenas para extrato/prova específica do grupo
 
-**Nova dúvida:**  
-Qual é o nome/CNPJ da aplicação efetivamente usada atualmente para os recursos vinculados às contemplações do Grupo 4012?
+**Resposta recebida:**  
+- Fundo: **Itaú Premium Renda Fixa Referenciado DI**;
+- CNPJ: **03.184.233/0001-80**;
+- instituição: Itaú.
 
-**Por que importa:**  
-Permite verificar taxa de administração do fundo, benchmark, liquidez e rentabilidade histórica efetiva.
+**Verificação externa:**  
+Nome/CNPJ correspondem a fundo real e ativo, com benchmark CDI e perfil de renda fixa de baixa volatilidade/alta liquidez.
 
-**Pergunta sugerida:**  
-> Você consegue confirmar qual fundo/aplicação o Grupo 4012 usa hoje para os créditos contemplados não utilizados? Se tiver nome e CNPJ da aplicação ou um extrato de exemplo, eu consigo conferir a rentabilidade efetiva.
+**Pendente apenas para auditoria documental forte:**  
+Receber extrato/posição do Grupo 4012 ou documento Bamaq que demonstre que os recursos daquele grupo estão efetivamente nesse veículo hoje.
 
 **Relação com arquivos:**  
-- Pendência: 1.1  
-- Especificação: 17A.2
+- Pendência: 1.1 / 11.2  
+- Especificação: 19.3A  
+- Follow-up: EVID-038
 
 **Resultado posterior:**  
-—
+Respondida comercialmente; identidade do fundo verificada externamente.
 
 ---
 
@@ -508,27 +638,29 @@ Ajuda a modelar o custo real de falha operacional sem confundir isso com perda d
 
 ### QN-019 — Qual é a data-base e o primeiro reajuste das novas cotas?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA COMERCIALMENTE  
 **Prioridade:** ALTA  
-**Origem:** Michele confirmou reajuste fixo de 3% a.a., mas não informou calendário  
+**Origem:** Michele confirmou reajuste fixo de 3% a.a. e posteriormente informou o primeiro reajuste da proposta  
 **Destinatário:** Michele / Bamaq
 
-**Nova dúvida:**  
-Agora sabemos que a cota entra com 214 meses remanescentes. Falta saber se ela herda a data-base anual já existente do Grupo 4012 ou se o primeiro reajuste ocorre 12 meses depois da adesão individual.
+**Nova dúvida original:**  
+Saber se a cota herda a data-base do grupo ou se conta 12 meses a partir da adesão individual, e em que mês ocorre o primeiro reajuste.
 
 **Por que importa:**  
 O simulador precisa posicionar o primeiro aumento de carta/saldo/parcela no mês correto. Um deslocamento de alguns meses altera lance, saldo e aportes.
 
-**Pergunta sugerida:**  
+**Pergunta sugerida original:**  
 > Perfeito sobre os 3% fixos. Como estou entrando num grupo que já está em andamento, minhas cotas herdam a data-base anual do Grupo 4012 ou contam 12 meses a partir da minha adesão? Em que mês exatamente acontece o primeiro reajuste?
 
 **Relação com arquivos:**  
 - Pendência: 1.5  
-- Especificação: 7.2
+- Especificação: 6.7 / 7.2  
+- Backlog software: SW-067
 
 **Resultado posterior:**  
-Michele confirmou que o reajuste anual ocorre no aniversário do grupo. Logo, a cota herda o calendário do Grupo 4012, em vez de contar necessariamente 12 meses desde sua própria adesão. Ainda falta a data exata e saber se a próxima assembleia do dia 18 já será o primeiro reajuste das cotas contratadas agora.
+Michele primeiro informou que o reajuste anual ocorre no aniversário do grupo. Em 29/09/2026, esclareceu operacionalmente que as novas cotas contratadas agora NÃO recebem 3% na próxima assembleia do dia 18 e que o primeiro reajuste ocorrerá em **abril de 2027**, daqui a aproximadamente sete meses. Em resposta específica ao item 1.1, reafirmou que a anotação anterior de “primeiro reajuste daqui a 7 meses” estava correta.
 
+Para a resolução mensal do simulador, a questão do primeiro reajuste está respondida. O dia exato dentro de abril/2027 permanece separado em QN-063 caso seja necessária precisão diária.
 
 ---
 
@@ -779,118 +911,197 @@ Michele disse que não existe troco em dinheiro após a compra. A norma e o regu
 
 ### QN-030 — Como funciona a exceção do cashback de 16/06/2026 em operação multi-cota?
 
-**Status:** CONFIRMAÇÃO FORMAL  
+**Status:** RESPONDIDA COMERCIALMENTE PARA O CENÁRIO ATUAL  
 **Prioridade:** ALTA  
-**Origem:** resposta da Michele versus item 4.1.3.1 do Regulamento da Campanha  
-**Destinatário:** QuintoAndar / Bamaq
+**Origem:** item 4.1.3.1 do Regulamento da Campanha + resposta específica de Michele em 29/09/2026  
+**Destinatário:** QuintoAndar / Bamaq apenas se houver divergência no contrato/documento final
 
-**Contradição:**  
-Michele disse que a base é sempre o crédito efetivamente utilizado. O regulamento prevê, desde 16/06/2026, base no crédito total contratado quando o imóvel vale pelo menos esse crédito.
+**Resposta recebida:**  
+Michele esclareceu que, quando várias cartas contempladas são usadas para comprar um único imóvel, Bamaq/QuintoAndar tratam a operação de forma **unificada** para faturamento, garantia e alienação fiduciária.
 
-**Pergunta sugerida:**  
-> No regulamento da campanha encontrei uma exceção válida desde 16/06/2026: quando o imóvel tem valor igual ou superior ao crédito contratado, o cashback é de 10% sobre o valor total do crédito contratado, e não sobre o crédito efetivamente liberado. Como isso funciona quando eu uso várias cotas juntas? Vocês comparam o preço do imóvel com a soma dos créditos contratados ou aplicam a regra cota por cota?
+No cenário:
+- imóvel = aproximadamente R$ 1.000.000;
+- soma nominal das quatro cartas = R$ 1.370.000;
+- lance embutido de 30% = R$ 411.000;
+- crédito líquido efetivamente faturado/liberado ao vendedor = R$ 959.000.
 
-**Por que importa:**  
-Pode mudar materialmente o cashback, principalmente com lance embutido.
+Segundo ela, a comparação do item 4.1.3.1 é feita sobre a **operação agregada**, e não cota por cota.
+
+Como:
+`R$ 1.000.000 < R$ 1.370.000`
+
+o imóvel não alcança o valor nominal contratado agregado. Com o lance embutido, o montante efetivamente faturado/liberado fica em R$ 959 mil.
+
+**Base informada para o cashback:**
+
+`base_cashback = credito_liquido_efetivamente_faturado_e_liberado`
+
+Logo:
+
+`10% × R$ 959.000 = R$ 95.900`
+
+**Consequência:**  
+A hipótese de R$ 137 mil de cashback fica descartada para este cenário com 30% de embutido nas quatro cotas.
+
+**Ressalva:**  
+A resposta resolve comercialmente a interpretação multi-cota. Antes da contratação definitiva, conferir se contrato/regulamento aplicável não traz redação conflitante.
 
 **Relação com arquivos:**  
 - Pendência: 2.7 / 8  
-- Especificação: 25.3–25.4  
-- Follow-up: EVID-015
+- Especificação: 25.3A–25.4  
+- Software: SW-028  
+- Follow-up: EVID-015 / EVID-037 / EVID-045
 
 **Resultado posterior:**  
-—
+Respondida: a comparação é agregada e o cashback do cenário é R$ 95.900.
 
 ---
 
 ### QN-031 — Lance embutido reduz ou não a base da exceção do cashback?
 
-**Status:** ABERTA  
+**Status:** RESPONDIDA COMERCIALMENTE — SIM  
 **Prioridade:** ALTA  
-**Origem:** item 4.1.3.1 fala em crédito contratado, enquanto lance embutido reduz o crédito líquido disponível  
-**Destinatário:** QuintoAndar / Bamaq
+**Origem:** respostas específicas de Michele em 29/09/2026  
+**Destinatário:** QuintoAndar / Bamaq apenas se houver divergência documental
 
-**Pergunta sugerida:**  
-> E nessa exceção, se uma carta de R$ 400 mil tiver R$ 40 mil de lance embutido e liberar só R$ 360 mil para a compra, mas o imóvel custar pelo menos R$ 400 mil, o cashback é 10% de R$ 400 mil ou 10% dos R$ 360 mil liberados?
+**Resposta consolidada:**  
+Sim. No cenário atual, o lance embutido reduz o crédito que efetivamente é faturado e liberado ao vendedor e, por consequência, reduz a base de cashback.
 
-**Por que importa:**  
-É exatamente a diferença entre a regra geral e a exceção promocional.
+Cálculo confirmado:
+- crédito nominal = R$ 1.370.000;
+- embutido 30% = R$ 411.000;
+- crédito líquido = R$ 959.000;
+- cashback = 10% × R$ 959.000 = **R$ 95.900**.
+
+**Regra operacional informada:**
+
+`base_cashback = credito_liquido_faturado_e_liberado`
 
 **Relação com arquivos:**  
-- Especificação: 25.3  
-- Backlog software: SW-028
+- Pendência: 2.7 / 8  
+- Especificação: 25.3A / 25.4  
+- Software: SW-028  
+- Follow-up: EVID-037 / EVID-045
 
 **Resultado posterior:**  
-—
+Respondida. Não aplicar cashback sobre os R$ 1,37 milhão nominais quando 30% são consumidos como lance embutido.
 
 ---
 
 ### QN-032 — O prazo contratual do cashback é 5 ou 7 dias úteis?
 
-**Status:** CONFIRMAÇÃO FORMAL  
+**Status:** ABERTA — DIVERGÊNCIA REITERADA  
 **Prioridade:** MÉDIA  
-**Origem:** Michele disse 7 dias; regulamento diz 5  
+**Origem:** Michele reiterou 7 dias úteis; regulamento disponível diz 5 dias úteis  
 **Destinatário:** QuintoAndar
 
+**Nova resposta:**  
+Michele voltou a afirmar que o cashback seria pago por PIX/depósito em conta em **até 7 dias úteis após a compra no cartório**.
+
+**Documento disponível:**  
+O Regulamento da Campanha estabelece **até 5 dias úteis**, contados do registro da alienação na matrícula e do pagamento do crédito ao vendedor.
+
+**Conclusão:**  
+A divergência 5 × 7 dias não foi resolvida; foi reiterada.
+
 **Pergunta sugerida:**  
-> Você comentou em até 7 dias úteis, mas o regulamento que recebi diz até 5 dias úteis contados do registro da alienação e do pagamento ao vendedor. Houve alguma atualização posterior do prazo ou continuam valendo os 5 dias do regulamento?
+> Sobre o prazo: você mencionou novamente até 7 dias úteis, mas o regulamento que tenho diz até 5 dias úteis após o registro da alienação e o pagamento ao vendedor. Existe um aditivo/regulamento mais recente mudando para 7 dias? Se sim, consegue me enviar?
 
 **Relação com arquivos:**  
 - Pendência: 8.1  
-- Especificação: 25.5
+- Especificação: 25.5–25.6  
+- Software: SW-029  
+- Follow-up: EVID-015 / EVID-037
 
 **Resultado posterior:**  
-—
+Pendente de documento posterior; por enquanto a especificação contratual continua usando 5 dias úteis.
 
 ---
 
 ### QN-033 — Qual é o tratamento fiscal do cashback e ele reduz o custo de aquisição do imóvel?
 
-**Status:** CONFIRMAÇÃO FORMAL  
+**Status:** PARCIALMENTE RESPONDIDA COMERCIALMENTE — ISENÇÃO DE IR ALEGADA, MAS NÃO DOCUMENTADA  
 **Prioridade:** MÉDIA  
-**Origem:** Michele afirmou “isento de IR”, mas o regulamento é silencioso  
-**Destinatário:** contador/tributarista; eventualmente QuintoAndar para informe/documento
+**Origem:** resposta de Michele em 29/09/2026  
+**Destinatário:** contador / QuintoAndar, se necessário
 
-**Nova dúvida:**  
-Além de não haver IR no recebimento, o cashback deve ser tratado como desconto/rebate que reduz o custo fiscal do imóvel para um ganho de capital futuro?
+**Nova informação:**  
+Michele afirmou que os R$ 95.900 de cashback seriam enviados por PIX e seriam “totalmente isentos de Imposto de Renda”.
 
-**Pergunta sugerida para contador:**  
-> Recebendo um cashback promocional de 10% ligado à aquisição de um imóvel por consórcio, como devo tratar isso no IRPF? É rendimento isento/não tributável, simples desconto no preço/custo de aquisição ou outra categoria? O cashback reduz o custo fiscal do imóvel para futuro cálculo de ganho de capital?
+**O que isso resolve:**  
+Do ponto de vista comercial, a empresa está apresentando o cashback como valor líquido recebido pelo cliente, sem retenção de IR.
 
-**Por que importa:**  
-Mesmo que não haja imposto no recebimento, reduzir o custo fiscal pode aumentar o imposto numa venda futura.
+**O que NÃO está resolvido:**  
+A fala da vendedora não substitui:
+- regra tributária aplicável ao beneficiário;
+- eventual obrigação de declaração;
+- definição de natureza jurídica/fiscal do cashback;
+- eventual impacto no custo de aquisição do imóvel para ganho de capital futuro.
+
+**Decisão de modelagem:**  
+No fluxo financeiro principal, registrar entrada de caixa de **R$ 95.900 sem retenção na fonte**, conforme a condição comercial informada.
+
+Não concluir a partir disso que:
+- não existe obrigação declaratória; ou
+- o cashback não altera a base/custo fiscal do imóvel.
+
+Essas questões continuam fora do motor até validação tributária específica.
 
 **Relação com arquivos:**  
 - Pendência: 8.3  
-- Especificação: 25.8 / 29.5
+- Especificação: 25.7–25.8  
+- Follow-up: EVID-045
 
 **Resultado posterior:**  
-—
+Isenção de IR foi alegada comercialmente, mas o tratamento fiscal completo continua pendente.
 
 ---
 
 ### QN-034 — A campanha termina em 30/09/2026 ou foi prorrogada?
 
-**Status:** ABERTA — URGENTE  
-**Prioridade:** ALTA  
-**Origem:** item 2.1 do Regulamento da Campanha  
-**Destinatário:** Michele / QuintoAndar
+**Status:** RESPONDIDA COMERCIALMENTE — MARCO OPERACIONAL DE ADESÃO ESCLARECIDO  
+**Prioridade:** ALTA / URGENTE  
+**Origem:** Regulamento da Campanha + resposta específica de Michele em 29/09/2026  
+**Destinatário:** Michele / QuintoAndar / Bamaq
 
-**Contexto:**  
-O regulamento disponível limita a elegibilidade a adesões realizadas até 30/09/2026.
+**Resposta recebida:**  
+Michele esclareceu que, para entrar no grupo/participar da próxima assembleia e preservar a condição de cashback dentro do prazo atual, o fluxo precisa ocorrer até 30/09:
 
-**Pergunta sugerida:**  
-> Vi agora um detalhe importante no regulamento: ele diz que a campanha vale para quem aderir até 30/09/2026. Como estamos em 28/09, queria confirmar o que exatamente precisa estar concluído até quarta-feira para garantir os benefícios: assinatura da adesão, pagamento da primeira parcela, emissão das cotas ou algum outro marco? A campanha foi prorrogada?
+1. emissão/homologação do contrato;
+2. recebimento do contrato por e-mail;
+3. aceite eletrônico pelo cliente;
+4. pagamento da primeira parcela.
 
-**Por que importa:**  
-Sem elegibilidade, o cashback de 10% e outros benefícios promocionais podem deixar de existir.
+Segundo ela, com o aceite eletrônico e o pagamento da primeira parcela:
+- o cliente “já entra no plano”;
+- grupo e número de cota são alocados;
+- passa a ter acesso ao aplicativo;
+- já fica apto a participar da assembleia seguinte.
+
+Ela também informou que a **segunda parcela vence em 15/11/2026**.
+
+**Conclusão operacional:**  
+Para a proposta atual, NÃO basta apenas enviar documentos ou receber o contrato. O marco comercial indicado pela vendedora exige **aceite eletrônico + pagamento da primeira parcela até 30/09/2026**, após a emissão do contrato.
+
+**Ressalva:**  
+Essa é uma confirmação comercial específica. O contrato final deve ser conferido antes do aceite para garantir que:
+- cashback;
+- valores das parcelas;
+- quatro cotas;
+- grupo;
+- prazo;
+- demais condições
+
+estejam coerentes com a proposta negociada.
 
 **Relação com arquivos:**  
 - Pendência: 8.4  
-- Follow-up: EVID-016
+- Especificação: 25.9–25.10  
+- Software: SW-069  
+- Follow-up: EVID-016 / EVID-034 / EVID-039 / EVID-044
 
 **Resultado posterior:**  
-—
+Marco operacional comercial fechado: emissão do contrato → aceite eletrônico → pagamento da primeira parcela até 30/09. Não houve indicação de prorrogação.
 
 ---
 
@@ -1372,35 +1583,47 @@ Evita deixar um custo fixo omitido no fluxo.
 
 ### QN-055 — Existe cobrança/dedução das assembleias anteriores à adesão quando a cota contempla?
 
-**Status:** CONFIRMAÇÃO FORMAL — CRÍTICA  
+**Status:** RESPONDIDA COMERCIALMENTE — CONFIRMAÇÃO DOCUMENTAL RESIDUAL  
 **Prioridade:** ALTA  
 **Origem:** contradição entre resposta de Michele e Regulamento Geral Bamaq 2025  
-**Destinatário:** Bamaq
+**Destinatário:** Bamaq / contrato-regulamento aplicável
 
-**Contradição:**  
-Michele afirmou que a nova cota não paga qualquer parcela retroativa e que todo o plano é diluído nos 214 meses restantes.
+**Contradição original:**  
+Michele havia afirmado que a nova cota não paga qualquer parcela retroativa e que todo o plano é diluído nos 214 meses restantes.
 
 Porém, o Regulamento Geral Bamaq 2025, art. 8º, VI, “a”, diz que, se uma cota aderida a grupo já em andamento for contemplada, o consorciado deve pagar as mensalidades correspondentes às assembleias anteriores à adesão; caso contrário, o valor pode ser deduzido do crédito.
 
-**Pergunta sugerida:**  
+**Pergunta enviada:**  
 > Encontrei um ponto importante no Regulamento Geral e queria confirmar especificamente para o Grupo 4012/QuintoAndar. Você me explicou que a cota nova entra com 214 parcelas e não paga nada retroativo. Porém, o art. 8º, VI, “a”, do Regulamento 2025 diz que, se uma cota que entrou em grupo já em andamento for contemplada, devem ser pagas as mensalidades correspondentes às assembleias anteriores à adesão, ou o valor é deduzido do crédito. Essa regra ainda existe no Regulamento 2026 e se aplica às nossas cotas novas do Grupo 4012? Ou há uma condição específica da parceria que afasta essa cobrança?
 
-**Por que importa:**  
-Se houver dedução na contemplação, o crédito líquido e a necessidade de caixa podem mudar bastante, especialmente em contemplações precoces.
+**Resultado posterior — 29/09/2026:**  
+Michele respondeu de forma categórica e específica que, para as quatro cotas do Grupo 4012 / produto QuintoAndar-Bamaq, **não existe e não haverá cobrança ou desconto retroativo** relativo às assembleias anteriores à entrada.
+
+Ela explicou que, segundo a operação comercial oferecida:
+- são cotas novas de lançamento/abertura de vagas em grupo já em andamento;
+- não existe assunção de dívida ou histórico de outra cota;
+- saldo e parcelas são recalculados do zero para o novo aderente e distribuídos pelo prazo remanescente;
+- na contemplação, o crédito liberado seria o valor integral da carta contratada, sem desconto por mensalidades anteriores.
+
+Ela atribuiu a cláusula genérica do regulamento a situações de substituição/repescagem de cotas canceladas. Essa justificativa deve ser registrada como **interpretação comercial da Michele**, não como reconciliação documental já comprovada.
+
+**Conclusão para modelagem:**  
+Para a proposta atual, não modelar qualquer ajuste retroativo. Reabrir somente se contrato/regulamento aplicável trouxer regra contraditória.
+
+**Pendência residual:**  
+Conferir no contrato, Regulamento 2026 ou documento específico do produto a base formal que afasta a cláusula do Regulamento 2025.
 
 **Relação com arquivos:**  
 - Pendência: 1.3  
 - Especificação: 6.6  
-- Follow-up: EVID-026
-
-**Resultado posterior:**  
-—
+- Follow-up: EVID-026  
+- Backlog software: SW-060
 
 ---
 
 ### QN-056 — A proposta formal mostrará exatamente 214 parcelas sem qualquer saldo anterior?
 
-**Status:** CONFIRMAÇÃO FORMAL  
+**Status:** RESPONDIDA COMERCIALMENTE — AGUARDAR DOCUMENTO FINAL  
 **Prioridade:** ALTA  
 **Origem:** memória comercial de entrada no grupo em andamento  
 **Destinatário:** Michele / Bamaq
@@ -1408,15 +1631,21 @@ Se houver dedução na contemplação, o crédito líquido e a necessidade de ca
 **Pergunta sugerida:**  
 > Na proposta/contrato das quatro cotas vai aparecer explicitamente que meu saldo inicial é só crédito + 24% + 1%, dividido pelas 214 parcelas restantes, sem qualquer saldo/parcela referente aos meses anteriores? Se puder, queria uma proposta ou memória oficial de uma cota de R$ 200 mil mostrando isso.
 
-**Por que importa:**  
-Uma memória oficial resolve de forma objetiva a ambiguidade entre a explicação comercial e o regulamento geral.
+**Resultado posterior — 29/09/2026:**  
+Michele afirmou que o saldo devedor por cota é estritamente o valor da carta de crédito + taxa de administração + fundo de reserva, diluídos nas parcelas futuras, e que os números apresentados na proposta comercial são definitivos para a operação. Também reafirmou que não existe valor anterior a ser pago ou deduzido na contemplação.
+
+Isso responde comercialmente à pergunta, mas não substitui a conferência da proposta/contrato final solicitada no próprio item.
+
+**Pendência residual:**  
+Verificar no documento final:
+- 214 parcelas contratuais;
+- saldo inicial correspondente a crédito + 24% + 1%;
+- inexistência de qualquer saldo, ajuste ou dedução por assembleias anteriores.
 
 **Relação com arquivos:**  
 - Pendência: 1.3  
-- Especificação: 6.1–6.6
-
-**Resultado posterior:**  
-—
+- Especificação: 6.1–6.6  
+- Follow-up: EVID-026
 
 ---
 
@@ -1448,24 +1677,33 @@ Provavelmente não muda a decisão econômica, mas permite reproduzir exatamente
 
 ### QN-058 — O cashback nominal continua igual com lance embutido?
 
-**Status:** CONFIRMAÇÃO FORMAL  
+**Status:** RESPONDIDA — NÃO  
 **Prioridade:** ALTA  
-**Origem:** cotações exibem 10% da carta nominal; explicação verbal anterior falou em crédito efetivamente usado  
+**Origem:** respostas específicas de Michele em 29/09/2026  
 **Destinatário:** QuintoAndar / Bamaq
 
-**Pergunta sugerida:**  
-> Nas cotações, a carta de R$400 mil aparece com R$40 mil de cashback. Se eu usar, por exemplo, R$40 mil de lance embutido e ficar com R$360 mil de crédito líquido para a compra, o cashback continua sendo os R$40 mil mostrados na cotação ou cai para R$36 mil?
+**Resposta consolidada:**  
+Não.
 
-**Por que importa:**  
-Diferença material no retorno da operação e teste direto da exceção do regulamento da campanha.
+No cenário das quatro cotas:
+- cashback nominal destacado nas propostas = R$ 137.000;
+- 30% de embutido = R$ 411.000;
+- crédito líquido faturado/liberado = R$ 959.000;
+- cashback aplicável = **R$ 95.900**.
+
+Michele também esclareceu que a análise multi-cota é agregada e que os R$137 mil somente seriam atingidos se o valor efetivamente faturado/utilizado na compra fosse os R$1,37 milhão nominais, sem redução promovida pelo lance embutido.
+
+**Consequência:**  
+Para o cenário atual, R$137 mil deixa de ser uma hipótese plausível de cashback.
 
 **Relação com arquivos:**  
 - Pendência: 2.7 / 8  
-- Especificação: 25.3A  
-- Follow-up: EVID-029
+- Especificação: 25.3A / 25.4  
+- Follow-up: EVID-029 / EVID-037 / EVID-045  
+- Software: SW-028
 
 **Resultado posterior:**  
-—
+Fechada em R$95,9 mil para o cenário com 30% de embutido.
 
 ---
 
@@ -1494,13 +1732,18 @@ Define quanto dos custos de aquisição pode ser financiado com o próprio créd
 
 ### QN-060 — Prazo para pagar o lance vencedor: 3 dias ou 2º dia útil?
 
-**Status:** CONFIRMAÇÃO FORMAL  
+**Status:** RESPONDIDA / RECONCILIADA  
 **Prioridade:** MÉDIA  
-**Origem:** nova mensagem de Michele versus ata do Grupo 4012 já analisada  
+**Origem:** nova resposta de Michele em 29/09/2026 + ata do Grupo 4012 já analisada  
 **Destinatário:** Bamaq
 
-**Pergunta sugerida:**  
-> Na sua mensagem você comentou que, quando o lance contempla, eu tenho 3 dias para pagar. Na ata/regra do Grupo 4012 que eu li, aparecia vencimento no 2º dia útil. Para esse grupo e essas cotas, qual é o prazo que efetivamente vale?
+**Resposta recebida:**  
+Michele afirmou em áudio que o lance vencedor deve ser pago em **até dois dias úteis**, acrescentando a expressão “48 horas”.
+
+**Reconciliação:**  
+A regra “até dois dias úteis” converge com a ata do Grupo 4012 anteriormente analisada, que apontava vencimento no segundo dia útil. A referência anterior a “3 dias” fica superada para esta proposta.
+
+Para modelagem operacional, usar **2 dias úteis**. A expressão “48 horas” deve ser lida como explicação informal, pois 48 horas corridas e dois dias úteis não são sempre equivalentes em fins de semana/feriados.
 
 **Por que importa:**  
 Afeta a liquidez necessária para lance agressivo e eventual empréstimo de curto prazo.
@@ -1508,63 +1751,95 @@ Afeta a liquidez necessária para lance agressivo e eventual empréstimo de curt
 **Relação com arquivos:**  
 - Pendência: 2.4  
 - Especificação: 11.8  
-- Follow-up: EVID-030
+- Software: SW-066  
+- Follow-up: EVID-030 / EVID-035
 
 **Resultado posterior:**  
-—
+Prazo operacional reconciliado em 29/09/2026: segundo dia útil / até 2 dias úteis.
 
 ---
 
 ### QN-061 — A assembleia do dia 18 é o aniversário/reajuste anual do Grupo 4012?
 
-**Status:** ABERTA — CRÍTICA  
-**Prioridade:** ALTA  
-**Origem:** Michele disse que o reajuste ocorre no aniversário do grupo e que “a tabela vai virar na assembleia do dia 18”  
+**Status:** RESPONDIDA — E CALENDÁRIO OPERACIONAL MENSAL AGORA MAIS CLARO  
+**Prioridade:** MÉDIA  
+**Origem:** esclarecimentos de Michele em 29/09/2026  
 **Destinatário:** Michele / Bamaq
 
-**Pergunta sugerida:**  
-> Você comentou duas coisas que eu queria conectar: o reajuste anual de 3% acontece no aniversário do grupo e a tabela atual vai virar na assembleia do dia 18. Essa assembleia do dia 18 é justamente o aniversário anual do Grupo 4012? Se eu contratar agora, minhas cotas já recebem os 3% nessa próxima assembleia?
+**Conclusão já confirmada:**  
+Não. A assembleia mensal e o reajuste anual fixo de 3% são eventos distintos.
 
-**Por que importa:**  
-Se o primeiro reajuste ocorrer poucas semanas após a adesão, carta, saldo e parcelas mudam quase imediatamente.
+**Novo detalhe operacional:**  
+Michele informou que:
+- as assembleias regulares são programadas para o dia 18;
+- quando o dia 18 cai em fim de semana/não útil, a assembleia é deslocada para dia útil;
+- em outubro/2026, como 18/10 cai em domingo, a próxima assembleia será **19/10/2026**.
+
+Essa regra é coerente com o histórico do próprio Grupo 4012: a assembleia de julho/2026 ocorreu em 20/07, quando o dia 18 caiu em sábado.
+
+**Implicação:**  
+“Dia 18” é calendário operacional recorrente da assembleia, e não a data-base do reajuste anual.
 
 **Relação com arquivos:**  
 - Pendência: 1.5  
-- Especificação: 6.7 / 7.2  
-- Follow-up: EVID-031
+- Especificação: 7.2 / 9.1  
+- Software: SW-077  
+- Follow-up: EVID-039
 
 **Resultado posterior:**  
-—
+Respondida. Próxima assembleia informada: 19/10/2026. Primeiro reajuste continua em abril/2027.
 
 ---
 
 ### QN-062 — O que exatamente fica “travado” ao emitir o contrato agora?
 
-**Status:** ABERTA — URGENTE  
+**Status:** RESPONDIDA COMERCIALMENTE  
 **Prioridade:** ALTA  
-**Origem:** cotação válida até 30/09 + proposta de emissão/alocação imediata  
+**Origem:** respostas de Michele em 29/09/2026  
 **Destinatário:** Michele / QuintoAndar / Bamaq
 
-**Pergunta sugerida:**  
-> Quando você diz que consegue alocar as cotas agora e emitir o contrato para travar esses valores e condições, qual é exatamente o marco que garante a proposta? Basta a emissão do contrato, eu preciso assinar, pagar a primeira parcela ou as cotas precisam estar efetivamente alocadas no grupo até 30/09? E essa “trava” vale só para a tabela de entrada/cashback ou também impede um reajuste de 3% já na assembleia seguinte?
+**Resposta consolidada:**  
+A emissão do contrato, sozinha, NÃO é o último marco.
 
-**Por que importa:**  
-Evita assinar sob urgência sem saber qual benefício está sendo preservado e por quanto tempo.
+Para efetivar a entrada dentro da condição atual, Michele descreveu:
+
+`documentação → emissão/homologação do contrato → envio por e-mail → aceite eletrônico → pagamento da primeira parcela`
+
+Com o aceite e pagamento:
+- o cliente entra no plano;
+- grupo e cota são alocados;
+- há acesso ao aplicativo;
+- passa a participar normalmente do consórcio;
+- preserva a condição/campanha dentro do prazo de 30/09, segundo a orientação comercial.
+
+**Marco operacional canônico para esta proposta:**  
+`condicaoComercialEfetivada = contrato_emitido && aceite_eletronico && primeira_parcela_paga`
+
+com prazo limite comercial de **30/09/2026**.
+
+A alocação de grupo/número de cota aparece na fala como consequência dessa efetivação, e não como uma etapa que o cliente precise concluir separadamente antes do pagamento.
+
+**Cronologia adicional:**  
+Michele informou a segunda parcela para **15/11/2026**.
+
+**Ressalva documental:**  
+A confirmação final deve ser conferida no contrato recebido. Se o contrato estabelecer marco diferente, prevalece o documento.
 
 **Relação com arquivos:**  
 - Pendência: 1.5 / 8.4  
 - Especificação: 25.10  
-- Follow-up: EVID-034
+- Software: SW-069  
+- Follow-up: EVID-034 / EVID-044
 
 **Resultado posterior:**  
-—
+Questão encerrada comercialmente. Não é necessário perguntar novamente qual ato produz a trava, salvo divergência no contrato.
 
 ---
 
 ### QN-063 — Qual é a data exata do aniversário do Grupo 4012?
 
-**Status:** ABERTA  
-**Prioridade:** ALTA  
+**Status:** RESPONDIDA PARCIALMENTE — MÊS CONFIRMADO  
+**Prioridade:** MÉDIA PARA O MODELO MENSAL  
 **Origem:** regra de reajuste vinculada ao aniversário do grupo  
 **Destinatário:** Bamaq
 
@@ -1572,7 +1847,7 @@ Evita assinar sob urgência sem saber qual benefício está sendo preservado e p
 > Qual é a data/mês exato do aniversário contratual do Grupo 4012 usado para aplicar os 3% anuais? Quero colocar essa data certa na simulação.
 
 **Por que importa:**  
-Permite substituir o calendário relativo da V2.54 pelo calendário real do grupo.
+Permite substituir o calendário relativo pelo calendário real do grupo. Como o simulador trabalha em resolução mensal, o mês é suficiente para a implementação atual; o dia exato só se torna necessário se introduzirmos cronologia diária/pro rata.
 
 **Relação com arquivos:**  
 - Pendência: 1.5  
@@ -1580,7 +1855,10 @@ Permite substituir o calendário relativo da V2.54 pelo calendário real do grup
 - Backlog software: SW-067
 
 **Resultado posterior:**  
-—
+Michele informou e depois reafirmou que o **primeiro reajuste será em abril de 2027**, aproximadamente sete meses após a entrada atual. Isso resolve o mês do primeiro reajuste para a simulação mensal. Ela não informou o dia exato dentro de abril nem apresentou a cláusula contratual que define formalmente a data-base.
+
+**Pendência residual:**  
+Confirmar o dia exato apenas se precisarmos modelar eventos em resolução diária ou reconciliar reajuste e contemplação dentro do mesmo mês.
 
 ---
 
@@ -1605,6 +1883,170 @@ Define o primeiro mês de custo e evita retroatividade indevida no software.
 **Resultado posterior:**  
 —
 ---
+
+
+### QN-065 — Histórico real dos lances do Grupo 4012
+
+**Status:** RESPONDIDA PARCIALMENTE — SÉRIE DE ABRIL A SETEMBRO AGORA COMPLETA; 45% CONFIRMADO COMO EXEMPLO DIDÁTICO  
+**Prioridade:** ALTA  
+**Origem:** pergunta enviada à Michele + atas oficiais do Grupo 4012 + respostas de 29/09/2026  
+**Destinatário:** Michele / Bamaq
+
+**Série documental completa recebida — Assembleias 001 a 006:**
+
+| Assembleia | Lance Livre vencedor | Menor vencedor Livre | Nº vencedores Livre | Cotas aptas não contempladas |
+|---|---:|---:|---:|---:|
+| Abr/2026 | 60,1400% | 60,1400% | 1 | 473 |
+| Mai/2026 | 60,9867% | 60,9867% | 1 | 509 |
+| Jun/2026 | **nenhum vencedor por Lance Livre** | — | 0 | 792 |
+| Jul/2026 | 73,0000%; 72,7300% | 72,7300% | 2 | 1.013 |
+| Ago/2026 | 70,6877%; 70,5508%; 69,5200%; 68,9081% | 68,9081% | 4 | 1.258 |
+| Set/2026 | 73,0000%; 72,0000%; 72,0000%; 72,0000% | 72,0000% | 4 | 1.502 |
+
+**O que a Ata 003 / junho acrescenta:**  
+- Assembleia nº 003 em 18/06/2026;
+- saldo para assembleia: R$ 501.927,02;
+- 792 cotas ativas não contempladas aptas;
+- contemplação por Lance Fixo: cota 0053 a 30,0000%;
+- não há percentual/cota vencedora exibida na coluna de Lance Livre;
+- total de cotas ativas contempladas na assembleia: 2.
+
+Assim, junho NÃO fornece evidência de Lance Livre vencedor abaixo de 60%. O dado de 30% é Lance Fixo e deve permanecer separado.
+
+**Reconstrução das afirmações comerciais:**  
+Antes do envio das atas, Michele havia escrito que, até a 6ª assembleia, o Lance Livre teria “variado a média entre 45% e 66%”. A formulação foi apresentada como descrição do histórico do grupo.
+
+Depois de confrontada com as atas, ela passou a dizer que:
+- 45% era apenas média/exemplo didático;
+- os lances tenderiam a cair ao longo do tempo;
+- aproximadamente 65% seria uma referência anterior a setembro, sem certeza;
+- houve contemplação com Lance Fixo de 30%;
+- haveria “lances menores”.
+
+A explicação posterior não corresponde de forma clara à redação original e deve ser tratada como reformulação comercial, não como evidência documental.
+
+**Leitura crítica após incorporar junho:**  
+1. 45% permanece abaixo de TODOS os Lances Livres vencedores documentados.
+2. Junho não contradiz isso; simplesmente não houve vencedor por Lance Livre registrado.
+3. A menção ao Lance Fixo de 30% é confirmada pela ata de junho, mas NÃO pode ser usada como benchmark do Lance Livre.
+4. A série de vencedores de Lance Livre não demonstra tendência de queda: após 60%–61% em abril/maio, os vencedores de julho–setembro ficaram aproximadamente entre 68,9% e 73%.
+5. A referência verbal de “~65%” não deve virar premissa sem memória/documento adicional.
+6. A mensagem anterior de “45%–66%” é incompatível com a série oficial de vencedores e reduz a confiabilidade das estimativas comerciais não documentadas.
+
+**Relação com arquivos:**  
+- Pendência: 2.4A / 11.1  
+- Especificação: 11.11  
+- Follow-up: EVID-036 / EVID-040 / EVID-041  
+- Software: SW-076
+
+**Resultado posterior:**  
+Série oficial 001–006 completa. 45% segue sendo cenário abaixo do histórico vencedor observado do Lance Livre; junho confirma apenas contemplação por Lance Fixo de 30%, não um Lance Livre baixo.
+
+---
+
+### QN-066 — Ata de junho e número total de ofertas por assembleia
+
+**Status:** RESPONDIDA NO LIMITE DOS DADOS DISPONÍVEIS  
+**Prioridade:** ALTA  
+**Origem:** Ata 003 recebida + resposta de Michele sobre sigilo das ofertas  
+**Destinatário:** Michele / Bamaq
+
+**Ata de junho:**  
+Recebida e incorporada.
+
+Ela mostra:
+- Assembleia nº 003 em 18/06/2026;
+- Grupo 4012;
+- 792 cotas ativas não contempladas aptas;
+- saldo para assembleia de R$ 501.927,02;
+- um Lance Fixo vencedor de 30,0000%;
+- nenhum vencedor por Lance Livre exibido;
+- 2 cotas ativas contempladas no total.
+
+**Número total de ofertas:**  
+Michele informou que:
+- os lances são sigilosos;
+- não existe para o cliente um relatório com todas as ofertas;
+- o cliente visualiza apenas os resultados divulgados/contemplados.
+
+**Consequência:**  
+Não é possível calcular com rigor:
+- quantos Lances Livres foram ofertados no total;
+- percentual de lances abaixo do corte;
+- taxa de sucesso empírica por faixa de lance;
+- distribuição dos lances perdedores;
+- se o número de ofertantes está diminuindo.
+
+**Decisão:**  
+Encerrar esta pergunta como respondida no limite de transparência disponível ao cliente.
+
+No simulador/análise:
+- usar vencedores oficiais como histórico descritivo;
+- não calcular probabilidade/taxa de sucesso;
+- não inferir distribuição dos perdedores;
+- não insistir com Michele no mesmo pedido.
+
+**Relação com arquivos:**  
+- Pendência: 2.4A  
+- Especificação: 11.11  
+- Follow-up: EVID-036 / EVID-041  
+- Software: SW-076
+
+**Resultado posterior:**  
+Ata 003 incorporada; denominador de ofertas permanece indisponível por sigilo.
+
+---
+
+### QN-067 — Existem grupos/produtos com cartas individuais maiores que R$ 400 mil?
+
+**Status:** RESPONDIDA PARA O PRODUTO QUINTOANDAR; ESCOPO FORA DO QUINTOANDAR NÃO FOI TRATADO  
+**Prioridade:** ALTA  
+**Origem:** pergunta direta + áudio de Michele em 29/09/2026  
+**Destinatário:** Michele / Bamaq apenas se quisermos explorar produto fora do QuintoAndar
+
+**Resposta recebida:**  
+Michele informou que, nos grupos do produto QuintoAndar:
+- carta mínima = **R$ 200 mil**;
+- carta máxima = **R$ 400 mil**;
+- não existem, dentro desse produto/grupo, cartas individuais de R$600 mil, R$700 mil, R$1 milhão ou R$1,5 milhão;
+- por isso operações maiores são estruturadas por desmembramento em várias cotas.
+
+Ela também apresentou como racional comercial:
+- mais cotas aumentariam a quantidade de números para sorteio;
+- cotas menores manteriam lances nominais menores;
+- a estrutura fragmentada seria mais “saudável” para o grupo e ampliaria a competição/contemplação.
+
+**Leitura para nossa análise:**  
+O ponto factual relevante para a decisão está resolvido:
+- **dentro do produto QuintoAndar, o teto por cota é R$400 mil**;
+- logo, para R$1,37 milhão, a estrutura necessariamente precisa de pelo menos quatro cotas se permanecermos nesse produto.
+
+As justificativas de que a fragmentação gera “mais chances” ou grupo “mais saudável” devem ser tratadas como explicação comercial, não como vantagem quantitativa comprovada.
+
+**Escopo ainda não respondido:**  
+A resposta não esclareceu se a Bamaq possui **outros produtos/grupos fora do QuintoAndar** com cartas maiores e se seria possível contratá-los mantendo:
+- cashback da campanha;
+- taxas/prazo semelhantes;
+- possibilidade de combinar cartas em imóvel QuintoAndar.
+
+Se o objetivo for permanecer na campanha QuintoAndar atual, essa lacuna deixa de ser relevante.
+
+**Pergunta residual opcional, somente se quisermos explorar alternativa fora da campanha atual:**  
+> Entendi que, no produto QuintoAndar, o intervalo é R$200 mil a R$400 mil por cota. Fora desse produto, a Bamaq tem hoje grupos imobiliários com cartas maiores? E, se tiver, eles poderiam ser usados numa compra pelo QuintoAndar com o mesmo cashback/condições, ou seriam produtos totalmente diferentes?
+
+**Relação com arquivos:**  
+- Pendência: 2.1A  
+- Especificação: 5.3 / 6.1 / arquitetura multi-cota  
+- Follow-up: EVID-043
+
+**Resultado posterior:**  
+Respondida para o produto em análise: R$200 mil–R$400 mil por cota. A estrutura de R$1,37 milhão em quatro cotas não é mero desenho comercial opcional; ela decorre do teto de R$400 mil dentro do produto QuintoAndar.
+
+---
+
+## Modelo de registro
+
+## Modelo de registro
 
 ## Modelo de registro
 
