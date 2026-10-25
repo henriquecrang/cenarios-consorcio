@@ -1461,7 +1461,7 @@ após confirmação da liquidação no encerramento
 
 ### SW-037 — Remover opção de compensação direta como default do resgate
 
-**Status:** PRONTA PARA ESPECIFICAR  
+**Status:** IMPLEMENTADA — V3.20  
 **Prioridade:** ALTA  
 **Tipo:** UX / REGRA FINANCEIRA  
 **Origem:** resposta comercial + regra Bacen  
@@ -2842,6 +2842,20 @@ O modo de usar rendimento na parcela explicita que o abatimento real exige solic
 A regra econômica por cota permanece a mesma.
 
 **Versão:** V3.19.
+
+---
+
+### SW-084 — Warning para compensação interna não confirmada
+
+**Status:** IMPLEMENTADA — V3.20  
+**Prioridade:** P1  
+**Tipo:** UX / RESGATE  
+**Origem:** issue #20
+
+**Implementado:**  
+A compensação direta da própria carta com a dívida permanece disponível somente como sensibilidade e gera warning explícito; a quitação prévia via ponte é o default conservador ao ativar resgate.
+
+**Versão:** V3.20.
 
 ---
 
