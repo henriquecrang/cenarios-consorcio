@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.3 · Lance Livre recalibrado</title>
+<title>Consórcio x CDB x Imóvel — V3.4 · Premissas comerciais reconciliadas</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -605,7 +605,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.3 · Lance Livre recalibrado</h1>
+  <h1>Consórcio x CDB x Imóvel — V3.4 · Premissas comerciais reconciliadas</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -902,13 +902,15 @@ th:first-child,td:first-child{text-align:left}
       </div>
 
       <div class="field">
-        <label>Carta rende</label>
-        <input id="cartaPctCdi" type="number" value="98" step=".5" min="0">
-        <div class="small">% do CDI de referência. O retorno resultante da carta é tratado como líquido no modelo.</div>
+        <label>Carta rende — líquido projetado</label>
+        <input id="cartaPctCdi" type="number" value="80" step=".5" min="0">
+        <div class="small">% do CDI de referência. Default analítico: 80% do CDI líquido, conforme orientação comercial recebida; é editável e não constitui garantia.</div>
       </div>
 
       <div class="assump">
         <b>Premissas independentes:</b> alterar o CDB benchmark não muda o rendimento das cartas. Alterar o CDI ou o percentual do CDI recebido pelas cartas não muda o benchmark.
+        <br><br>
+        <b>Bruto × líquido:</b> a faixa comercial de 98%–105% do CDI foi posteriormente esclarecida como referência <b>bruta</b> da aplicação. Para projeção da carta, usamos 80% do CDI como retorno <b>líquido</b>. O modelo não aplica um segundo desconto de IR sobre esse percentual.
       </div>
 
       <div class="field">
@@ -1684,12 +1686,12 @@ th:first-child,td:first-child{text-align:left}
         <b>Sensibilidade — rendimento da carta contemplada</b>
         <div class="small" style="margin:4px 0 8px">
           Mostra quanto o resultado da estratégia contra o benchmark depende da hipótese “Carta rende (% do CDI)”, mantendo o CDB benchmark fixo.
-          Esta é uma premissa decisiva: confirmar por escrito a remuneração efetiva do crédito não utilizado, por quanto tempo ela vale, se o rendimento pode abater parcelas e se há IR/taxa adicional.
+          O cenário-base agora usa 80% do CDI líquido. A curva continua permitindo sensibilidades mais baixas ou mais altas; 100% do CDI é apenas um ponto de sensibilidade, não uma expectativa de retorno líquido.
         </div>
         <div class="break-even-summary">
           <div><div class="label">Δ se carta render 0% do CDI</div><div class="value" id="yieldSensZero">—</div></div>
-          <div><div class="label">Δ no rendimento atualmente informado</div><div class="value" id="yieldSensCurrent">—</div></div>
-          <div><div class="label">Δ se carta render 100% do CDI</div><div class="value" id="yieldSensFull">—</div></div>
+          <div><div class="label">Δ no rendimento configurado</div><div class="value" id="yieldSensCurrent">—</div></div>
+          <div><div class="label">Δ na sensibilidade de 100% do CDI</div><div class="value" id="yieldSensFull">—</div></div>
         </div>
         <canvas id="chartYieldSensitivity" width="920" height="340"></canvas>
         <div class="break-even-guide" id="yieldSensGuide">—</div>
@@ -1702,6 +1704,7 @@ th:first-child,td:first-child{text-align:left}
           o Lance Livre, o rendimento da carta em % do CDI e o percentual da parte em dinheiro do lance financiado.
           Não há probabilidades implícitas: os presets são hipóteses de sensibilidade e todos os campos das linhas alternativas são editáveis.
           Os Lances Livres sugeridos foram recalibrados para a faixa dos vencedores documentados do Grupo 4012 (aprox. 60%–73%); isso não significa que a faixa se repetirá.
+          Para rendimento líquido da carta, os presets usam 70% / 80% / 90% do CDI como sensibilidades; 80% é a hipótese-base atual.
         </div>
 
         <div class="decision-toolbar">
@@ -1980,7 +1983,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=1;
-const SCENARIO_APP_VERSION='3.3';
+const SCENARIO_APP_VERSION='3.4';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -3929,8 +3932,8 @@ const decisionScenarioDefs=[
   {key:'earlyAll',name:'Todas cedo',lancePct:73,yieldMode:'current'},
   {key:'twoWaves',name:'Duas ondas',lancePct:72,yieldMode:'current'},
   {key:'staggered',name:'Escalonada',lancePct:69,yieldMode:'current'},
-  {key:'stress',name:'Stress de prazo + rendimento',lancePct:73,yieldPct:80},
-  {key:'fastHighYield',name:'Rápida + rendimento alto',lancePct:70,yieldPct:105},
+  {key:'stress',name:'Stress de prazo + rendimento',lancePct:73,yieldPct:70},
+  {key:'fastHighYield',name:'Rápida + rendimento otimista',lancePct:70,yieldPct:90},
   {key:'custom',name:'Histórico / custom',lancePct:60.1,yieldMode:'current'}
 ];
 
@@ -3955,8 +3958,8 @@ function decisionPresetDescription(key,conts){
   if(key==='earlyAll') return `Todas as ${conts.length} cotas no mês ${conts[0]}, com Lance Livre de 73% (topo observado nas atas).`;
   if(key==='twoWaves') return `Contemplação em duas ondas: ${months}, com Lance Livre de 72%.`;
   if(key==='staggered') return `Contemplações escalonadas: ${months}, com Lance Livre de 69% (próximo ao piso recente de agosto).`;
-  if(key==='stress') return `Prazo mais lento (${months}), Lance Livre de 73% e carta a 80% do CDI.`;
-  if(key==='fastHighYield') return `Contemplação rápida (${months}), Lance Livre de 70% e carta a 105% do CDI.`;
+  if(key==='stress') return `Prazo mais lento (${months}), Lance Livre de 73% e carta a 70% do CDI líquido.`;
+  if(key==='fastHighYield') return `Contemplação rápida (${months}), Lance Livre de 70% e carta a 90% do CDI líquido.`;
   return 'Linha livre iniciada em 60,1%, próxima ao menor vencedor documentado; edite para testar outra combinação.';
 }
 
