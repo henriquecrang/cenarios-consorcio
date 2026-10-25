@@ -2118,6 +2118,7 @@ function inferQuotaCountFromSavedControls(controls){
   return maxIndex || 4;
 }
 const money = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(v);
+const money2 = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
 const pct = x => Number(x)/100;
 const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
 
@@ -3153,16 +3154,16 @@ function simulate(){
     const delta=actual-quoted;
     const pctDelta=quoted!==0 ? delta/quoted*100 : 0;
     const sign=delta>0?'+':'';
-    return `${sign}${money(delta)} (${sign}${pctDelta.toFixed(3).replace('.',',')}%)`;
+    return `${sign}${money2(delta)} (${sign}${pctDelta.toFixed(3).replace('.',',')}%)`;
   };
   $('kQuoteCredit').textContent=money(OFFICIAL_QUOTE.credit);
   $('kQuoteCreditCalc').textContent=money(cfg.credit0);
   $('kQuoteCreditDiff').textContent=quoteDiff(cfg.credit0,OFFICIAL_QUOTE.credit);
-  $('kQuoteReduced').textContent=money(OFFICIAL_QUOTE.reducedInstallment);
-  $('kQuoteReducedCalc').textContent=money(initialReduced);
+  $('kQuoteReduced').textContent=money2(OFFICIAL_QUOTE.reducedInstallment);
+  $('kQuoteReducedCalc').textContent=money2(initialReduced);
   $('kQuoteReducedDiff').textContent=quoteDiff(initialReduced,OFFICIAL_QUOTE.reducedInstallment);
-  $('kQuoteFull').textContent=money(OFFICIAL_QUOTE.fullInstallment);
-  $('kQuoteFullCalc').textContent=money(initialFullCalculated);
+  $('kQuoteFull').textContent=money2(OFFICIAL_QUOTE.fullInstallment);
+  $('kQuoteFullCalc').textContent=money2(initialFullCalculated);
   $('kQuoteFullDiff').textContent=quoteDiff(initialFullCalculated,OFFICIAL_QUOTE.fullInstallment);
   $('kQuoteCashbackNominal').textContent=money(OFFICIAL_QUOTE.nominalCashback);
   $('kQuoteCashbackEffective').textContent=purchased ? money(purchaseCashback) : '—';
