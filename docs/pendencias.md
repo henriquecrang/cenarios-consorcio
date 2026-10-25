@@ -1,3 +1,28 @@
+============================================================
+AUDITORIA V3.6 — MATRIZ COMPARÁVEL
+============================================================
+
+Issue #5: RESOLVIDA.
+
+A auditoria V3.5 mostrou que a matriz misturava:
+- linha Atual sem compra dentro do horizonte;
+- linhas alternativas comprando na última contemplação;
+- preço do imóvel travado ao crédito, produzindo ativos de valores diferentes por linha.
+
+Implementado na V3.6:
+- política comum de compra para todas as linhas;
+- default = comprar na última contemplação;
+- política comum de preço;
+- default = imóvel-alvo fixo de R$1.000.000;
+- opção explícita de usar todo o crédito como preço;
+- linha “Base comparável” em vez de “Atual”;
+- preço do imóvel exibido como output;
+- política persistida nos presets;
+- migração compatível do antigo `buyAtLastCont`.
+
+Pendência removida:
+A matriz deixa de ter como problema estrutural a falta de comparabilidade entre política de compra e tamanho do ativo.
+
 PENDÊNCIAS — SIMULADOR CONSÓRCIO x CDB x IMÓVEL
 Base atual de software: V3.2
 Baseline auditada histórica: V2.54
