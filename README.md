@@ -4,7 +4,7 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estado atual
 
-- **Aplicação:** V3.15 em `index.html`, servida diretamente pelo GitHub Pages.
+- **Aplicação:** V3.16 em `index.html`, servida diretamente pelo GitHub Pages.
 - **Documentação canônica:** consolidada a partir da rodada `pre_respostas30`, com limpeza de inconsistências residuais e a divergência posterior sobre o histórico de lances.
 - **Histórico:** preservado pelo Git; não mantemos cópias versionadas redundantes na árvore atual.
 
@@ -49,9 +49,10 @@ As issues #5–#10 abertas pela auditoria foram concluídas nas versões V3.6–
 - **V3.12 / #12:** cashback recebido no mês seguinte à compra por default;
 - **V3.13 / #13:** taxa de transferência calculada sobre saldo devedor por cota;
 - **V3.14 / #14:** crédito residual pós-compra deixa de ser contado como ativo livre sem política explícita.
-- **V3.15 / #15:** Lance Fixo e Lance Livre passam a ser modalidades explícitas, com bases distintas e testes.
+- **V3.15 / #15:** Lance Fixo e Lance Livre passam a ser modalidades explícitas, com bases distintas e testes;
+- **V3.16 / #16:** compra pode usar apenas um subconjunto das cotas; cotas não usadas permanecem independentes no motor.
 
-A documentação canônica foi saneada na **#11** e continua sincronizada com V3.14; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
+A documentação canônica foi saneada na **#11** e continua sincronizada com V3.16; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
 
 Os gaps ainda reais ficam concentrados em `docs/pendencias.md` e em novas issues de implementação quando necessário.
 
