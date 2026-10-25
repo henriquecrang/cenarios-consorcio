@@ -707,6 +707,8 @@ function runScenario(cfg,overrides={}){
       totalStrategyGross:anyContemplated ? totalStrategyGross : null,
       preCredit:(!quotaSold ? sumQ(q=>!q.contemplated ? q.credit : 0) : null),
       debt:aggregateOutstanding,
+      comparableDebt:comparableOutstanding,
+      debtByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.outstanding])),
       loanDebt:aggregateLoanBalance,
       gross:grossAsset,
       comparableAsset,
