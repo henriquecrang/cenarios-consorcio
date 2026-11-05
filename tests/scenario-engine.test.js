@@ -456,3 +456,24 @@ console.log('scenario-engine integration tests: ok');
    assert.ok(loss.cotaDetails[0].letterBalance<cfg.cotas[0].credit0,'perda de aplicação diminui saldo da carta');
    assert.equal(lower.hist[0].cdb,legacy.hist[0].cdb,'taxa do benchmark permanece independente');
  }
+
+
+ // #27 — cobrança antecipada de taxa, reserva zero e destinos de amortização.
+ {
+   const cfg=makeConfig({conts:[20,20,20,20],buyRaw:215});
+   const legacy=runScenario(cfg);
+   const upfront=runScenario({...cfg,adminFeeUpfrontShare:0.50});
+   const expected=1370000*0.24*0.50;
+   close(upfront.hist[0].upfrontAdminFees,expected);
+   assert.ok(upfront.hist[0].monthlyOutflow>legacy.hist[0].monthlyOutflow);
+   const noReserve=runScenario({...cfg,reserva:0});
+   assert.ok(noReserve.hist[0].debt<legacy.hist[0].debt);
+   const reducedLimited=runScenario({...cfg,reducedUntilMonth:3});
+   assert.ok(reducedLimited.hist[3].monthlyConsortiumInstallment>
+     legacy.hist[3].monthlyConsortiumInstallment);
+   const shortenTerm=runScenario({...cfg,lanceAmortization:'term'});
+   assert.ok(shortenTerm.cotaDetails[0].termEndMonth<214,'lance reduz o prazo');
+   assert.ok(shortenTerm.cotaDetails[0].postInstall>legacy.cotaDetails[0].postInstall,
+     'lance não reduz parcela no modo prazo');
+   assert.ok(shortenTerm.hist.some(h=>h.m<214 && h.debt<0.01),'quitação antecipada ocorre');
+ }
