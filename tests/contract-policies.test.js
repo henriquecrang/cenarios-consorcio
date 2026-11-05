@@ -32,3 +32,11 @@ assert.equal(canUseYieldForInstallment({yieldInstallmentMode:'capitalize',rendim
 assert.equal(canUseYieldForInstallment({yieldInstallmentMode:'requested_months',yieldInstallmentApproved:true,yieldRequestMonths:[5,7]},6),false);
 assert.equal(canUseYieldForInstallment({yieldInstallmentMode:'requested_months',yieldInstallmentApproved:true,yieldRequestMonths:[5,7]},7),true);
 assert.throws(()=>canUseYieldForInstallment({yieldInstallmentMode:'automatic',yieldInstallmentApproved:false},5),/autorização/);
+
+const {calculateTransferFee}=require('../contract-policies.js');
+const feeCotas=[{id:'A',credit:400000,outstanding:350000},{id:'B',credit:200000,outstanding:180000}];
+assert.equal(calculateTransferFee(feeCotas,{kind:'fixed_per_transfer',fixed:500,registrationPerQuota:150},100000).total,800);
+assert.equal(calculateTransferFee(feeCotas,{kind:'fixed_per_quota',fixed:500},100000).total,1000);
+assert.equal(calculateTransferFee(feeCotas,{kind:'credit_pct',rate:0.01,cap:1000},100000).total,2000);
+assert.equal(calculateTransferFee(feeCotas,{kind:'outstanding_pct',rate:0.01,cap:1000},100000).total,2000);
+assert.equal(calculateTransferFee(feeCotas,{kind:'offer_pct',rate:0.02},100000).total,2000);
