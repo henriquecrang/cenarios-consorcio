@@ -497,3 +497,21 @@ console.log('scenario-engine integration tests: ok');
    assert.throws(()=>runScenario({...cfg,yieldInstallmentMode:'automatic',
      yieldInstallmentApproved:false}),/autorização/);
  }
+
+ // #33 — tarifas alternativas e aprovação explícita de cessão.
+ {
+   const cfg=makeConfig({conts:[4,4,4,4],buyRaw:215});
+   const sale={quotaSale:{month:5,grossOffer:200000,saleFeePct:0.01,
+     saleFeeCap:1000,saleExtraCostPct:0,payLanceLoanOnSale:false}};
+   const blocked=runScenario({...cfg,transferApprovalRequired:true,
+     transferApproved:false},sale);
+   assert.equal(blocked.quotaSaleBlockedByApproval,true);
+   assert.equal(blocked.quotaSold,false);
+   close(blocked.quotaSaleNetCash,0);
+   const allowed=runScenario({...cfg,transferApprovalRequired:true,
+     transferApproved:true,transferFeePolicy:{kind:'fixed_per_transfer',fixed:500,
+       registrationPerQuota:150}},sale);
+   assert.equal(allowed.quotaSold,true);
+   close(allowed.quotaSaleTransferFee,1100);
+   assert.deepEqual(Object.keys(allowed.quotaSaleTransferFeeByQuota).sort(),['A','B','C','D']);
+ }
