@@ -668,6 +668,16 @@ th:first-child,td:first-child{text-align:left}
 
 
 
+<div class="field">
+  <label>Perfil de condições contratuais</label>
+  <select id="perfilContrato">
+    <option value="bamaq" selected>QuintoAndar/Bamaq — proposta de referência (não é regra universal)</option>
+    <option value="generic">Nova proposta genérica — iniciar sem valores comerciais</option>
+    <option value="custom">Configuração personalizada — manter os números atuais</option>
+  </select>
+  <div class="small" id="perfilContratoStatus">Referência de pesquisa Bamaq/QuintoAndar Grupo 4012; 400/400/370/200, prazo 214, taxa 24%, reserva 1%, cashback 10%. Os dados não representam outras administradoras.</div>
+</div>
+
 <div class="section">1. Consórcio — estrutura de cotas</div>
 
 <div class="quota-count-row">
@@ -2386,7 +2396,7 @@ function scenarioApplyControls(controls){
   }
 
   // Presets antigos não herdam condições de contrato da simulação anterior.
-  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:'',adminAntecipada:'0',fimParcelaReduzida:'0',amortizacaoLance:'installment',rendimentoAbatimentoModo:'legacy',abatimentoAutorizado:'no',mesesAbatimento:''};
+  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:'',adminAntecipada:'0',fimParcelaReduzida:'0',amortizacaoLance:'installment',rendimentoAbatimentoModo:'legacy',abatimentoAutorizado:'no',mesesAbatimento:'',perfilContrato:'bamaq'};
   Object.entries(newControlDefaults).forEach(([id,value])=>{
     if(!controls[id] && $(id)) $(id).value=value;
   });
@@ -2879,11 +2889,55 @@ function initScenarioManager(){
   }
 }
 
+
+function configureContractProfile(){
+  const el=$('perfilContrato');
+  const profile=el.value;
+  const labels={
+    bamaq:'Perfil comercial de referência QuintoAndar/Bamaq; não é regra universal.',
+    generic:'Nova proposta genérica: preencha dados reais do contrato. O motor bloqueará resultados enquanto faltar informação essencial. Cashback zerado.',
+    custom:'Premissas personalizadas: confirme indexador, lances, taxas e rendimento na proposta/contrato.'
+  };
+  if(profile==='generic'){
+    if(!confirm('Iniciar nova proposta genérica? Isso substituirá os campos atuais. Salve ou exporte a simulação antes de continuar.')){
+      el.value='bamaq';return;
+    }
+    const reset={
+      prazo:'',reduzida:'100',adm:'',reserva:'',reajuste:'',
+      primeiroReajuste:'12',ajusteModelo:'fixed_annual',reajusteSerie:'',
+      ajusteTeto:'',ajustePiso:'',adminAntecipada:'0',fimParcelaReduzida:'0',
+      amortizacaoLance:'installment',lanceTotal:'0',lanceFixoPct:'0',
+      lanceEmb:'0',tetoEmbGrupo:'0',baseLanceFixo:'credit',
+      baseLanceLivre:'outstanding',embFixoPermitido:'no',cashback:'0',
+      cashbackDelayMonths:'1',cartaYieldMode:'fixed_net',
+      cartaYieldNetAnnual:'',cartaYieldSeries:'',cartaPctCdi:'0',
+      rendimentoAbatimentoModo:'capitalize',abatimentoAutorizado:'no',
+      mesesAbatimento:'',taxaTransferenciaVenda:'0',tetoTransferenciaVenda:'0'
+    };
+    Object.entries(reset).forEach(([id,value])=>{if($(id))$(id).value=value});
+    if($('cartaCapitaliza'))$('cartaCapitaliza').checked=true;
+    if($('cartaPagaParcela'))$('cartaPagaParcela').checked=false;
+    if($('lanceLivreMode'))$('lanceLivreMode').checked=true;
+    if($('lanceFixoMode'))$('lanceFixoMode').checked=false;
+    renderQuotaStructure({count:1,credits:[0],conts:[12],preserve:false});
+    if($('cota1EmbPct'))$('cota1EmbPct').value='0';
+    if($('cota1LancePct'))$('cota1LancePct').value='0';
+  }else if(profile==='bamaq'){
+    // Não descartar alterações anteriores ao simplesmente alterar o rótulo.
+    // O botão de restaurar cotas mantém a opção de recuperar os valores da oferta.
+  }
+  if($('perfilContratoStatus')) $('perfilContratoStatus').textContent=labels[profile];
+  scenarioMarkDirty();
+  simulate();
+}
+
+$('perfilContrato')?.addEventListener('change',configureContractProfile);
+
 const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['rendimentoAbatimentoModo','abatimentoAutorizado','mesesAbatimento','adminAntecipada','fimParcelaReduzida','amortizacaoLance','cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['perfilContrato','rendimentoAbatimentoModo','abatimentoAutorizado','mesesAbatimento','adminAntecipada','fimParcelaReduzida','amortizacaoLance','cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -3016,6 +3070,17 @@ function syncInflationLinkedFields(){
 
 function collectScenarioConfig(){
   syncInflationLinkedFields();
+  // Um perfil genérico não pode usar 24%/1%/3% ou cartas QuintoAndar não informados.
+  const profile=$('perfilContrato')?.value||'bamaq';
+  if(profile!=='bamaq'){
+    const required=['prazo','adm','reserva','reduzida'];
+    if($('ajusteModelo').value==='fixed_annual') required.push('reajuste');
+    if($('cartaYieldMode').value==='fixed_net') required.push('cartaYieldNetAnnual');
+    const missing=required.filter(id=>!$(id) || $(id).value.trim()==='');
+    if(missing.length) throw new Error('Informe os dados contratuais obrigatórios: '+missing.join(', '));
+    if([...document.querySelectorAll('#quotaConfigBody .quota-credit-input')].some(el=>Number(el.value)<=0))
+      throw new Error('Informe o valor de crédito de todas as cotas no perfil genérico');
+  }
 
   const N=Math.max(1,+$('prazo').value||1);
   const quotaCount=getQuotaCount();
@@ -3089,6 +3154,7 @@ function collectScenarioConfig(){
 
   const cfg={
     credit0,N,cotas,firstCont,cont,purchaseReadyCont,buyRaw,buy,sellMonth,
+    contractProfile:$('perfilContrato')?.value||'bamaq',
     reduced:clamp(pct($('reduzida').value),0,1),
     reducedUntilMonth:Math.max(0,Math.round(+$('fimParcelaReduzida').value||0)),
     adminFeeUpfrontShare:clamp(pct($('adminAntecipada').value),0,1),
