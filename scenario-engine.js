@@ -1,15 +1,18 @@
 (function(root,factory){
   let core=root.ConsorcioModel;
   let policies=root.ConsorcioPolicies;
-  if(typeof module==='object' && module.exports){ core=require('./model-core.js'); policies=require('./contract-policies.js'); }
-  const api=factory(core,policies);
+  let property=root.ConsorcioProperty;
+  if(typeof module==='object' && module.exports){ core=require('./model-core.js'); policies=require('./contract-policies.js'); property=require('./property-economics.js'); }
+  const api=factory(core,policies,property);
   if(typeof module==='object' && module.exports) module.exports=api;
   root.ConsorcioEngine=api;
-})(typeof globalThis!=='undefined' ? globalThis : this,function(core,policies){
+})(typeof globalThis!=='undefined' ? globalThis : this,function(core,policies,property){
   if(!core) throw new Error('ConsorcioModel is required before ConsorcioEngine');
   if(!policies) throw new Error('ConsorcioPolicies is required before ConsorcioEngine');
+  if(!property) throw new Error('ConsorcioProperty is required before ConsorcioEngine');
   const {resolveEffectiveBid,resolveCashbackBase,calculateCashback}=core;
   const {rateAtAdjustment,letterMonthlyRateAt,canUseYieldForInstallment,calculateTransferFee}=policies;
+  const {propertyPurchaseCosts,monthlyPropertyNetRent,propertyRealization,propertySale}=property;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const pct=x=>Number(x)/100;
 
@@ -63,6 +66,9 @@ function annualizeMonthlyRate(r){
 
 function runScenario(cfg,overrides={}){
   const N=cfg.N;
+  const assetType=cfg.assetType||'property';
+  if(!['property','none'].includes(assetType))
+    throw new Error('Tipo de ativo não suportado: '+assetType+'. Veículos/serviços exigem adaptador próprio.');
   const lancePct=clamp(overrides.lancePct ?? cfg.lancePct,0,1);
   const embPct=clamp(cfg.embMaxPct,0,0.30);
 
@@ -98,10 +104,11 @@ function runScenario(cfg,overrides={}){
     : N+1;
 
   const resgateAtivo=cfg.resgateAtivo;
-  const buy=resgateAtivo || purchaseReadyCont>N
+  const buy=resgateAtivo || purchaseReadyCont>N || assetType!=='property'
     ? N+1
     : Math.min(N+1,Math.max(purchaseReadyCont,cfg.buyRaw));
-  const sellMonth=Math.min(N+1,Math.max(buy<=N?buy:N+1,cfg.sellMonth));
+  const sellMonth=assetType!=='property' ? N+1 :
+    Math.min(N+1,Math.max(buy<=N?buy:N+1,cfg.sellMonth));
 
   const minRedeemForScenario=cont+6;
   const configuredRedeemMonth=Number.isFinite(cfg.redeemMonth) ? cfg.redeemMonth : N+1;
@@ -536,26 +543,20 @@ function runScenario(cfg,overrides={}){
       rgiAtPurchase=rgi;
       fixedOwnerAtPurchase=fixedOwner;
 
-      const creditUsed=Math.min(price,creditAtBuy);
-      residualGross=Math.max(0,creditAtBuy-price);
-      complement=Math.max(0,price-creditAtBuy);
-
-      purchaseCostsGross=price*cfg.itbi+rgi+cfg.outros;
-      residualAppliedToCosts=0;
-      residualUnallocated=residualGross;
+      const purchaseCosts=propertyPurchaseCosts({
+        price,availableCredit:creditAtBuy,principalCredit:principalCreditAtBuy,
+        itbi:cfg.itbi,rgi,outros:cfg.outros,
+        residualCreditPolicy:cfg.residualCreditPolicy,
+        residualExpenseCapPct:cfg.residualExpenseCapPct ?? 0.10
+      });
+      residualGross=purchaseCosts.residualGross;
+      complement=purchaseCosts.complement;
+      purchaseCostsGross=purchaseCosts.purchaseCostsGross;
+      residualAppliedToCosts=purchaseCosts.residualAppliedToCosts;
+      residualUnallocated=purchaseCosts.residualUnallocated;
       residualComparableAsset=0;
-
-      if(cfg.residualCreditPolicy==='costs' && residualGross>0){
-        const residualCostCap=Math.max(0,principalCreditAtBuy*(cfg.residualExpenseCapPct ?? 0.10));
-        residualAppliedToCosts=Math.min(residualGross,purchaseCostsGross,residualCostCap);
-        residualUnallocated=Math.max(0,residualGross-residualAppliedToCosts);
-      }
-
-      // Compatibilidade de output: residualCredit representa o valor ainda sem
-      // destinação após aplicações explícitas. Ele NÃO é automaticamente ativo
-      // comparável; residualComparableAsset controla o reconhecimento patrimonial.
       residualCredit=residualUnallocated;
-      purchaseCostsOutOfPocket=Math.max(0,purchaseCostsGross-residualAppliedToCosts);
+      purchaseCostsOutOfPocket=purchaseCosts.purchaseCostsOutOfPocket;
 
       cashbackEligibleBase=resolveCashbackBase(
         price,
@@ -581,11 +582,11 @@ function runScenario(cfg,overrides={}){
 
     let netRent=0;
     if(purchased && !propertySold && m>buy){
-      const received=currentRent*(1-cfg.vacancy);
-      const variableCosts=received*(cfg.adminRent+cfg.manut);
-      const operatingBeforeTax=received-variableCosts-fixedOwner;
-      const tax=Math.max(0,operatingBeforeTax)*cfg.rentTax;
-      netRent=operatingBeforeTax-tax;
+      const rental=monthlyPropertyNetRent({
+        rent:currentRent,vacancy:cfg.vacancy,adminRent:cfg.adminRent,
+        maintenance:cfg.manut,rentTax:cfg.rentTax,fixedOwner
+      });
+      netRent=rental.netRent;
       totalNetRent += netRent;
       rendaEstrategia += netRent;
 
@@ -603,15 +604,19 @@ function runScenario(cfg,overrides={}){
       if(guaranteeMode && !cfg.substituteGuaranteeApproved){
         propertySaleBlockedByGuarantee=true;
       }else{
-      const saleBaseValue=cfg.propertySaleBase==='market' ? propertyValue : price;
-      propertySalePrice=saleBaseValue*cfg.propertySalePctOfPurchase;
-      propertySaleBrokerage=propertySalePrice*cfg.sellerBrokeragePct;
-      propertySaleGuaranteeCost=guaranteeMode ? Math.max(0,cfg.substituteGuaranteeCost||0) : 0;
-      propertySaleOtherCosts=cfg.sellerOtherCosts+propertySaleGuaranteeCost;
-      const simplifiedTaxBasis=price+purchaseCostsGross;
-      const simplifiedCapitalGain=Math.max(0,propertySalePrice-simplifiedTaxBasis);
-      propertySaleTax=simplifiedCapitalGain*cfg.sellerCapitalGainTaxPct;
-      propertySaleTotalCosts=propertySaleBrokerage+propertySaleOtherCosts+propertySaleTax;
+      const sale=propertySale({
+        marketValue:propertyValue,purchasePrice:price,
+        baseMode:cfg.propertySaleBase,pctOfBase:cfg.propertySalePctOfPurchase,
+        purchaseCostsGross,brokeragePct:cfg.sellerBrokeragePct,
+        otherCosts:cfg.sellerOtherCosts,capitalGainTaxPct:cfg.sellerCapitalGainTaxPct,
+        guaranteeCost:guaranteeMode?Math.max(0,cfg.substituteGuaranteeCost||0):0
+      });
+      propertySalePrice=sale.salePrice;
+      propertySaleBrokerage=sale.brokerage;
+      propertySaleGuaranteeCost=sale.guaranteeCost;
+      propertySaleOtherCosts=sale.otherCosts;
+      propertySaleTax=sale.tax;
+      propertySaleTotalCosts=sale.totalCosts;
 
       propertySaleConsortiumPayoff=cfg.sellPropertyPayoff ? sumQ(q=>q.usedInPurchase ? q.outstanding : 0) : 0;
       propertySaleLoanPayoff=cfg.payLanceLoanOnPropertySale ? sumQ(q=>q.usedInPurchase ? q.loanBalance : 0) : 0;
@@ -733,18 +738,18 @@ function runScenario(cfg,overrides={}){
       comparableAsset=aggregateLetterBalance+residualComparableAsset;
     }else{
       grossAsset=propertyValue+aggregateLetterBalance+residualComparableAsset;
-      const hypotheticalBrokerage=propertyValue*cfg.sellerBrokeragePct;
-      const hypotheticalOtherCosts=cfg.sellerOtherCosts;
-      const simplifiedTaxBasis=price+purchaseCostsGross;
-      const hypotheticalGain=Math.max(0,propertyValue-simplifiedTaxBasis);
-      const hypotheticalTax=hypotheticalGain*cfg.sellerCapitalGainTaxPct;
-      propertyNetRealizationThisMonth=Math.max(0,propertyValue-hypotheticalBrokerage-hypotheticalOtherCosts-hypotheticalTax);
+      const realization=propertyRealization({
+        marketValue:propertyValue,priceAtPurchase:price,purchaseCostsGross,
+        brokeragePct:cfg.sellerBrokeragePct,otherCosts:cfg.sellerOtherCosts,
+        capitalGainTaxPct:cfg.sellerCapitalGainTaxPct
+      });
+      propertyNetRealizationThisMonth=realization.net;
       comparableAsset=propertyNetRealizationThisMonth+aggregateLetterBalance+residualComparableAsset;
       if(m===N){
         finalPropertyMarketValue=propertyValue;
         finalPropertyNetRealization=propertyNetRealizationThisMonth;
-        finalPropertyExitCosts=hypotheticalBrokerage+hypotheticalOtherCosts;
-        finalPropertyExitTax=hypotheticalTax;
+        finalPropertyExitCosts=realization.brokerage+realization.otherCosts;
+        finalPropertyExitTax=realization.tax;
       }
     }
 
@@ -870,7 +875,7 @@ function runScenario(cfg,overrides={}){
   }));
 
   return {
-    cfg,N,cont,firstCont,lastCont:cont,buy,sellMonth,redeemMonth,lancePct,embPct,cotaDetails,
+    cfg,N,assetType,cont,firstCont,lastCont:cont,buy,sellMonth,redeemMonth,lancePct,embPct,cotaDetails,
     hist,last,
     strategy:last.totalStrategy,
     benchmark:last.cdb,
