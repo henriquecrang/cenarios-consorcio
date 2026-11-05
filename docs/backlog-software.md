@@ -1,10 +1,10 @@
-# Itens de generalização — auditoria #24 (05/11/2026)
+# Itens de generalização — evolução V3.22 (05/11/2026)
 
-**Status geral: IDENTIFICADO / NÃO IMPLEMENTADO.** Diagnóstico em [docs/auditoria-generalizacao-consorcios.md](auditoria-generalizacao-consorcios.md). Preservar V3.21 Bamaq até execução das issues. Os itens SW-089–SW-099 foram criados pela auditoria; não devem ser marcados como implementados só por terem issue aberta.
+**Estado:** políticas contratuais V3.22 implementadas **parcial ou totalmente conforme cada item**. Referência: [docs/politicas-contratuais-v3.22.md](politicas-contratuais-v3.22.md) e [auditoria #24](auditoria-generalizacao-consorcios.md). A simulação Bamaq histórica segue protegida por regressões; pesquisa #35 depende de contratos específicos. Testes JavaScript isolados passaram, sem validação visual/navegador nesta sessão.
 
 ### SW-099 — Validar contratos e atas de grupos atuais
 
-**Status:** PESQUISA PENDENTE — sem contrato específico verificado  
+**Status:** PESQUISA PÚBLICA CONCLUÍDA / CONTRATOS E ATAS DE GRUPOS AINDA PENDENTES — #35  
 **Prioridade:** P1  
 **Origem:** [issue #35](https://github.com/henriquecrang/cenarios-consorcio/issues/35) / prova documental para perfis reais Rodobens/Santander/Bamaq.  
 **Critério:** obter contrato e ata por grupo, mapear cláusulas a fixtures, registrar lacunas e não habilitar presets como validados sem documentação.
@@ -13,28 +13,28 @@
 
 ### SW-098 — Portabilidade do ativo e avaliação
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.22 (adaptador imóvel; outros ativos não suportados)  
 **Prioridade:** P2  
 **Origem:** [issue #34](https://github.com/henriquecrang/cenarios-consorcio/issues/34) / G10; separar motor de cotas do valuation imobiliário  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
 ### SW-097 — Tarifas, cessão e garantias por grupo
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA V3.22 — tarifas e aprovação de cessão conjunta  
 **Prioridade:** P2  
 **Origem:** [issue #33](https://github.com/henriquecrang/cenarios-consorcio/issues/33) / G09; bases fixas/percentuais e aprovações condicionais  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
 ### SW-096 — Perfis contratuais e defaults genéricos
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA V3.22 — perfis genérico, Bamaq e personalizado; contratos reais externos pendentes #35  
 **Prioridade:** P1  
 **Origem:** [issue #32](https://github.com/henriquecrang/cenarios-consorcio/issues/32) / G08; isolar o preset Bamaq/QuintoAndar e cashback promocional  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
@@ -58,46 +58,46 @@
 
 ### SW-093 — Autorização para uso de rendimento nas parcelas
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA V3.22 — autorização/agenda de abatimentos  
 **Prioridade:** P1  
 **Origem:** [issue #29](https://github.com/henriquecrang/cenarios-consorcio/issues/29) / G05; distinguir rendimento devido do abatimento operacional  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
 ### SW-092 — Remuneração financeira de carta independente do CDI fixo
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA V3.22 — CDI, taxa líquida fixa ou curvas  
 **Prioridade:** P0  
 **Origem:** [issue #28](https://github.com/henriquecrang/cenarios-consorcio/issues/28) / G04; política de taxa líquida ou curva temporal sem IR duplicado  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
 ### SW-091 — Formação de parcelas e amortização por plano
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA PARCIALMENTE — V3.22 (taxa antecipada, fase reduzida, prazo ou parcela; escalonamento avançado pendente)  
 **Prioridade:** P0  
 **Origem:** [issue #27](https://github.com/henriquecrang/cenarios-consorcio/issues/27) / G03; encargos, reserva zero, reduzida, prazo versus parcela  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
 ### SW-090 — Bases e restrições de modalidades de lance
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA V3.22 — bases/tetos/combinações de lance; ofertas em número de parcelas ainda não suportadas  
 **Prioridade:** P0  
 **Origem:** [issue #26](https://github.com/henriquecrang/cenarios-consorcio/issues/26) / G02; teto embutido e regras de fixo por contrato  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
 ### SW-089 — Índice e periodicidade de reajustes
 
-**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Status:** IMPLEMENTADA V3.22 — séries anuais/eventos contratualmente configuráveis  
 **Prioridade:** P0  
 **Origem:** [issue #25](https://github.com/henriquecrang/cenarios-consorcio/issues/25) / G01; fixo, INCC/IPCA e outras regras com fonte  
-**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+**Critério:** verificar o escopo da implementação V3.22 e seus testes; limitações remanescentes constam em [políticas](politicas-contratuais-v3.22.md). Não presumir cláusulas de grupos não documentados.
 
 ---
 
