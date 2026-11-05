@@ -19,3 +19,7 @@ close(letterMonthlyRateAt({letterYieldMode:'fixed_net',letterNetAnnual:0.07},2),
 close(letterMonthlyRateAt({letterYieldMode:'monthly_series',letterMonthlyRates:[0.01,0.02]},2),0.02);
 assert.throws(()=>letterMonthlyRateAt({letterYieldMode:'monthly_series',letterMonthlyRates:[0.01]},2),/não cobre/);
 console.log('contract-policies regression tests: ok');
+
+assert.equal(letterMonthlyRateAt({letterYieldMode:'annual_net_series',letterAnnualRates:[0.06,0.08]},12),Math.pow(1.06,1/12)-1);
+close(letterMonthlyRateAt({letterYieldMode:'annual_net_series',letterAnnualRates:[0.06,0.08]},13),Math.pow(1.08,1/12)-1);
+assert.throws(()=>letterMonthlyRateAt({letterYieldMode:'annual_net_series',letterAnnualRates:[0.06]},13),/não cobre/);
