@@ -742,6 +742,26 @@ th:first-child,td:first-child{text-align:left}
 </div>
 
 <div class="field">
+  <label>Política de atualização contratual</label>
+  <select id="ajusteModelo">
+    <option value="fixed_annual" selected>Percentual fixo anual — proposta Bamaq</option>
+    <option value="annual_series">Índice anual projetado (INCC, IPCA etc.) — informar série</option>
+    <option value="event_series">Eventos de reajuste em meses específicos — informar série</option>
+  </select>
+  <div class="small">O índice corrige crédito/obrigações contratuais; não é o rendimento financeiro da carta já contemplada. Use projeções explícitas do grupo.</div>
+</div>
+<div class="field">
+  <label>Série de reajustes projetados (%)</label>
+  <textarea id="reajusteSerie" rows="2" placeholder="Anual: 6;4;5 ou por evento: 7:6;19:4"></textarea>
+  <div class="small">Anual: taxas por ocorrência desde o primeiro reajuste. Eventos: mês:percentual. Informe todos até o horizonte; valores negativos apenas quando previstos pelo contrato.</div>
+</div>
+<div class="row">
+  <div class="field"><label>Teto contratual por reajuste (%) — opcional</label><input id="ajusteTeto" type="number" step=".1" placeholder="Sem teto"></div>
+  <div class="field"><label>Piso contratual por reajuste (%) — opcional</label><input id="ajustePiso" type="number" step=".1" placeholder="Sem piso"></div>
+</div>
+<div id="contractPolicyError" role="alert" class="warn" style="display:none"></div>
+
+<div class="field">
   <label>Se contemplação e reajuste ocorrerem no mesmo mês</label>
   <div class="lock-options" role="radiogroup" aria-label="Ordem entre reajuste e contemplação no mesmo mês">
     <label class="radio-option">
@@ -1953,6 +1973,7 @@ th:first-child,td:first-child{text-align:left}
 </div>
 
 <script src="model-core.js"></script>
+<script src="contract-policies.js"></script>
 <script src="scenario-engine.js"></script>
 <script>
 const $ = id => document.getElementById(id);
@@ -2268,6 +2289,11 @@ function scenarioApplyControls(controls){
     if($('lanceFixoPct')) $('lanceFixoPct').value='30';
   }
 
+  // Presets antigos não herdam condições de contrato da simulação anterior.
+  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:''};
+  Object.entries(newControlDefaults).forEach(([id,value])=>{
+    if(!controls[id] && $(id)) $(id).value=value;
+  });
   const ranges=[];
   Object.entries(controls).forEach(([id,item])=>{
     const el=$(id);
@@ -2761,7 +2787,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -2973,6 +2999,10 @@ function collectScenarioConfig(){
     reaj:Math.max(0,pct($('reajuste').value)),
     firstAdj:Math.max(1,+$('primeiroReajuste').value||12),
     adjustmentBeforeContemplation:$('reajAntesCont').checked,
+    adjustmentMode:$('ajusteModelo').value,
+    adjustmentSeries:$('ajusteModelo').value==='fixed_annual' ? [] : window.ConsorcioPolicies.parseRateSeries($('reajusteSerie').value,$('ajusteModelo').value),
+    adjustmentCap:$('ajusteTeto').value==='' ? null : pct($('ajusteTeto').value),
+    adjustmentFloor:$('ajustePiso').value==='' ? null : pct($('ajustePiso').value),
 
     lanceMode:$('lanceFixoMode').checked ? 'fixed' : 'free',
     lancePct:clamp(pct($('lanceTotal').value),0,1),
@@ -3117,8 +3147,18 @@ function collectScenarioConfig(){
 
 
 function simulate(){
-  const cfg=collectScenarioConfig();
-  const r=runScenario(cfg);
+  let cfg,r;
+  try{
+    cfg=collectScenarioConfig();
+    r=runScenario(cfg);
+    if($('contractPolicyError')) $('contractPolicyError').style.display='none';
+  }catch(err){
+    if($('contractPolicyError')){
+      $('contractPolicyError').textContent='Configuração contratual inválida: '+(err?.message||String(err));
+      $('contractPolicyError').style.display='block';
+    }
+    return;
+  }
 
   const {
     N,cont,firstCont,lastCont,buy,sellMonth,cotaDetails,
