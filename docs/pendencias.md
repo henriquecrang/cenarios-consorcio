@@ -1,31 +1,32 @@
-# Pendências canônicas — estado da linha V3.21
+# Pendências canônicas — estado da linha V3.22
 
 Este arquivo contém também auditorias históricas de versões anteriores. Para saber o que ainda está aberto, prevalecem:
 1. este cabeçalho de estado;
 2. os blocos de auditoria mais recentes;
 3. o checklist residual ao final.
 
-## Portabilidade contratual — diagnóstico #24 (05/11/2026)
+## Portabilidade contratual — implementação V3.22 e lacunas (05/11/2026)
 
-**Estado:** pesquisa concluída, **funcionalidades abaixo ainda não implementadas**. Ver [matriz G01–G10](auditoria-generalizacao-consorcios.md). O motor V3.21 e seus resultados Bamaq permanecem inalterados.
+**Versão atual:** [docs/politicas-contratuais-v3.22.md](politicas-contratuais-v3.22.md) e [auditoria de generalização](auditoria-generalizacao-consorcios.md). Os modos abaixo têm código e regressões JS isoladas; **não foi feita validação manual de navegador nem verificada conclusão de GitHub Actions**. Não atribuir a marcas/administradoras contratos de grupos que não examinamos.
 
-**P0 motor:**
-- [ ] [#25](https://github.com/henriquecrang/cenarios-consorcio/issues/25) — indexador/preço do bem, periodicidade, teto e trajetória de reajustes (G01).
-- [ ] [#26](https://github.com/henriquecrang/cenarios-consorcio/issues/26) — bases e limites de lance, impossibilidade de combinar determinadas modalidades (G02).
-- [ ] [#27](https://github.com/henriquecrang/cenarios-consorcio/issues/27) — taxa de administração, reserva, parcelas reduzidas, amortização por prazo/parcela (G03).
-- [ ] [#28](https://github.com/henriquecrang/cenarios-consorcio/issues/28) — retorno financeiro líquido da carta não limitado a CDI × percentual fixo (G04).
+**P0 — primeira implementação disponível:**
+- [x] [#25](https://github.com/henriquecrang/cenarios-consorcio/issues/25): reajuste fixo anual, curva anual e calendário de eventos (INCC/IPCA como **taxas fornecidas**), piso/teto; não busca índices automaticamente e não define indexador por administradora.
+- [x] [#26](https://github.com/henriquecrang/cenarios-consorcio/issues/26): base Livre/Fixo por contrato, embutido com teto variável e combinação Fixo+Embutido proibida quando política exige; ainda sem lance por número absoluto de parcelas ou FGTS operacional.
+- [ ] **PARCIAL** [#27](https://github.com/henriquecrang/cenarios-consorcio/issues/27): parcela reduzida com término configurável, percentual de administração antecipado e redução de prazo/parcelas após lance implementados; cronogramas escalonados por cota e regras de múltiplos vencimentos **ainda pendentes**.
+- [x] [#28](https://github.com/henriquecrang/cenarios-consorcio/issues/28): rendimento líquido da carta pós-contemplação em taxa anual fixa, % do CDI, série anual ou mensal, sem IR em duplicidade; curvas não garantidas e sem dados de fundos/índices automaticamente obtidos.
 
-**P1 regras complementares e perfis:**
-- [ ] [#29](https://github.com/henriquecrang/cenarios-consorcio/issues/29) — uso autorizado dos rendimentos para abater parcelas (G05).
-- [ ] [#30](https://github.com/henriquecrang/cenarios-consorcio/issues/30) — destinos de crédito e residual, inclusive quitação de financiamento (G06).
-- [ ] [#31](https://github.com/henriquecrang/cenarios-consorcio/issues/31) — encerramento, crédito não utilizado e rateio final (G07).
-- [ ] [#32](https://github.com/henriquecrang/cenarios-consorcio/issues/32) — separar defaults genéricos do preset Bamaq/QuintoAndar e integração ao wizard #23 (G08).
+**P1 — regras complementares, presets e pesquisa:**
+- [x] [#29](https://github.com/henriquecrang/cenarios-consorcio/issues/29): usar rendimentos para parcelas só com autorização explicitada e, opcionalmente, nos meses informados; legado comercial Bamaq preservado.
+- [ ] [#30](https://github.com/henriquecrang/cenarios-consorcio/issues/30): destinos do crédito residual, amortização e quitação de financiamento — **não incluído nesta implementação**.
+- [ ] [#31](https://github.com/henriquecrang/cenarios-consorcio/issues/31): encerramento, rateio e crédito contemplado não usado — **não incluído nesta implementação**.
+- [x] [#32](https://github.com/henriquecrang/cenarios-consorcio/issues/32): perfis Bamaq/QuintoAndar, genérico em branco e personalizado, sem aplicar cashback Bamaq ao genérico, com migração não destrutiva.
+- [ ] [#35](https://github.com/henriquecrang/cenarios-consorcio/issues/35): [pesquisa pública 2026 publicada](fontes-contratuais-2026.md), mas **contratos/atas de grupos reais Rodobens e Santander e exceção particular Bamaq Grupo 4012 seguem sem prova**.
 
-**P2 expansão:**
-- [ ] [#33](https://github.com/henriquecrang/cenarios-consorcio/issues/33) — cessão, tarifas e garantias por regulamento (G09).
-- [ ] [#34](https://github.com/henriquecrang/cenarios-consorcio/issues/34) — motor de cota separado da economia imobiliária (G10).
+**P2 — cessão e separação de domínio:**
+- [x] [#33](https://github.com/henriquecrang/cenarios-consorcio/issues/33): taxas de cessão com bases alternativas, valor fixo, cadastro por cota e bloqueio sem autorização; ainda só há cessão conjunta de cotas.
+- [ ] **PARCIAL** [#34](https://github.com/henriquecrang/cenarios-consorcio/issues/34): módulo `property-economics.js` e modo sem compra implementados; faltam adaptadores de veículos, serviços e separação integral da orquestração do motor.
 
-**Evidências ainda pendentes:** [#35](https://github.com/henriquecrang/cenarios-consorcio/issues/35) — contrato/ata atual de grupo Rodobens; ata/proposta de grupo Santander; confirmação documental específica de políticas Bamaq, incluindo abatimento de rendimentos e ingresso em grupo em andamento. Não migrar dados comerciais ao conjunto de regras gerais sem fonte.
+**Riscos ainda materiais para novas administradoras:** série real de índices e limites assinados, regras de amortização não lineares, lance em número de parcelas, cashback comercial, taxa de administração escalonada, autorização de abatimento mensal, cessão parcial, crédito residual, quitação e encerramento. A documentação do [regulamento Bamaq 2026](fontes-contratuais-2026.md) não reconciliou exceção comercial de mensalidades anteriores do Grupo 4012.
 
 ---
 
