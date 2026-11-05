@@ -530,3 +530,12 @@ console.log('scenario-engine integration tests: ok');
   assert.ok(noAsset.cotaDetails.some(q=>q.letterBalance>0));
   assert.throws(()=>runScenario({...cfg,assetType:'vehicle'}),/não suportado/);
 }
+
+
+// #28 — não exigir série de rendimento após consumo de todas as cartas.
+{
+  const cfg=makeConfig({conts:[4,4,4,4],buyRaw:4});
+  const r=runScenario({...cfg,letterYieldMode:'monthly_series',letterMonthlyRates:[]});
+  assert.equal(r.buy,4);
+  close(r.totalLetterYieldAccrued,0);
+}
