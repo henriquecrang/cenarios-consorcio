@@ -1,12 +1,15 @@
 (function(root,factory){
   let core=root.ConsorcioModel;
-  if(typeof module==='object' && module.exports) core=require('./model-core.js');
-  const api=factory(core);
+  let policies=root.ConsorcioPolicies;
+  if(typeof module==='object' && module.exports){ core=require('./model-core.js'); policies=require('./contract-policies.js'); }
+  const api=factory(core,policies);
   if(typeof module==='object' && module.exports) module.exports=api;
   root.ConsorcioEngine=api;
-})(typeof globalThis!=='undefined' ? globalThis : this,function(core){
+})(typeof globalThis!=='undefined' ? globalThis : this,function(core,policies){
   if(!core) throw new Error('ConsorcioModel is required before ConsorcioEngine');
+  if(!policies) throw new Error('ConsorcioPolicies is required before ConsorcioEngine');
   const {resolveEffectiveBid,resolveCashbackBase,calculateCashback}=core;
+  const {rateAtAdjustment,letterMonthlyRateAt}=policies;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const pct=x=>Number(x)/100;
 
@@ -228,7 +231,7 @@ function runScenario(cfg,overrides={}){
   let lastFixedOwner=fixedOwner;
 
   const hist=[];
-  const isAdjMonth=m => m>=cfg.firstAdj && (m-cfg.firstAdj)%12===0;
+  const adjustmentAt=m=>rateAtAdjustment(cfg,m);
   const isPropertyAnniversary=m => purchased && !propertySold && m>buy && (m-buy)%12===0;
 
   for(let m=1;m<=N;m++){
@@ -241,14 +244,15 @@ function runScenario(cfg,overrides={}){
       }
     }
 
-    // Reajuste individual por cota.
+    // Reajuste contratual parametrizado; o legado é fixo anual.
+    const adjustment=adjustmentAt(m);
     cotas.forEach(q=>{
-      q.deferSameMonthAdjustment = isAdjMonth(m) && m===q.cont && !cfg.adjustmentBeforeContemplation && !q.contemplated && !quotaSold;
-      if(isAdjMonth(m) && !quotaSold && !redeemed && !q.deferSameMonthAdjustment){
-        q.credit *= (1+cfg.reaj);
-        q.outstanding *= (1+cfg.reaj);
+      q.deferSameMonthAdjustment = adjustment.applies && m===q.cont && !cfg.adjustmentBeforeContemplation && !q.contemplated && !quotaSold;
+      if(adjustment.applies && !quotaSold && !redeemed && !q.deferSameMonthAdjustment){
+        q.credit *= (1+adjustment.rate);
+        q.outstanding *= (1+adjustment.rate);
         const rem=N-m+1;
-        if(!q.contemplated) q.fullInstall *= (1+cfg.reaj);
+        if(!q.contemplated) q.fullInstall *= (1+adjustment.rate);
         else q.fullInstall = rem>0 ? q.outstanding/rem : q.outstanding;
       }
     });
@@ -398,7 +402,7 @@ function runScenario(cfg,overrides={}){
         q.postInstall=q.fullInstall;
 
         if(q.deferSameMonthAdjustment){
-          q.outstanding *= (1+cfg.reaj);
+          q.outstanding *= (1+adjustment.rate);
           q.fullInstall=rem>0 ? q.outstanding/rem : q.outstanding;
           q.postInstall=q.fullInstall;
         }
