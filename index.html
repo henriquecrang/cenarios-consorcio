@@ -813,13 +813,44 @@ th:first-child,td:first-child{text-align:left}
       </div>
 
       <div class="field">
+  <label>Base do lance fixo neste contrato</label>
+  <select id="baseLanceFixo">
+    <option value="credit" selected>Carta atualizada (Bamaq)</option>
+    <option value="credit_plus_fees">Carta + taxa de administração + reserva (cenário contratual)</option>
+    <option value="outstanding">Saldo devedor atualizado</option>
+  </select>
+  <div class="small">Exemplo: certos grupos Santander usam carta + encargos para Lance Fixo; confirme regulamento e ata do grupo.</div>
+</div>
+<div class="field">
+  <label>Base do lance livre neste contrato</label>
+  <select id="baseLanceLivre">
+    <option value="outstanding" selected>Saldo devedor atualizado (Bamaq)</option>
+    <option value="credit">Carta atualizada</option>
+    <option value="credit_plus_fees">Carta + encargos contratuais</option>
+  </select>
+</div>
+<div class="row">
+  <div class="field">
+    <label>Limite de lance embutido (%)</label>
+    <input id="tetoEmbGrupo" type="number" value="30" min="0" max="100" step=".5">
+  </div>
+  <div class="field">
+    <label>Lance Fixo aceita embutido?</label>
+    <select id="embFixoPermitido">
+      <option value="yes" selected>Sim — cenário Bamaq</option>
+      <option value="no">Não — proibição contratual</option>
+    </select>
+  </div>
+</div>
+<div class="small">As modalidades e os limites dependem do regulamento. Uma combinação proibida será rejeitada, não ajustada silenciosamente.</div>
+<div class="field">
         <label>Lance embutido</label>
-        <input id="lanceEmb" type="number" value="30" step=".5" min="0" max="30">
-        <div class="small">% da carta atualizada da própria cota — máximo de 30% e nunca acima do lance total efetivo.</div>
+        <input id="lanceEmb" type="number" value="30" step=".5" min="0" max="100">
+        <div class="small">% da carta atualizada da própria cota — limitado pelo teto contratual informado acima e pelo lance total efetivo.</div>
       </div>
       <div class="assump">
         <b>Regra do lance integrada:</b> em cada cota, o <b>Lance Livre</b> usa o saldo devedor atualizado; o <b>Lance Fixo</b> usa a carta atualizada.
-        O <b>lance embutido</b> é sempre calculado separadamente sobre a carta atualizada, limitado a 30% da carta e ao próprio valor total do lance.
+        O <b>lance embutido</b> é calculado sobre a carta atualizada, limitado pelo regulamento informado e pelo valor efetivo do lance. As bases abaixo são defaults Bamaq, editáveis por contrato.
         A parte em dinheiro é a diferença entre o lance efetivo da modalidade escolhida e o embutido efetivamente utilizado.
         <br><br>
         Exemplo reconciliado: saldo devedor de R$ 495.330, carta de R$ 400 mil, Lance Livre de 45% e embutido de 30% ⇒ lance total de R$ 222.898,50, R$ 120 mil embutidos e R$ 102.898,50 em dinheiro.
@@ -2083,7 +2114,7 @@ function renderQuotaStructure({count=null,credits=null,conts=null,loanTerms=null
       <td><label class="decision-check"><input id="cota${i+1}UseCompra" type="checkbox" ${useInPurchase?'checked':''}> sim</label></td>
       <td><select id="cota${i+1}LanceMode"><option value="free"${bidMode==='free'?' selected':''}>Livre</option><option value="fixed"${bidMode==='fixed'?' selected':''}>Fixo</option></select></td>
       <td><input id="cota${i+1}LancePct" type="number" value="${bidPct}" step=".1" min="0" max="100"></td>
-      <td><input id="cota${i+1}EmbPct" type="number" value="${embPct}" step=".5" min="0" max="30"></td>
+      <td><input id="cota${i+1}EmbPct" type="number" value="${embPct}" step=".5" min="0" max="100"></td>
     </tr>`);
 
     const prevL=previous.loans[i] || {};
@@ -2290,7 +2321,7 @@ function scenarioApplyControls(controls){
   }
 
   // Presets antigos não herdam condições de contrato da simulação anterior.
-  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:''};
+  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes'};
   Object.entries(newControlDefaults).forEach(([id,value])=>{
     if(!controls[id] && $(id)) $(id).value=value;
   });
@@ -2787,7 +2818,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -2935,7 +2966,7 @@ function collectScenarioConfig(){
       useInPurchase:$(`cota${idx+1}UseCompra`)?.checked !== false,
       lanceMode:$(`cota${idx+1}LanceMode`)?.value==='fixed' ? 'fixed' : 'free',
       bidPct:clamp(pct($(`cota${idx+1}LancePct`)?.value ?? 0),0,1),
-      embPct:clamp(pct($(`cota${idx+1}EmbPct`)?.value ?? 0),0,0.30)
+      embPct:clamp(pct($(`cota${idx+1}EmbPct`)?.value ?? 0),0,1)
     };
   });
   syncSingleQuotaSlider();
@@ -3007,7 +3038,15 @@ function collectScenarioConfig(){
     lanceMode:$('lanceFixoMode').checked ? 'fixed' : 'free',
     lancePct:clamp(pct($('lanceTotal').value),0,1),
     fixedLancePct:clamp(pct($('lanceFixoPct').value),0,1),
-    embMaxPct:clamp(pct($('lanceEmb').value),0,0.30),
+    embMaxPct:clamp(pct($('lanceEmb').value),0,1),
+    bidPolicy:{
+      fixedBase:$('baseLanceFixo').value,
+      freeBase:$('baseLanceLivre').value,
+      maxEmbeddedPct:clamp(pct($('tetoEmbGrupo').value),0,1),
+      allowFixedEmbedded:$('embFixoPermitido').value==='yes',
+      feeRatio:Math.max(0,pct($('adm').value))+Math.max(0,pct($('reserva').value)),
+      strict:true
+    },
 
     usarEmprestimoLance:$('comEmprestimoLance').checked,
     emprestimoTermosPorCota,
