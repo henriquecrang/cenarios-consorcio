@@ -1,3 +1,97 @@
+# Itens de generalização — auditoria #24 (05/11/2026)
+
+**Status geral: IDENTIFICADO / NÃO IMPLEMENTADO.** Diagnóstico em [docs/auditoria-generalizacao-consorcios.md](auditoria-generalizacao-consorcios.md). Preservar V3.21 Bamaq até execução das issues. Os itens SW-089–SW-098 foram criados pela auditoria; não devem ser marcados como implementados só por terem issue aberta.
+
+### SW-098 — Portabilidade do ativo e avaliação
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P2  
+**Origem:** [issue #34](https://github.com/henriquecrang/cenarios-consorcio/issues/34) / G10; separar motor de cotas do valuation imobiliário  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-097 — Tarifas, cessão e garantias por grupo
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P2  
+**Origem:** [issue #33](https://github.com/henriquecrang/cenarios-consorcio/issues/33) / G09; bases fixas/percentuais e aprovações condicionais  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-096 — Perfis contratuais e defaults genéricos
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P1  
+**Origem:** [issue #32](https://github.com/henriquecrang/cenarios-consorcio/issues/32) / G08; isolar o preset Bamaq/QuintoAndar e cashback promocional  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-095 — Encerramento e créditos não utilizados
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P1  
+**Origem:** [issue #31](https://github.com/henriquecrang/cenarios-consorcio/issues/31) / G07; crédito restrito, quitação, rateio e prazos de disponibilização  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-094 — Destinação do crédito e residual
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P1  
+**Origem:** [issue #30](https://github.com/henriquecrang/cenarios-consorcio/issues/30) / G06; compra, residual amortizado, despesas, quitação de financiamento  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-093 — Autorização para uso de rendimento nas parcelas
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P1  
+**Origem:** [issue #29](https://github.com/henriquecrang/cenarios-consorcio/issues/29) / G05; distinguir rendimento devido do abatimento operacional  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-092 — Remuneração financeira de carta independente do CDI fixo
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P0  
+**Origem:** [issue #28](https://github.com/henriquecrang/cenarios-consorcio/issues/28) / G04; política de taxa líquida ou curva temporal sem IR duplicado  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-091 — Formação de parcelas e amortização por plano
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P0  
+**Origem:** [issue #27](https://github.com/henriquecrang/cenarios-consorcio/issues/27) / G03; encargos, reserva zero, reduzida, prazo versus parcela  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-090 — Bases e restrições de modalidades de lance
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P0  
+**Origem:** [issue #26](https://github.com/henriquecrang/cenarios-consorcio/issues/26) / G02; teto embutido e regras de fixo por contrato  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
+### SW-089 — Índice e periodicidade de reajustes
+
+**Status:** PENDENTE DE IMPLEMENTAÇÃO — auditoria #24  
+**Prioridade:** P0  
+**Origem:** [issue #25](https://github.com/henriquecrang/cenarios-consorcio/issues/25) / G01; fixo, INCC/IPCA e outras regras com fonte  
+**Critério:** executar a issue própria e atualizar especificação, pendências, testes, presets e documentação sem alterar silenciosamente a baseline Bamaq.
+
+---
+
 ### SW-088 — Modalidade Lance Fixo × Lance Livre
 
 **Status:** IMPLEMENTADA — V3.15  
