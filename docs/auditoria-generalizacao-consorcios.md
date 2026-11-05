@@ -88,6 +88,10 @@ Na implementação, transformar cada amostra em teste isolado e compará-la com 
 
 **Sequência proposta:** #31 → #29 → #30 → #32, podendo antecipar estrutura dos presets sem permitir simulação de regras ainda não suportadas.
 
+### Trilha paralela — pesquisa e evidências de contrato
+
+- [ ] [#35](https://github.com/henriquecrang/cenarios-consorcio/issues/35) — validar propostas e atas atuais de grupos Bamaq/Rodobens/Santander e criar fixtures de contrato. A pesquisa pode ocorrer em paralelo aos P0; **bloqueia presets nomeados como contratualmente validados** na #32, mas não bloqueia a implementação de políticas gerais explicitamente parametrizadas.
+
 ### Bloco C — P2, ampliar governança e domínios
 
 - [ ] [#33](https://github.com/henriquecrang/cenarios-consorcio/issues/33) — regras/ tarifas de cessão e garantia por plano;
@@ -118,4 +122,4 @@ Se nova prova alterar a leitura, editar o relatório e o requisito da issue corr
 
 ---
 
-**Definição de pronto da #24:** esta matriz + **issues #25–#34 abertas** e interligadas + docs canônicos sincronizados + issue #23 informada. **Não** implica que o simulador suporte os modelos alternativos antes da implementação das issues.
+**Definição de pronto da #24:** esta matriz + **issues #25–#35 abertas** e interligadas + docs canônicos sincronizados + issue #23 informada. **Não** implica que o simulador suporte os modelos alternativos antes da implementação das issues.
