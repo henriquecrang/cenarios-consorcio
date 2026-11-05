@@ -730,6 +730,18 @@ th:first-child,td:first-child{text-align:left}
 
 <div class="row">
   <div class="field">
+    <label>Taxa de administração paga antecipadamente (%)</label>
+    <input id="adminAntecipada" type="number" value="0" min="0" max="100" step="1">
+    <div class="small">Parcela da taxa de administração total, cobrada à vista no mês 1. Default Bamaq: 0% antecipado.</div>
+  </div>
+  <div class="field">
+    <label>Último mês com parcela reduzida</label>
+    <input id="fimParcelaReduzida" type="number" value="0" min="0" step="1">
+    <div class="small">0 = até a contemplação. Outro valor: a partir do mês seguinte, o saldo restante é redistribuído no prazo.</div>
+  </div>
+</div>
+<div class="row">
+  <div class="field">
     <label>Reajuste anual</label>
     <input id="reajuste" type="number" value="3" step=".1">
     <div class="small">% a.a.</div>
@@ -843,6 +855,14 @@ th:first-child,td:first-child{text-align:left}
   </div>
 </div>
 <div class="small">As modalidades e os limites dependem do regulamento. Uma combinação proibida será rejeitada, não ajustada silenciosamente.</div>
+<div class="field">
+  <label>Como o lance amortiza a dívida?</label>
+  <select id="amortizacaoLance">
+    <option value="installment" selected>Reduzir parcelas futuras (Bamaq baseline)</option>
+    <option value="term">Manter prestação integral e encurtar prazo</option>
+  </select>
+  <div class="small">Na redução de prazo, parcelas após contemplação são limitadas ao saldo e cessam quando ele zera. Confirme a modalidade admitida pelo contrato.</div>
+</div>
 <div class="field">
         <label>Lance embutido</label>
         <input id="lanceEmb" type="number" value="30" step=".5" min="0" max="100">
@@ -2342,7 +2362,7 @@ function scenarioApplyControls(controls){
   }
 
   // Presets antigos não herdam condições de contrato da simulação anterior.
-  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:''};
+  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:'',adminAntecipada:'0',fimParcelaReduzida:'0',amortizacaoLance:'installment'};
   Object.entries(newControlDefaults).forEach(([id,value])=>{
     if(!controls[id] && $(id)) $(id).value=value;
   });
@@ -2839,7 +2859,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['adminAntecipada','fimParcelaReduzida','amortizacaoLance','cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -3046,6 +3066,9 @@ function collectScenarioConfig(){
   const cfg={
     credit0,N,cotas,firstCont,cont,purchaseReadyCont,buyRaw,buy,sellMonth,
     reduced:clamp(pct($('reduzida').value),0,1),
+    reducedUntilMonth:Math.max(0,Math.round(+$('fimParcelaReduzida').value||0)),
+    adminFeeUpfrontShare:clamp(pct($('adminAntecipada').value),0,1),
+    lanceAmortization:$('amortizacaoLance').value,
     adm:Math.max(0,pct($('adm').value)),
     reserva:Math.max(0,pct($('reserva').value)),
     reaj:Math.max(0,pct($('reajuste').value)),
