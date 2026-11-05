@@ -4,7 +4,7 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 ## Estado atual
 
-- **Aplicação:** V3.21 em `index.html`, servida diretamente pelo GitHub Pages.
+- **Aplicação:** V3.22 em `index.html`, servida diretamente pelo GitHub Pages.
 - **Documentação canônica:** consolidada a partir da rodada `pre_respostas30`, com limpeza de inconsistências residuais e a divergência posterior sobre o histórico de lances.
 - **Histórico:** preservado pelo Git; não mantemos cópias versionadas redundantes na árvore atual.
 
@@ -12,11 +12,18 @@ Simulador e documentação de investigação para análise de cenários de cons�
 
 - `index.html` — interface e orquestração do simulador; entry point do GitHub Pages.
 - `model-core.js` — regras financeiras puras de baixo nível.
+- `contract-policies.js` — políticas contratuais de reajuste, rendimento, abatimento e cessão.
+- `property-economics.js` — adaptação dos custos, aluguel e venda de imóveis.
 - `scenario-engine.js` — motor completo `runScenario`, sem dependência do DOM e compartilhado pelo navegador e pelos testes.
 - `tests/model-core.test.js` — regressões unitárias das regras críticas.
+- `tests/contract-policies.test.js` — validações de índices, rendimento, abatimento e taxas.
+- `tests/property-economics.test.js` — regressões de compra, aluguel e venda.
 - `tests/scenario-engine.test.js` — regressões de integração da operação multi-cota.
 - `.github/workflows/test.yml` — CI sem dependências externas; executa `npm test` a cada push/PR.
 - `docs/especificacao-modelo.md` — especificação canônica do modelo.
+- `docs/politicas-contratuais-v3.22.md` — modos suportados, defaults, premissas e limites.
+- `docs/auditoria-generalizacao-consorcios.md` — auditoria #24 e issues derivadas.
+- `docs/fontes-contratuais-2026.md` — fontes oficiais pesquisadas e provas ainda faltantes (#35).
 - `docs/pendencias.md` — somente pendências e riscos ainda relevantes.
 - `docs/backlog-software.md` — backlog técnico e estado das mudanças.
 - `docs/backlog-perguntas-bamaq.md` — perguntas, respostas e reconciliações comerciais/documentais.
@@ -35,6 +42,20 @@ Para publicar, configure o GitHub Pages para servir a branch `main` a partir de 
 URL esperada após a publicação:
 
 `https://henriquecrang.github.io/cenarios-consorcio/`
+
+## V3.22 — políticas contratuais configuráveis (issues #25–#29, #32–#34)
+
+- **#25:** índices/reajustes fixos, séries anuais e eventos mensais com teto/piso, preservando 3% ao ano Bamaq.
+- **#26:** bases e limites de lance configuráveis; possibilidade de proibir lance fixo combinado com embutido.
+- **#28:** rendimento líquido financeiro de crédito contemplado via CDI, taxa líquida fixa ou séries anuais/mensais.
+- **#27:** taxa de administração antecipada, duração da parcela reduzida e redução do prazo pelo lance.
+- **#29:** rendimento da carta separado do abatimento autorizado nas parcelas, com solicitações mês a mês.
+- **#32:** perfil de proposta QuintoAndar/Bamaq separado da criação genérica sem cashback promocional e sem dados contratuais presumidos.
+- **#33:** bases de tarifas de cessão, cadastro, tarifa fixa e aprovação exigida.
+- **#34:** fórmulas econômicas de imóvel movidas para `property-economics.js`, com cenário de carta sem compra; veículos/serviços não são simulados como imóveis.
+- **#35:** pesquisa documental pública avançada; contratos e atas de grupos específicos ainda pendentes.
+
+**Status:** a implementação cobre os modos especificados em [políticas contratuais](docs/politicas-contratuais-v3.22.md), **não** todos os contratos do mercado. Usos de crédito residual e encerramento (#30 e #31) continuam fora desta rodada. A suíte possui quatro blocos de regressão; testes JS isolados passaram em 05/11/2026, mas validação visual e GitHub Actions não foram confirmados nesta sessão. Não configurar um grupo real sem conferir proposta, regulamento, condições particulares e ata.
 
 ## Estado após a auditoria da V3.5
 
@@ -57,7 +78,7 @@ As issues #5–#10 abertas pela auditoria foram concluídas nas versões V3.6–
 - **V3.20 / #20:** resgate pós-180 dias deixa de sugerir compensação interna como default; quitação prévia/ponte passa a ser o cenário conservador;
 - **V3.21 / #22:** venda com substituição de garantia exige aprovação explícita da Bamaq; custo da substituição é input manual e patrimônio externo continua fora da estratégia.
 
-A documentação canônica foi saneada na **#11** e continua sincronizada com V3.21; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
+A documentação canônica foi saneada na **#11** e foi reconciliada com as evoluções da V3.22; o histórico permanece no Git e em `docs/follow-up-auditorias.md`.
 
 Os gaps ainda reais ficam concentrados em `docs/pendencias.md` e em novas issues de implementação quando necessário.
 
