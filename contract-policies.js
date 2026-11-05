@@ -105,5 +105,33 @@
     if(mode==='automatic') return true;
     return (cfg.yieldRequestMonths||[]).includes(month);
   }
-  return {parseRateSeries,rateAtAdjustment,letterMonthlyRateAt,parseMonthList,canUseYieldForInstallment};
+  function calculateTransferFee(quotas,policy,offer){
+    const rows=Array.isArray(quotas)?quotas:[];
+    const p=policy||{};
+    const kind=p.kind||'outstanding_pct';
+    const rate=Math.max(0,finite(p.rate??0,'Tarifa percentual'));
+    const cap=Number(p.cap)>0?Number(p.cap):Infinity;
+    const fixed=Math.max(0,finite(p.fixed??0,'Tarifa fixa'));
+    const registration=Math.max(0,finite(p.registrationPerQuota??0,'Cadastro por cota'));
+    if(!['outstanding_pct','credit_pct','fixed_per_quota','fixed_per_transfer','offer_pct'].includes(kind))
+      throw new Error('Base de tarifa de transferência não suportada: '+kind);
+    const n=rows.length||1;
+    const fees=rows.map(q=>{
+      let variable=0;
+      if(kind==='outstanding_pct') variable=Math.max(0,Number(q.outstanding)||0)*rate;
+      else if(kind==='credit_pct') variable=Math.max(0,Number(q.credit)||0)*rate;
+      else if(kind==='offer_pct') variable=Math.max(0,Number(offer)||0)*rate/n;
+      else if(kind==='fixed_per_quota') variable=fixed;
+      else if(kind==='fixed_per_transfer') variable=fixed/n;
+      // O teto é por cota para percentuais; tarifas fixas não são limitadas
+      // por um teto percentual que não faça parte do contrato.
+      const assessed=kind.endsWith('_pct')?Math.min(variable,cap):variable;
+      return {id:q.id,fee:assessed+registration};
+    });
+    return {
+      byQuota:Object.fromEntries(fees.map(f=>[f.id,f.fee])),
+      total:fees.reduce((a,f)=>a+f.fee,0)
+    };
+  }
+  return {parseRateSeries,rateAtAdjustment,letterMonthlyRateAt,parseMonthList,canUseYieldForInstallment,calculateTransferFee};
 });
