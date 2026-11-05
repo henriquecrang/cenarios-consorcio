@@ -9,6 +9,18 @@
 
 ---
 
+## Plano de execução acordado após auditoria V3.5 — registro histórico
+
+**Ordem deliberada:** #5 comparabilidade da matriz → #9 CDI bruto × CDB líquido → #10 migração de presets → #8 testes de integração → #6 sensibilidade de financiamento → #7 cashback com rendimento acumulado → #11 limpeza documental.
+
+**Critério de priorização original:** #5, #9 e #10 foram tratados como P0. A #8 foi antecipada em relação às demais P1 para congelar e proteger o comportamento do motor com testes de integração. A #11 foi deixada para o fim para que a limpeza documental refletisse o estado efetivamente implementado.
+
+**Regra de execução acordada:** ao trabalhar em cada issue, atualizar em conjunto `docs/especificacao-modelo.md`, `docs/pendencias.md` e o item correspondente de `docs/backlog-software.md`.
+
+**Reconciliação posterior:** este plano já foi executado na linha V3.6–V3.11, mas a ordem cronológica real das versões não corresponde exatamente à ordem inicialmente planejada: #5→V3.6, #9→V3.7, #10→V3.8, #6→V3.9, #7→V3.10 e #8→V3.11; a limpeza documental #11 foi abordada posteriormente. Portanto, não reabrir essas issues apenas porque aparecem neste registro. Consultar README, documentação canônica e issues para o estado vigente.
+
+---
+
 ## 1. Finalidade deste documento
 
 Este arquivo registra o que aconteceu **depois de cada apontamento de auditoria**.
