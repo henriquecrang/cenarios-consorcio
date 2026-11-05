@@ -2492,6 +2492,14 @@ function scenarioApplyState(rawState,{simulateNow=true}={}){
   scenarioApplying=true;
   try{
     scenarioApplyControls(state.controls);
+    lastContractProfile=$('perfilContrato')?.value||'bamaq';
+    if($('perfilContratoStatus')){
+      $('perfilContratoStatus').textContent=lastContractProfile==='generic'
+        ? 'Nova proposta genérica: preencha o contrato; cashback e taxas específicas Bamaq não são presumidos.'
+        : (lastContractProfile==='bamaq'
+          ? 'Perfil comercial Bamaq/QuintoAndar de referência; condições específicas não são regras universais.'
+          : 'Premissas personalizadas: confira-as com os documentos do contrato.');
+    }
     // A matriz possui uma célula de contemplação por cota; ao trocar o número
     // de cotas ela precisa ser reconstruída antes de receber seus valores salvos.
     decisionMatrixInitialized=false;
@@ -2931,19 +2939,24 @@ function initScenarioManager(){
 }
 
 
+let lastContractProfile='bamaq';
 function configureContractProfile(){
   const el=$('perfilContrato');
   const profile=el.value;
+  const previous=lastContractProfile;
   const labels={
     bamaq:'Perfil comercial de referência QuintoAndar/Bamaq; não é regra universal.',
-    generic:'Nova proposta genérica: preencha dados reais do contrato. O motor bloqueará resultados enquanto faltar informação essencial. Cashback zerado.',
-    custom:'Premissas personalizadas: confirme indexador, lances, taxas e rendimento na proposta/contrato.'
+    generic:'Nova proposta genérica: informe os dados do contrato. Sem cashback nem taxas da oferta Bamaq; o motor bloqueia informações essenciais ausentes.',
+    custom:'Premissas personalizadas: confira cada condição com proposta, regulamento e ata do grupo.'
   };
-  if(profile==='generic'){
-    if(!confirm('Iniciar nova proposta genérica? Isso substituirá os campos atuais. Salve ou exporte a simulação antes de continuar.')){
-      el.value='bamaq';return;
+  if(profile==='generic' || profile==='bamaq'){
+    const description=profile==='generic'
+      ? 'Criar nova proposta genérica? Os campos atuais serão substituídos. Antes, salve ou exporte a simulação.'
+      : 'Restaurar todos os dados financeiros da proposta Bamaq/QuintoAndar? Isso substituirá os campos atuais. Antes, salve ou exporte.';
+    if(!confirm(description)){
+      el.value=previous;return;
     }
-    const reset={
+    const base=profile==='generic' ? {
       prazo:'',reduzida:'100',adm:'',reserva:'',reajuste:'',assetType:'none',
       precoImovel:'0',aluguel:'0',rgi:'0',itbi:'0',outrosCompra:'0',
       custosFixos:'0',valImovel:'0',corretagemVendaImovel:'0',
@@ -2956,28 +2969,50 @@ function configureContractProfile(){
       cashbackDelayMonths:'1',cartaYieldMode:'fixed_net',
       cartaYieldNetAnnual:'',cartaYieldSeries:'',cartaPctCdi:'0',
       rendimentoAbatimentoModo:'capitalize',abatimentoAutorizado:'no',
-      mesesAbatimento:'',taxaTransferenciaVenda:'0',tetoTransferenciaVenda:'0',tarifaTransferenciaModelo:'outstanding_pct',tarifaTransferenciaFixa:'0',cadastroTransferenciaPorCota:'0',cessaoExigeAprovacao:'yes',cessaoAprovada:'no'
+      mesesAbatimento:'',tarifaTransferenciaModelo:'outstanding_pct',
+      tarifaTransferenciaFixa:'0',cadastroTransferenciaPorCota:'0',
+      cessaoExigeAprovacao:'yes',cessaoAprovada:'no'
+    } : {
+      prazo:'214',reduzida:'50',adm:'24',reserva:'1',reajuste:'3',
+      primeiroReajuste:'7',assetType:'property',ajusteModelo:'fixed_annual',
+      reajusteSerie:'',ajusteTeto:'',ajustePiso:'',adminAntecipada:'0',
+      fimParcelaReduzida:'0',amortizacaoLance:'installment',
+      lanceTotal:'70',lanceFixoPct:'30',lanceEmb:'30',tetoEmbGrupo:'30',
+      baseLanceFixo:'credit',baseLanceLivre:'outstanding',embFixoPermitido:'yes',
+      cashback:'10',cashbackDelayMonths:'1',precoImovel:'1000000',
+      aluguel:'5500',itbi:'3',rgi:'6000',valImovel:'4',cartaYieldMode:'cdi_pct',
+      cartaPctCdi:'80',cartaYieldNetAnnual:'10.92',cartaYieldSeries:'',
+      rendimentoAbatimentoModo:'legacy',abatimentoAutorizado:'no',mesesAbatimento:'',
+      taxaTransferenciaVenda:'1',tetoTransferenciaVenda:'1000',
+      tarifaTransferenciaModelo:'outstanding_pct',tarifaTransferenciaFixa:'0',
+      cadastroTransferenciaPorCota:'0',cessaoExigeAprovacao:'no',cessaoAprovada:'no'
     };
-    Object.entries(reset).forEach(([id,value])=>{if($(id))$(id).value=value});
-    if($('precoManual')) $('precoManual').checked=true;
-    if($('precoTravado')) $('precoTravado').checked=false;
-    if($('aluguelManual')) $('aluguelManual').checked=true;
-    if($('aluguelTravado')) $('aluguelTravado').checked=false;
-    if($('rgiManual')) $('rgiManual').checked=true;
-    if($('rgiTravado')) $('rgiTravado').checked=false;
-    if($('custosFixosManual')) $('custosFixosManual').checked=true;
-    if($('custosFixosTravado')) $('custosFixosTravado').checked=false;
-    if($('cartaCapitaliza'))$('cartaCapitaliza').checked=true;
-    if($('cartaPagaParcela'))$('cartaPagaParcela').checked=false;
+    Object.entries(base).forEach(([id,value])=>{if($(id))$(id).value=value});
+    const generic=profile==='generic';
+    for(const [manual,locked] of [['precoManual','precoTravado'],['aluguelManual','aluguelTravado'],['rgiManual','rgiTravado'],['custosFixosManual','custosFixosTravado']]){
+      if($(manual))$(manual).checked=generic;
+      if($(locked))$(locked).checked=!generic;
+    }
+    if($('cartaCapitaliza'))$('cartaCapitaliza').checked=generic;
+    if($('cartaPagaParcela'))$('cartaPagaParcela').checked=!generic;
     if($('lanceLivreMode'))$('lanceLivreMode').checked=true;
     if($('lanceFixoMode'))$('lanceFixoMode').checked=false;
-    renderQuotaStructure({count:1,credits:[0],conts:[12],preserve:false});
-    if($('cota1EmbPct'))$('cota1EmbPct').value='0';
-    if($('cota1LancePct'))$('cota1LancePct').value='0';
-  }else if(profile==='bamaq'){
-    // Não descartar alterações anteriores ao simplesmente alterar o rótulo.
-    // O botão de restaurar cotas mantém a opção de recuperar os valores da oferta.
+    if($('reajAntesCont'))$('reajAntesCont').checked=true;
+    if($('contAntesReaj'))$('contAntesReaj').checked=false;
+    if($('semResgate'))$('semResgate').checked=true;
+    if($('comResgate'))$('comResgate').checked=false;
+    renderQuotaStructure({count:generic?1:4,
+      credits:generic?[0]:DEFAULT_QUOTA_CREDITS,
+      conts:generic?[12]:DEFAULT_QUOTA_CONTS,preserve:false});
+    if(generic){
+      if($('cota1EmbPct'))$('cota1EmbPct').value='0';
+      if($('cota1LancePct'))$('cota1LancePct').value='0';
+    }
+    if($('mesImovel'))$('mesImovel').value=generic ? '215' : '215';
+    decisionMatrixInitialized=false;
+    buildDecisionRows();
   }
+  lastContractProfile=profile;
   if($('perfilContratoStatus')) $('perfilContratoStatus').textContent=labels[profile];
   scenarioMarkDirty();
   simulate();
