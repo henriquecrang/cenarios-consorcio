@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consórcio x CDB x Imóvel — V3.21 · Gate de garantia substituta</title>
+<title>Consórcio × CDB × Imóvel — V3.22 · Contratos configuráveis</title>
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#172033; --muted:#667085;
@@ -615,7 +615,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <div class="wrap">
-  <h1>Consórcio x CDB x Imóvel — V3.21 · Gate de garantia substituta</h1>
+  <h1>Consórcio × CDB × Imóvel — V3.22 · Contratos configuráveis</h1>
   <div class="sub">Um único gráfico interativo: clique no nome de qualquer série para exibi-la ou escondê-la.</div>
 
   <div class="scenario-menu" id="scenarioMenu" aria-label="Gerenciador de consórcios salvos">
@@ -2317,7 +2317,7 @@ const SCENARIO_LIBRARY_KEY='consorcio-sim-v3:library';
 const SCENARIO_LAST_SELECTED_KEY='consorcio-sim-v3:last-selected';
 const SCENARIO_SCHEMA='consorcio-simulator-presets';
 const SCENARIO_FORMAT_VERSION=2;
-const SCENARIO_APP_VERSION='3.21';
+const SCENARIO_APP_VERSION='3.22';
 let scenarioLibrary=[];
 let scenarioSelectedId=null;
 let scenarioDirty=false;
@@ -2945,6 +2945,9 @@ function configureContractProfile(){
     }
     const reset={
       prazo:'',reduzida:'100',adm:'',reserva:'',reajuste:'',assetType:'none',
+      precoImovel:'0',aluguel:'0',rgi:'0',itbi:'0',outrosCompra:'0',
+      custosFixos:'0',valImovel:'0',corretagemVendaImovel:'0',
+      irGanhoVendaImovel:'0',taxaTransferenciaVenda:'0',tetoTransferenciaVenda:'0',
       primeiroReajuste:'12',ajusteModelo:'fixed_annual',reajusteSerie:'',
       ajusteTeto:'',ajustePiso:'',adminAntecipada:'0',fimParcelaReduzida:'0',
       amortizacaoLance:'installment',lanceTotal:'0',lanceFixoPct:'0',
@@ -2956,6 +2959,14 @@ function configureContractProfile(){
       mesesAbatimento:'',taxaTransferenciaVenda:'0',tetoTransferenciaVenda:'0',tarifaTransferenciaModelo:'outstanding_pct',tarifaTransferenciaFixa:'0',cadastroTransferenciaPorCota:'0',cessaoExigeAprovacao:'yes',cessaoAprovada:'no'
     };
     Object.entries(reset).forEach(([id,value])=>{if($(id))$(id).value=value});
+    if($('precoManual')) $('precoManual').checked=true;
+    if($('precoTravado')) $('precoTravado').checked=false;
+    if($('aluguelManual')) $('aluguelManual').checked=true;
+    if($('aluguelTravado')) $('aluguelTravado').checked=false;
+    if($('rgiManual')) $('rgiManual').checked=true;
+    if($('rgiTravado')) $('rgiTravado').checked=false;
+    if($('custosFixosManual')) $('custosFixosManual').checked=true;
+    if($('custosFixosTravado')) $('custosFixosTravado').checked=false;
     if($('cartaCapitaliza'))$('cartaCapitaliza').checked=true;
     if($('cartaPagaParcela'))$('cartaPagaParcela').checked=false;
     if($('lanceLivreMode'))$('lanceLivreMode').checked=true;
@@ -3729,6 +3740,10 @@ if(loanBody){
   if(purchased && cfg.cashbackBasePolicy==='available' && creditAtBuy>principalCreditAtBuy+0.01) warnings.push('A base de cashback está incluindo rendimentos financeiros acumulados da carta. Essa hipótese NÃO foi confirmada documentalmente e existe apenas como sensibilidade.');
   if(purchased && residualUnallocated>0) warnings.push(`Há ${money(residualUnallocated)} de crédito residual sem destinação definida. Por prudência, esse valor NÃO é contado no patrimônio comparável. Escolha “usar em custos de aquisição” se quiser modelar essa destinação; amortização/devolução continuam pendentes de mecânica contratual.`);
   if(purchased && residualAppliedToCosts>0) warnings.push(`${money(residualAppliedToCosts)} do crédito residual foram usados para reduzir os custos de aquisição pagos do bolso. O teto aplicado foi ${(cfg.residualExpenseCapPct*100).toFixed(1).replace('.',',')}% do principal líquido disponível.`);
+  if(cfg.contractProfile==='generic') warnings.push('Perfil genérico: nenhuma taxa ou promoção QuintoAndar/Bamaq deve ser presumida. Confira as condições contratadas antes de interpretar os resultados; contrato/ata específicos de Rodobens e Santander ainda não foram validados.');
+  if(cfg.assetType==='none') warnings.push('Sem aquisição no horizonte: os saldos de cartas contempladas são direitos vinculados, não dinheiro livre disponível para investir, e sua liquidação no encerramento do grupo ainda não está modelada (#31).');
+  if(cfg.yieldInstallmentMode==='requested_months') warnings.push('O abatimento foi simulado apenas nos meses informados, com autorização contratual marcada manualmente; o procedimento real pode exigir solicitação e prazo específico.');
+  if(cfg.lanceMode==='fixed' && cfg.bidPolicy?.fixedBase!=='credit') warnings.push('Neste perfil, o lance fixo usa a base contratual escolhida (não necessariamente a carta). Confira o regulamento/ata antes de usar os resultados.');
   if(r.quotaSaleBlockedByApproval) warnings.push('A cessão das cotas foi bloqueada: o contrato exige aprovação da administradora, ainda não confirmada. Não foi reconhecida receita de venda.');
   if(propertySold && !cfg.sellPropertyPayoff) warnings.push('Na venda do imóvel com substituição de garantia, o modelo presume que a Bamaq aceita outro imóvel como garantia e mantém o consórcio ativo. Essa aceitação precisa ser confirmada; o imóvel substituto não foi somado ao patrimônio da estratégia.');
   if(propertySold && propertySaleTopUp>0) warnings.push(`A venda exigiu ${money(propertySaleTopUp)} adicionais do seu bolso porque o valor líquido não foi suficiente para cobrir custos e quitação escolhida.`);
@@ -3739,7 +3754,7 @@ if(loanBody){
   const tranchesDepoisHorizonte=cotaDetails.filter(q=>q.loanPrincipal>0 && q.cont+q.loanTerm>N).map(q=>q.id);
   if(tranchesDepoisHorizonte.length) warnings.push(`As tranches das cotas ${tranchesDepoisHorizonte.join(', ')} terminam depois do horizonte simulado. O saldo bancário agregado remanescente de ${money(last.loanDebt)} foi descontado do patrimônio final da estratégia.`);
   if(cfg.seguroAtivo && cfg.seguroValorRaw>0) warnings.push('O seguro/proteção financeira está sendo tratado como sensibilidade de modelagem. A existência, obrigatoriedade, base de cálculo e reajuste do seguro real ainda precisam ser confirmados no contrato/tabela de tarifas da operação.');
-  if(cfg.rendimentoPagaParcela) warnings.push('O cenário de usar os rendimentos da carta para abater parcelas segue a informação operacional recebida: cada cota só pode usar seu próprio rendimento para sua própria parcela. Os materiais públicos da Bamaq consultados confirmam que os rendimentos são acrescidos ao crédito contemplado, mas não detalham publicamente esse abatimento mensal.');
+  if(cfg.yieldInstallmentMode==='legacy' && cfg.rendimentoPagaParcela) warnings.push('O cenário de usar os rendimentos da carta para abater parcelas segue a informação operacional recebida: cada cota só pode usar seu próprio rendimento para sua própria parcela. Os materiais públicos da Bamaq consultados confirmam que os rendimentos são acrescidos ao crédito contemplado, mas não detalham publicamente esse abatimento mensal.');
   if(cfg.resgateAtivo && cfg.minResgate>N) warnings.push('O prazo mínimo de 180 dias para resgate cai depois do horizonte simulado.');
   if(redeemed && !cfg.resgateComPonte) warnings.push('No resgate foi usada a hipótese de compensação direta do saldo do consórcio com a própria carta. Essa prática existe publicamente em outras administradoras, mas precisa ser confirmada para a Bamaq.');
   if(redeemed && cfg.irResgatePct===0) warnings.push('O IR/custo adicional do resgate está em 0%. A base agora soma todos os rendimentos aferidos da carta, inclusive os usados para abater parcelas; confirmar com Bamaq/contador se existe algum haircut adicional além do retorno líquido já informado.');
@@ -3748,7 +3763,7 @@ if(loanBody){
   if(buy>N) warnings.push('A compra está definida para depois do horizonte.');
   if(buy>N && cfg.lockPropertyPrice) warnings.push('Como o preço está travado ao valor da carta no mês da compra, ele só será atualizado quando a compra estiver dentro do horizonte simulado.');
   if(cfg.cotas && new Set(cfg.cotas.map(c=>c.cont)).size>1) warnings.push('Multi-cota: as contemplações estão escalonadas. A compra continua ocorrendo apenas após a última contemplação.');
-  if(cfg.rendimentoPagaParcela && cfg.cotas && cfg.cotas.length>1) warnings.push('Sem pooling entre cotas: o rendimento de cada carta abate somente a parcela daquela própria cota. Se o rendimento exceder a parcela, o excedente permanece capitalizando na mesma carta; não é transferido para cobrir parcelas de outras cotas.');
+  if(cfg.yieldInstallmentMode!=='capitalize' && cfg.cotas && cfg.cotas.length>1) warnings.push('Sem pooling entre cotas: o rendimento de cada carta abate somente a parcela daquela própria cota. Se o rendimento exceder a parcela, o excedente permanece capitalizando na mesma carta; não é transferido para cobrir parcelas de outras cotas.');
 
   if(warnings.length){
     warning.style.display='block';
