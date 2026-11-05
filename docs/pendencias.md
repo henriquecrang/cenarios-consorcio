@@ -25,7 +25,7 @@ Este arquivo contém também auditorias históricas de versões anteriores. Para
 - [ ] [#33](https://github.com/henriquecrang/cenarios-consorcio/issues/33) — cessão, tarifas e garantias por regulamento (G09).
 - [ ] [#34](https://github.com/henriquecrang/cenarios-consorcio/issues/34) — motor de cota separado da economia imobiliária (G10).
 
-**Evidências ainda pendentes:** contrato/ata atual de grupo Rodobens; ata/proposta de grupo Santander; confirmação documental específica de políticas Bamaq, incluindo abatimento de rendimentos e ingresso em grupo em andamento. Não migrar dados comerciais ao conjunto de regras gerais sem fonte.
+**Evidências ainda pendentes:** [#35](https://github.com/henriquecrang/cenarios-consorcio/issues/35) — contrato/ata atual de grupo Rodobens; ata/proposta de grupo Santander; confirmação documental específica de políticas Bamaq, incluindo abatimento de rendimentos e ingresso em grupo em andamento. Não migrar dados comerciais ao conjunto de regras gerais sem fonte.
 
 ---
 
