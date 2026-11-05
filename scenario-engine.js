@@ -441,7 +441,10 @@ function runScenario(cfg,overrides={}){
     postInstall=sumQ(q=>q.postInstall);
 
     let monthlyLetterYieldThisMonth=0;
-    const cartaMonthly=letterMonthlyRateAt(cfg,m);
+    // A curva da aplicação só precisa cobrir meses em que há crédito contemplado
+    // ainda não utilizado; após utilização de todas as cartas não há retorno a projetar.
+    const hasInvestedLetter=cotas.some(q=>q.contemplated && !q.usedInPurchase && !redeemed && !quotaSold && m>q.cont);
+    const cartaMonthly=hasInvestedLetter ? letterMonthlyRateAt(cfg,m) : 0;
     const yieldEntries=[];
     cotas.forEach(q=>{
       q.monthlyLetterYield=0;
