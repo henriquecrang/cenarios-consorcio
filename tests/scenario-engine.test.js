@@ -440,3 +440,19 @@ console.log('scenario-engine integration tests: ok');
    const custom=runScenario({...c,adjustmentMode:'event_series',adjustmentSeries:[{month:7,rate:0.06}]});
    assert.ok(custom.hist[6].preCredit>legacy.hist[6].preCredit,'6% em M7 supera o reajuste Bamaq de 3%');
  }
+
+ // #28 — rendimento líquido diretamente informado ou curva; benchmark permanece independente.
+ {
+   const cfg=makeConfig({conts:[4,4,4,4],buyRaw:215});
+   cfg.rendimentoPagaParcela=false;
+   const legacy=runScenario(cfg);
+   const explicit=runScenario({...cfg,letterYieldMode:'fixed_net',letterNetAnnual:0.1092});
+   close(explicit.totalLetterYieldAccrued,legacy.totalLetterYieldAccrued,0.03);
+   const lower=runScenario({...cfg,letterYieldMode:'fixed_net',letterNetAnnual:0.07});
+   assert.ok(lower.totalLetterYieldAccrued<legacy.totalLetterYieldAccrued);
+   const curve=runScenario({...cfg,letterYieldMode:'annual_net_series',letterAnnualRates:Array(18).fill(0.07)});
+   close(curve.totalLetterYieldAccrued,lower.totalLetterYieldAccrued,0.03);
+   const loss=runScenario({...cfg,letterYieldMode:'monthly_series',letterMonthlyRates:Array(214).fill(-0.001)});
+   assert.ok(loss.cotaDetails[0].letterBalance<cfg.cotas[0].credit0,'perda de aplicação diminui saldo da carta');
+   assert.equal(lower.hist[0].cdb,legacy.hist[0].cdb,'taxa do benchmark permanece independente');
+ }
