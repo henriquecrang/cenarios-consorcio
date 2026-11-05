@@ -79,7 +79,8 @@ function runScenario(cfg,overrides={}){
     useInPurchase:c.useInPurchase!==false,
     lanceMode:fallbackMode,
     bidPct:clamp(Number(fallbackBidPct)||0,0,1),
-    embPct:clamp(Number(c.embPct ?? c.embMaxPct ?? embPct)||0,0,0.30),
+    embPct:Math.max(0,Number(c.embPct ?? c.embMaxPct ?? embPct)||0),
+    bidPolicy:c.bidPolicy || cfg.bidPolicy || null,
     loanTerms:{
       fundPct:clamp(c.loanTerms?.fundPct ?? cfg.emprestimoLancePct,0,1),
       rateMonthly:Math.max(0,c.loanTerms?.rateMonthly ?? cfg.emprestimoTaxaMes),
@@ -356,7 +357,8 @@ function runScenario(cfg,overrides={}){
           q.lanceMode,
           q.lanceMode==='free' ? q.bidPct : 0,
           q.lanceMode==='fixed' ? q.bidPct : (cfg.fixedLancePct??0.30),
-          q.embPct
+          q.embPct,
+          q.bidPolicy
         );
         q.requestedLanceAtCont=lance.requestedTotal;
         q.effectiveLanceAtCont=lance.effectiveTotal;
