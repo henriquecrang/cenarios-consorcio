@@ -12,6 +12,14 @@ O Git e o arquivo de follow-up preservam a evolução histórica. Este documento
 
 ---
 
+## Escopo de portabilidade contratual — auditoria #24 (05/11/2026)
+
+**Atenção:** a V3.21 é a especificação canônica do **comportamento implementado**, mas o motor ainda não é universal para todos os grupos/administradoras. As premissas 3% fixos anuais, Fixo sobre carta, teto de embutido 30%, formação linear de parcelas e rendimento líquido da carta modelado como % do CDI descrevem principalmente o **preset QuintoAndar/Bamaq**, com controles parciais. A regra de indexador do contrato antes da contemplação é diferente do **rendimento financeiro líquido obrigatório** sobre o crédito já contemplado e não utilizado; nenhuma delas equivale ao CDB benchmark.
+
+A [matriz de diagnóstico](auditoria-generalizacao-consorcios.md) G01–G10 apresenta riscos e evidências comparativas Bamaq/Rodobens/Santander. A implementação de políticas genéricas está **PENDENTE** nas [issues #25–#34](https://github.com/henriquecrang/cenarios-consorcio/issues/24). Até elas serem concluídas, não oferecer perfis de outras administradoras como se o motor já reproduzisse fielmente seus contratos. Preservar saídas V3.21 para o preset Bamaq e manter a mesma fonte de verdade para o wizard #23.
+
+---
+
 # 1. Finalidade
 
 Este documento define **como o simulador deve funcionar**.
