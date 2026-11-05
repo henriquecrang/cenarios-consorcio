@@ -21,6 +21,28 @@
 
 ---
 
+## Follow-up da auditoria #24 — implementação V3.22 (05/11/2026)
+
+**Contexto:** a auditoria #24 foi encerrada ao produzir o diagnóstico e backlog #25–#35. Esta entrada registra o desenvolvimento das issues escolhidas para execução autônoma, não muda as evidências históricas V3.21 do Grupo 4012.
+
+**Implementado:** módulo puro `contract-policies.js` para séries de reajuste, rentabilidade líquida do crédito, abatimento autorizado e taxas de transferência; `model-core.js` com bases/tetos/restrições de lance; `scenario-engine.js` atualizado para consumir essas políticas; `property-economics.js` extraído; `index.html` com controles e perfis de proposta comercial/contrato genérico, mantendo presets antigos. As especificações e limitações estão em [políticas contratuais V3.22](politicas-contratuais-v3.22.md).
+
+**Resultados dos testes:** foram executadas quatro suítes de regressão em ambiente JavaScript isolado — `model-core`, `contract-policies`, `property-economics` e `scenario-engine` — todas com sucesso após os novos modos. O JavaScript inline da página foi compilado sem erro. **Não foi executado um teste E2E real no navegador nem confirmado o pipeline do GitHub Actions nesta sessão**, portanto não atribuir status de "re-auditado visualmente" a essas mudanças.
+
+**Decisões financeiras deliberadas:**
+1. Índices INCC/IPCA/preço do bem entram como **série exógena** informada, não como busca automática de fonte oficial ou inferência a partir da marca.
+2. O rendimento da carta contemplada permanece ligado ao retorno financeiro líquido das aplicações, independente da correção contratual e do benchmark.
+3. O perfil genérico não recebe automaticamente 24% de administração, 1% de reserva, 3% de correção, 80% do CDI ou cashback 10% da campanha QuintoAndar/Bamaq; informações essenciais vazias bloqueiam o cálculo.
+4. Uso dos rendimentos da carta para abater prestações depende de autorização no novo modelo; o modo histórico Bamaq continua reproduzível, mas **não** representa confirmação contratual definitiva.
+5. Lances e garantias/cessão só são projetados nos modos suportados; há erro ou gate quando a combinação contratual informada é proibida.
+6. Imóvel mantém o adaptador próprio, e `assetType=none` não pressupõe compra; venda/uso de veículo ou serviços permanece sem modelagem, não é substituído por um fluxo imobiliário fictício.
+7. A exceção comercial de Bamaq Grupo 4012 à obrigação retroativa do regulamento 2026 **não foi confirmada por instrumento particular**. Fonte e pendência na [pesquisa de contratos #35](fontes-contratuais-2026.md).
+8. #27 (cronogramas escalonados por cota) e #34 (adaptadores de outros ativos e separação completa) são apenas **parcialmente cumpridas**. #30 e #31 não foram desenvolvidas nesta sequência solicitada.
+
+**Revisão pendente:** simulação manual no navegador, confirmação de CI e documentos específicos dos grupos (Rodobens, Santander e Bamaq). Não inferir validação contratual ou retorno garantido a partir das hipóteses de cenário.
+
+---
+
 ## 1. Finalidade deste documento
 
 Este arquivo registra o que aconteceu **depois de cada apontamento de auditoria**.
