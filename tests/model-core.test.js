@@ -67,3 +67,20 @@ function close(actual,expected,tolerance=0.005){
 }
 
 console.log('model-core regression tests: ok');
+
+
+ // #26 — políticas contratuais (sem alterar a compatibilidade da modalidade Bamaq).
+ {
+   const fees={fixedBase:'credit_plus_fees',freeBase:'outstanding',feeRatio:0.25,maxEmbeddedPct:0.20,allowFixedEmbedded:false,strict:true};
+   const fixed=resolveEffectiveBid(400000,500000,'fixed',0.70,0.20,0,fees);
+   close(fixed.base,500000);
+   close(fixed.effectiveTotal,100000);
+   close(fixed.cash,100000);
+   assert.throws(()=>resolveEffectiveBid(400000,500000,'fixed',0.70,0.20,0.10,fees),/não admite/);
+   assert.throws(()=>resolveEffectiveBid(400000,500000,'free',0.25,0.20,0.30,fees),/excede/);
+   const twenty=resolveEffectiveBid(400000,500000,'free',0.25,0.20,0.20,fees);
+   close(twenty.embedded,80000);
+   close(twenty.cash,45000);
+   const legacy=resolveEffectiveBid(400000,500000,'fixed',0.70,0.30,0.30);
+   close(legacy.base,400000);close(legacy.embedded,120000);
+ }
