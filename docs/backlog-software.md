@@ -1,6 +1,15 @@
 # Itens de generalização — auditoria #24 (05/11/2026)
 
-**Status geral: IDENTIFICADO / NÃO IMPLEMENTADO.** Diagnóstico em [docs/auditoria-generalizacao-consorcios.md](auditoria-generalizacao-consorcios.md). Preservar V3.21 Bamaq até execução das issues. Os itens SW-089–SW-098 foram criados pela auditoria; não devem ser marcados como implementados só por terem issue aberta.
+**Status geral: IDENTIFICADO / NÃO IMPLEMENTADO.** Diagnóstico em [docs/auditoria-generalizacao-consorcios.md](auditoria-generalizacao-consorcios.md). Preservar V3.21 Bamaq até execução das issues. Os itens SW-089–SW-099 foram criados pela auditoria; não devem ser marcados como implementados só por terem issue aberta.
+
+### SW-099 — Validar contratos e atas de grupos atuais
+
+**Status:** PESQUISA PENDENTE — sem contrato específico verificado  
+**Prioridade:** P1  
+**Origem:** [issue #35](https://github.com/henriquecrang/cenarios-consorcio/issues/35) / prova documental para perfis reais Rodobens/Santander/Bamaq.  
+**Critério:** obter contrato e ata por grupo, mapear cláusulas a fixtures, registrar lacunas e não habilitar presets como validados sem documentação.
+
+---
 
 ### SW-098 — Portabilidade do ativo e avaliação
 
