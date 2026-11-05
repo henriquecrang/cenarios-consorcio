@@ -23,3 +23,12 @@ console.log('contract-policies regression tests: ok');
 assert.equal(letterMonthlyRateAt({letterYieldMode:'annual_net_series',letterAnnualRates:[0.06,0.08]},12),Math.pow(1.06,1/12)-1);
 close(letterMonthlyRateAt({letterYieldMode:'annual_net_series',letterAnnualRates:[0.06,0.08]},13),Math.pow(1.08,1/12)-1);
 assert.throws(()=>letterMonthlyRateAt({letterYieldMode:'annual_net_series',letterAnnualRates:[0.06]},13),/não cobre/);
+
+const {parseMonthList,canUseYieldForInstallment}=require('../contract-policies.js');
+assert.deepEqual(parseMonthList('9;5;7',12),[5,7,9]);
+assert.throws(()=>parseMonthList('5;5',12),/únicos/);
+assert.equal(canUseYieldForInstallment({rendimentoPagaParcela:true},5),true);
+assert.equal(canUseYieldForInstallment({yieldInstallmentMode:'capitalize',rendimentoPagaParcela:true},5),false);
+assert.equal(canUseYieldForInstallment({yieldInstallmentMode:'requested_months',yieldInstallmentApproved:true,yieldRequestMonths:[5,7]},6),false);
+assert.equal(canUseYieldForInstallment({yieldInstallmentMode:'requested_months',yieldInstallmentApproved:true,yieldRequestMonths:[5,7]},7),true);
+assert.throws(()=>canUseYieldForInstallment({yieldInstallmentMode:'automatic',yieldInstallmentApproved:false},5),/autorização/);
