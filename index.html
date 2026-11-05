@@ -1001,6 +1001,27 @@ th:first-child,td:first-child{text-align:left}
         <div class="small">% do CDI de referência. Default analítico: 80% do CDI líquido, conforme orientação comercial recebida; é editável e não constitui garantia.</div>
       </div>
 
+      <div class="field">
+        <label>Como projetar o rendimento líquido da carta contemplada?</label>
+        <select id="cartaYieldMode">
+          <option value="cdi_pct" selected>Percentual do CDI — referência QuintoAndar/Bamaq</option>
+          <option value="fixed_net">Taxa líquida anual hipotética</option>
+          <option value="annual_net_series">Curva anual de taxas líquidas</option>
+          <option value="monthly_series">Curva mensal de taxas líquidas</option>
+        </select>
+        <div class="small">O reajuste antes da contemplação não é esse rendimento. Após contemplar, o recurso recebe rendimentos líquidos efetivos das aplicações do grupo; estes campos são hipóteses, não rentabilidade garantida.</div>
+      </div>
+      <div class="field">
+        <label>Taxa líquida anual projetada da carta (% a.a.)</label>
+        <input id="cartaYieldNetAnnual" type="number" value="10.92" step=".1" min="-99" max="200">
+        <div class="small">Usada somente em “Taxa líquida anual hipotética”; sem tributar novamente dentro do fluxo-base.</div>
+      </div>
+      <div class="field">
+        <label>Curva de rendimentos projetados (%)</label>
+        <textarea id="cartaYieldSeries" rows="2" placeholder="Anual: 9;8;7 ou mensal: 0.8;0.7;0.9"></textarea>
+        <div class="small">Taxas líquidas em sequência cronológica a partir do primeiro mês simulado. Preencher todos os anos ou meses do horizonte, sem extrapolação automática.</div>
+      </div>
+
       <div class="assump">
         <b>Premissas independentes:</b> o CDB é uma hipótese <b>líquida</b> de benchmark; o CDI é uma referência <b>bruta</b> separada. Alterar um não altera automaticamente o outro.
         <br><br>
@@ -2321,7 +2342,7 @@ function scenarioApplyControls(controls){
   }
 
   // Presets antigos não herdam condições de contrato da simulação anterior.
-  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes'};
+  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:''};
   Object.entries(newControlDefaults).forEach(([id,value])=>{
     if(!controls[id] && $(id)) $(id).value=value;
   });
@@ -2818,7 +2839,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -3064,6 +3085,12 @@ function collectScenarioConfig(){
     cdiAnnual:Math.max(0,pct($('cdi').value)),
     inflationAnnual:Math.max(0,pct($('inflacao').value)),
     cartaPctCdi:Math.max(0,pct($('cartaPctCdi').value)),
+    letterYieldMode:$('cartaYieldMode').value,
+    letterNetAnnual:pct($('cartaYieldNetAnnual').value),
+    letterAnnualRates:$('cartaYieldMode').value==='annual_net_series'
+      ? window.ConsorcioPolicies.parseRateSeries($('cartaYieldSeries').value,'annual_series') : [],
+    letterMonthlyRates:$('cartaYieldMode').value==='monthly_series'
+      ? window.ConsorcioPolicies.parseRateSeries($('cartaYieldSeries').value,'annual_series') : [],
     rendimentoPagaParcela:$('cartaPagaParcela').checked,
 
     resgateAtivo,
