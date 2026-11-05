@@ -1,9 +1,33 @@
-# Pendências canônicas — estado da linha V3.20
+# Pendências canônicas — estado da linha V3.21
 
 Este arquivo contém também auditorias históricas de versões anteriores. Para saber o que ainda está aberto, prevalecem:
 1. este cabeçalho de estado;
 2. os blocos de auditoria mais recentes;
 3. o checklist residual ao final.
+
+## Portabilidade contratual — diagnóstico #24 (05/11/2026)
+
+**Estado:** pesquisa concluída, **funcionalidades abaixo ainda não implementadas**. Ver [matriz G01–G10](auditoria-generalizacao-consorcios.md). O motor V3.21 e seus resultados Bamaq permanecem inalterados.
+
+**P0 motor:**
+- [ ] [#25](https://github.com/henriquecrang/cenarios-consorcio/issues/25) — indexador/preço do bem, periodicidade, teto e trajetória de reajustes (G01).
+- [ ] [#26](https://github.com/henriquecrang/cenarios-consorcio/issues/26) — bases e limites de lance, impossibilidade de combinar determinadas modalidades (G02).
+- [ ] [#27](https://github.com/henriquecrang/cenarios-consorcio/issues/27) — taxa de administração, reserva, parcelas reduzidas, amortização por prazo/parcela (G03).
+- [ ] [#28](https://github.com/henriquecrang/cenarios-consorcio/issues/28) — retorno financeiro líquido da carta não limitado a CDI × percentual fixo (G04).
+
+**P1 regras complementares e perfis:**
+- [ ] [#29](https://github.com/henriquecrang/cenarios-consorcio/issues/29) — uso autorizado dos rendimentos para abater parcelas (G05).
+- [ ] [#30](https://github.com/henriquecrang/cenarios-consorcio/issues/30) — destinos de crédito e residual, inclusive quitação de financiamento (G06).
+- [ ] [#31](https://github.com/henriquecrang/cenarios-consorcio/issues/31) — encerramento, crédito não utilizado e rateio final (G07).
+- [ ] [#32](https://github.com/henriquecrang/cenarios-consorcio/issues/32) — separar defaults genéricos do preset Bamaq/QuintoAndar e integração ao wizard #23 (G08).
+
+**P2 expansão:**
+- [ ] [#33](https://github.com/henriquecrang/cenarios-consorcio/issues/33) — cessão, tarifas e garantias por regulamento (G09).
+- [ ] [#34](https://github.com/henriquecrang/cenarios-consorcio/issues/34) — motor de cota separado da economia imobiliária (G10).
+
+**Evidências ainda pendentes:** contrato/ata atual de grupo Rodobens; ata/proposta de grupo Santander; confirmação documental específica de políticas Bamaq, incluindo abatimento de rendimentos e ingresso em grupo em andamento. Não migrar dados comerciais ao conjunto de regras gerais sem fonte.
+
+---
 
 ## Estado estrutural já implementado
 
