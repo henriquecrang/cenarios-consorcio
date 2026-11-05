@@ -64,8 +64,15 @@
   function letterMonthlyRateAt(cfg,month){
     const mode=cfg.letterYieldMode||'cdi_pct';
     let annual;
-    if(mode==='cdi_pct') annual=(Number(cfg.cdiAnnual)||0)*(Number(cfg.cartaPctCdi)||0);
+    if(mode==='cdi_pct') annual=Math.max(0,Number(cfg.cdiAnnual)||0)*Math.max(0,Number(cfg.cartaPctCdi)||0);
     else if(mode==='fixed_net') annual=boundedRate(cfg.letterNetAnnual,'Taxa líquida anual da carta');
+    else if(mode==='annual_net_series'){
+      const series=cfg.letterAnnualRates||[];
+      const rates=Array.isArray(series)?series:parseRateSeries(series,'annual_series');
+      const index=Math.floor((month-1)/12);
+      if(index>=rates.length) throw new Error('Série anual de rendimentos não cobre o mês '+month);
+      annual=boundedRate(rates[index],'Rendimento líquido do ano '+(index+1));
+    }
     else if(mode==='monthly_series'){
       const series=cfg.letterMonthlyRates||[];
       const rates=Array.isArray(series)?series:parseRateSeries(series,'annual_series');
