@@ -477,3 +477,23 @@ console.log('scenario-engine integration tests: ok');
      'lance não reduz parcela no modo prazo');
    assert.ok(shortenTerm.hist.some(h=>h.m<214 && h.debt<0.01),'quitação antecipada ocorre');
  }
+
+ // #29 — direito ao rendimento não significa autorização automática de abatimento.
+ {
+   const cfg=makeConfig({conts:[4,4,4,4],buyRaw:215});
+   cfg.rendimentoPagaParcela=true;
+   const legacy=runScenario(cfg);
+   const scheduled=runScenario({...cfg,yieldInstallmentMode:'requested_months',
+     yieldInstallmentApproved:true,yieldRequestMonths:[5,7,9]});
+   assert.equal(legacy.hist[5].yieldAbatementRequested,true);
+   assert.equal(scheduled.hist[5].yieldAbatementRequested,false);
+   assert.ok(scheduled.hist[4].monthlyYieldUsedByQuota.A>0);
+   close(scheduled.hist[5].monthlyYieldUsedByQuota.A,0);
+   assert.ok(scheduled.hist[5].monthlyLetterYieldByQuota.A>0,
+     'crédito rende inclusive no mês em que não solicita abatimento');
+   assert.ok(scheduled.totalYieldUsedForInstallments<legacy.totalYieldUsedForInstallments);
+   const none=runScenario({...cfg,yieldInstallmentMode:'capitalize'});
+   close(none.totalYieldUsedForInstallments,0);
+   assert.throws(()=>runScenario({...cfg,yieldInstallmentMode:'automatic',
+     yieldInstallmentApproved:false}),/autorização/);
+ }
