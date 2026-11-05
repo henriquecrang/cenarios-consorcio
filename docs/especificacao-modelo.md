@@ -1,22 +1,43 @@
 # Especificação canônica do modelo — Simulador Consórcio × CDB × Imóvel
 
-**Baseline de implementação atual:** V3.21  
+**Baseline de implementação atual:** V3.22  
 **Status:** especificação funcional e financeira canônica do comportamento esperado do simulador  
 **Documentos complementares:**  
 - `docs/pendencias.md` — premissas externas, regras contratuais e funcionalidades ainda abertas;  
 - `docs/backlog-software.md` — histórico/estado das mudanças de software;  
 - `docs/backlog-perguntas-bamaq.md` — perguntas e respostas comerciais/documentais;  
-- `docs/follow-up-auditorias.md` — trilha histórica de auditorias e evidências.
+- `docs/follow-up-auditorias.md` — trilha histórica de auditorias e evidências;
+- `docs/politicas-contratuais-v3.22.md` — modos contratuais suportados na V3.22 e limitações;
+- `docs/fontes-contratuais-2026.md` — pesquisa documental #35 ainda sem propostas/atas de grupos atuais.
 
 O Git e o arquivo de follow-up preservam a evolução histórica. Este documento deve ser lido linearmente como o **estado canônico atual**; descrições de comportamento de versões antigas não prevalecem sobre as regras abaixo.
 
 ---
 
+## Evolução implementada V3.22 — políticas de contrato (05/11/2026)
+
+**Estado atual do motor:** os acoplamentos identificados na auditoria #24 receberam **primeira implementação configurável**, com modalidades e limites definidos no [documento de políticas V3.22](politicas-contratuais-v3.22.md). A linha V3.21 Bamaq permanece como **modo legado/preset de referência**, preservando os testes de regressão. **Não** considerar quaisquer condições de Rodobens ou Santander como contrato de grupo validado: a [pesquisa #35](fontes-contratuais-2026.md) está pendente de instrumentos individuais e atas.
+
+- [#25](https://github.com/henriquecrang/cenarios-consorcio/issues/25): reajustes por percentual fixo anual, série anual ou calendário de eventos; piso/teto por ocorrência.
+- [#26](https://github.com/henriquecrang/cenarios-consorcio/issues/26): política de base Fixo/Livre, teto de embutido por contrato e proibição de combinar Fixo + embutido quando aplicável.
+- [#28](https://github.com/henriquecrang/cenarios-consorcio/issues/28): remuneração **líquida financeira** da carta após contemplação por CDI×percentual, taxa líquida anual ou séries de taxas anuais/mensais.
+- [#27](https://github.com/henriquecrang/cenarios-consorcio/issues/27): adiantamento de parte da taxa administrativa, opção de terminar período reduzido antes da contemplação, reduzir **prazo ou parcela** por lance (modelos adicionais de cobrança continuam pendentes).
+- [#29](https://github.com/henriquecrang/cenarios-consorcio/issues/29): abater rendimento da própria carta automaticamente **apenas se elegível** ou em meses de solicitação informados; modo legado preservado para reprodução histórica.
+- [#32](https://github.com/henriquecrang/cenarios-consorcio/issues/32): perfil específico Bamaq/QuintoAndar, perfil genérico sem premissas comerciais preenchidas e perfil personalizado. Perfis reais de outras empresas permanecem condicionados a contrato/ata.
+- [#33](https://github.com/henriquecrang/cenarios-consorcio/issues/33): base, valores e cadastro da tarifa de cessão, incluindo gate de autorização.
+- [#34](https://github.com/henriquecrang/cenarios-consorcio/issues/34): fórmulas econômicas de compra, aluguel e venda de imóvel extraídas para `property-economics.js`. `assetType=none` não realiza compra; demais tipos de bem ainda requerem novos adaptadores.
+
+**Norma conceitual:** índice contratual de correção da carta/prestações (fixo, INCC, IPCA, preço de referência etc.) **não** equivale à rentabilidade líquida de investimentos mantidos enquanto o crédito já foi contemplado; esse rendimento, por sua vez, **não** equivale ao retorno do CDB benchmark. Regras opcionais precisam de evidência por grupo. **PENDENTE:** cronogramas inteiramente escalonados por cota, ofertas por número de parcelas, FGTS, destinos residuais, encerramento/fundo de reserva, cessão parcial e uso em serviços/veículos.
+
+**Regressão:** quatro suítes JS (model-core, contract-policies, property-economics, scenario-engine) passaram em execução isolada; ainda falta verificação manual em navegador e confirmação de GitHub Actions. A V3.22 não implementa automaticamente as [issues #30 e #31](https://github.com/henriquecrang/cenarios-consorcio/issues/30).
+
+---
+
 ## Escopo de portabilidade contratual — auditoria #24 (05/11/2026)
 
-**Atenção:** a V3.21 é a especificação canônica do **comportamento implementado**, mas o motor ainda não é universal para todos os grupos/administradoras. As premissas 3% fixos anuais, Fixo sobre carta, teto de embutido 30%, formação linear de parcelas e rendimento líquido da carta modelado como % do CDI descrevem principalmente o **preset QuintoAndar/Bamaq**, com controles parciais. A regra de indexador do contrato antes da contemplação é diferente do **rendimento financeiro líquido obrigatório** sobre o crédito já contemplado e não utilizado; nenhuma delas equivale ao CDB benchmark.
+**Nota histórica da auditoria:** a V3.21 era o estado canônico anterior à generalização, e o motor **ainda não é universal** para todos os grupos/administradoras. As premissas 3% fixos anuais, Fixo sobre carta, teto de embutido 30%, formação linear de parcelas e rendimento líquido da carta modelado como % do CDI descrevem principalmente o **preset QuintoAndar/Bamaq**, com controles parciais. A regra de indexador do contrato antes da contemplação é diferente do **rendimento financeiro líquido obrigatório** sobre o crédito já contemplado e não utilizado; nenhuma delas equivale ao CDB benchmark.
 
-A [matriz de diagnóstico](auditoria-generalizacao-consorcios.md) G01–G10 apresenta riscos e evidências comparativas Bamaq/Rodobens/Santander. A implementação de políticas genéricas está **PENDENTE** nas [issues #25–#35](https://github.com/henriquecrang/cenarios-consorcio/issues/24). Até elas serem concluídas, não oferecer perfis de outras administradoras como se o motor já reproduzisse fielmente seus contratos. Preservar saídas V3.21 para o preset Bamaq e manter a mesma fonte de verdade para o wizard #23.
+A [matriz de diagnóstico](auditoria-generalizacao-consorcios.md) G01–G10 apresenta riscos e evidências comparativas Bamaq/Rodobens/Santander. A implementação completa de políticas genéricas **ainda tem lacunas** nas [issues #25–#35](https://github.com/henriquecrang/cenarios-consorcio/issues/24). Até elas serem concluídas, não oferecer perfis de outras administradoras como se o motor já reproduzisse fielmente seus contratos. Preservar saídas V3.21 para o preset Bamaq e manter a mesma fonte de verdade para o wizard #23.
 
 ---
 
