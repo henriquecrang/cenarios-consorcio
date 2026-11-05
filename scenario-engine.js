@@ -130,7 +130,11 @@ function runScenario(cfg,overrides={}){
   if(cfg.lockOwnerCosts) fixedOwner=currentRent*cfg.ownerCostsPctOfRent;
 
   const cotas=scenarioCotas.map(c=>{
-    const outstanding=c.credit0*(1+cfg.adm+cfg.reserva);
+    // A taxa administrativa antecipada é desembolso no primeiro mês,
+    // não obrigação duplicada nas parcelas futuras.
+    const upfrontAdminShare=clamp(Number(cfg.adminFeeUpfrontShare??0),0,1);
+    const upfrontAdminFee=c.credit0*Math.max(0,cfg.adm||0)*upfrontAdminShare;
+    const outstanding=c.credit0*(1+cfg.adm+cfg.reserva)-upfrontAdminFee;
     const fullInstall=outstanding/N;
     return {
       ...c,
@@ -138,6 +142,8 @@ function runScenario(cfg,overrides={}){
       outstanding,
       fullInstall,
       initialReduced:fullInstall*cfg.reduced,
+      upfrontAdminFee,
+      termEndMonth:N,
       contemplated:false,
       usedInPurchase:false,
       letterBalance:0,
@@ -250,20 +256,33 @@ function runScenario(cfg,overrides={}){
         q.outstanding *= (1+adjustment.rate);
         const rem=N-m+1;
         if(!q.contemplated) q.fullInstall *= (1+adjustment.rate);
+        else if(cfg.lanceAmortization==='term') q.fullInstall *= (1+adjustment.rate);
         else q.fullInstall = rem>0 ? q.outstanding/rem : q.outstanding;
       }
     });
 
     let installment=0;
     let outstandingBeforeInstallment=0;
+    const reductionEnds=Number.isInteger(cfg.reducedUntilMonth) && cfg.reducedUntilMonth>0
+      ? Math.min(cfg.reducedUntilMonth,N) : N;
     cotas.forEach(q=>{
+      // Ao acabar a fase reduzida antes da contemplação, recalcular o saldo
+      // pela duração remanescente sem perdoar valores não pagos.
+      if(!q.contemplated && m===reductionEnds+1 && reductionEnds<N){
+        q.fullInstall=q.outstanding/(N-m+1);
+      }
       outstandingBeforeInstallment += q.outstanding;
-      q.monthlyInstallment=(redeemed || quotaSold) ? 0 : (q.contemplated ? q.fullInstall : q.fullInstall*cfg.reduced);
+      const reducedActive=!q.contemplated && m<=reductionEnds;
+      const raw=(q.contemplated||!reducedActive) ? q.fullInstall : q.fullInstall*cfg.reduced;
+      q.monthlyInstallment=(redeemed || quotaSold) ? 0 :
+        (cfg.lanceAmortization==='term' ? Math.min(q.outstanding,raw) : raw);
       q.outstanding=Math.max(0,q.outstanding-q.monthlyInstallment);
       installment += q.monthlyInstallment;
+      if(cfg.lanceAmortization==='term' && q.outstanding<0.005) q.fullInstall=0;
     });
 
-    let cashObrigacoes=installment;
+    const upfrontFeesThisMonth=m===1 ? sumQ(q=>q.upfrontAdminFee) : 0;
+    let cashObrigacoes=installment+upfrontFeesThisMonth;
     let rendaEstrategia=0;
     let currentLoanPayment=0;
     let currentInsurancePayment=0;
@@ -396,12 +415,16 @@ function runScenario(cfg,overrides={}){
         q.letterBalance=Math.max(0,q.credit-lance.embedded);
         q.letterPrincipalAtCont=q.letterBalance;
         const rem=N-m;
-        q.fullInstall=rem>0 ? q.outstanding/rem : 0;
+        if(cfg.lanceAmortization!=='term') q.fullInstall=rem>0 ? q.outstanding/rem : 0;
+        q.termEndMonth=cfg.lanceAmortization==='term' && q.fullInstall>0
+          ? Math.min(N,m+Math.ceil(q.outstanding/q.fullInstall)) : N;
         q.postInstall=q.fullInstall;
 
         if(q.deferSameMonthAdjustment){
           q.outstanding *= (1+adjustment.rate);
-          q.fullInstall=rem>0 ? q.outstanding/rem : q.outstanding;
+          q.fullInstall=cfg.lanceAmortization==='term'
+            ? q.fullInstall*(1+adjustment.rate)
+            : (rem>0 ? q.outstanding/rem : q.outstanding);
           q.postInstall=q.fullInstall;
         }
       }
@@ -746,6 +769,7 @@ function runScenario(cfg,overrides={}){
       loanDebtByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.loanBalance])),
       monthlyInsurancePayment:currentInsurancePayment,
       monthlyConsortiumInstallment:installment,
+      upfrontAdminFees:upfrontFeesThisMonth,
       monthlyConsortiumInstallmentByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.monthlyInstallment])),
       monthlyLetterYield:monthlyLetterYieldThisMonth,
       monthlyLetterYieldByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.monthlyLetterYield])),
@@ -817,6 +841,8 @@ function runScenario(cfg,overrides={}){
     cashLanceAtCont:q.cashLanceAtCont,
     letterPrincipalAtCont:q.letterPrincipalAtCont,
     postInstall:q.postInstall,
+    upfrontAdminFee:q.upfrontAdminFee,
+    termEndMonth:q.termEndMonth,
     loanReleaseMonth:q.loanReleaseMonth,
     loanFundPct:q.loanFundPct,
     loanRateMonthly:q.loanRateMonthly,
