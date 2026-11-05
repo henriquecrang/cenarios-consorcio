@@ -1313,6 +1313,37 @@ th:first-child,td:first-child{text-align:left}
         <div class="small">É o valor pago diretamente a você pelo comprador; o comprador assume as obrigações futuras da cota após aprovação da Bamaq.</div>
       </div>
 
+      <div class="field">
+        <label>Política de tarifa para cessão da cota</label>
+        <select id="tarifaTransferenciaModelo">
+          <option value="outstanding_pct" selected>Percentual do saldo devedor por cota — referência Bamaq</option>
+          <option value="credit_pct">Percentual da carta vigente por cota</option>
+          <option value="offer_pct">Percentual da oferta total de cessão</option>
+          <option value="fixed_per_quota">Valor fixo por cota</option>
+          <option value="fixed_per_transfer">Valor fixo por transferência</option>
+        </select>
+        <div class="small">Os valores fixos e percentuais dependem do contrato e tabela de tarifas do grupo.</div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Tarifa fixa da transferência (R$)</label><input id="tarifaTransferenciaFixa" type="number" value="0" step="50" min="0"></div>
+        <div class="field"><label>Cadastro por cota (R$)</label><input id="cadastroTransferenciaPorCota" type="number" value="0" step="50" min="0"></div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Transferência depende de aprovação?</label>
+          <select id="cessaoExigeAprovacao">
+            <option value="no" selected>Não modelar gate — legado V3.21</option>
+            <option value="yes">Sim, autorização obrigatória</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>A administradora aprovou a cessão?</label>
+          <select id="cessaoAprovada">
+            <option value="no" selected>Não comprovada</option>
+            <option value="yes">Sim, comprovada</option>
+          </select>
+        </div>
+      </div>
       <div class="row">
         <div class="field">
           <label>Taxa de transferência</label>
@@ -2396,7 +2427,7 @@ function scenarioApplyControls(controls){
   }
 
   // Presets antigos não herdam condições de contrato da simulação anterior.
-  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:'',adminAntecipada:'0',fimParcelaReduzida:'0',amortizacaoLance:'installment',rendimentoAbatimentoModo:'legacy',abatimentoAutorizado:'no',mesesAbatimento:'',perfilContrato:'bamaq'};
+  const newControlDefaults={ajusteModelo:'fixed_annual',reajusteSerie:'',ajusteTeto:'',ajustePiso:'',baseLanceFixo:'credit',baseLanceLivre:'outstanding',tetoEmbGrupo:'30',embFixoPermitido:'yes',cartaYieldMode:'cdi_pct',cartaYieldNetAnnual:'10.92',cartaYieldSeries:'',adminAntecipada:'0',fimParcelaReduzida:'0',amortizacaoLance:'installment',rendimentoAbatimentoModo:'legacy',abatimentoAutorizado:'no',mesesAbatimento:'',perfilContrato:'bamaq',tarifaTransferenciaModelo:'outstanding_pct',tarifaTransferenciaFixa:'0',cadastroTransferenciaPorCota:'0',cessaoExigeAprovacao:'no',cessaoAprovada:'no'};
   Object.entries(newControlDefaults).forEach(([id,value])=>{
     if(!controls[id] && $(id)) $(id).value=value;
   });
@@ -2912,7 +2943,7 @@ function configureContractProfile(){
       cashbackDelayMonths:'1',cartaYieldMode:'fixed_net',
       cartaYieldNetAnnual:'',cartaYieldSeries:'',cartaPctCdi:'0',
       rendimentoAbatimentoModo:'capitalize',abatimentoAutorizado:'no',
-      mesesAbatimento:'',taxaTransferenciaVenda:'0',tetoTransferenciaVenda:'0'
+      mesesAbatimento:'',taxaTransferenciaVenda:'0',tetoTransferenciaVenda:'0',tarifaTransferenciaModelo:'outstanding_pct',tarifaTransferenciaFixa:'0',cadastroTransferenciaPorCota:'0',cessaoExigeAprovacao:'yes',cessaoAprovada:'no'
     };
     Object.entries(reset).forEach(([id,value])=>{if($(id))$(id).value=value});
     if($('cartaCapitaliza'))$('cartaCapitaliza').checked=true;
@@ -2937,7 +2968,7 @@ const {runScenario}=window.ConsorcioEngine;
 
 // Controles fixos. Cotas e condições por tranche são dinâmicas e usam
 // listeners delegados nos respectivos containers.
-const inputs = ['perfilContrato','rendimentoAbatimentoModo','abatimentoAutorizado','mesesAbatimento','adminAntecipada','fimParcelaReduzida','amortizacaoLance','cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
+const inputs = ['tarifaTransferenciaModelo','tarifaTransferenciaFixa','cadastroTransferenciaPorCota','cessaoExigeAprovacao','cessaoAprovada','perfilContrato','rendimentoAbatimentoModo','abatimentoAutorizado','mesesAbatimento','adminAntecipada','fimParcelaReduzida','amortizacaoLance','cartaYieldMode','cartaYieldNetAnnual','cartaYieldSeries','baseLanceFixo','baseLanceLivre','tetoEmbGrupo','embFixoPermitido','ajusteModelo','reajusteSerie','ajusteTeto','ajustePiso','prazo','reduzida','adm','reserva','reajuste','primeiroReajuste','reajAntesCont','contAntesReaj','mesImovel','lanceLivreMode','lanceFixoMode','lanceTotal','lanceFixoPct','lanceEmb','semEmprestimoLance','comEmprestimoLance','emprestimoLancePct','emprestimoTaxaMes','emprestimoTrAnual','emprestimoPrazo','emprestimoSistema','emprestimoTermosIguais','emprestimoTermosPorCota','semSeguro','comSeguro','seguroBase','seguroValor','cdb','cdi','cartaPctCdi','inflacaoProjetada','inflacao','inflacaoValorHojeSegue','inflacaoValorHojeManual','reajAluguelSegue','reajAluguelManual','valImovelSegue','valImovelManual','cartaCapitaliza','cartaPagaParcela','semResgate','comResgate','mesResgate','resgateCompensar','resgatePonte','ponteTaxaMes','ponteDias','ponteIofFixo','ponteIofDia','quitarEmpLanceResgateSim','quitarEmpLanceResgateNao','irResgate','mesVendaCarta','ofertaVendaCarta','taxaTransferenciaVenda','tetoTransferenciaVenda','custoAdicionalVenda','quitarEmpVendaSim','quitarEmpVendaNao','precoImovel','precoManual','precoTravado','itbi','rgi','rgiManual','rgiTravado','rgiPctImovel','outrosCompra','cashback','aluguel','aluguelManual','aluguelTravado','aluguelPctImovel','reajAluguel','vacancia','adminAluguel','manut','irAluguel','custosFixos','custosFixosManual','custosFixosTravado','custosFixosPctAluguel','valImovel','mesVendaImovel','vendaBaseMercado','vendaBaseCompra','pctVendaSobreCompra','vendaImovelQuitaConsorcio','vendaImovelTrocaGarantia','garantiaSubstitutaAprovada','custoSubstituicaoGarantia','quitarEmpVendaImovelSim','quitarEmpVendaImovelNao','corretagemVendaImovel','irGanhoVendaImovel','outrosCustosVendaImovel'];
 inputs.forEach(id=>$(id)?.addEventListener('input',simulate));
 
 renderQuotaStructure({
@@ -3258,6 +3289,13 @@ function collectScenarioConfig(){
     sellerOtherCosts:Math.max(0,+$('outrosCustosVendaImovel').value||0),
 
     saleFeePct:Math.max(0,pct($('taxaTransferenciaVenda').value)),
+    transferFeePolicy:{
+      kind:$('tarifaTransferenciaModelo').value,
+      fixed:Math.max(0,+$('tarifaTransferenciaFixa').value||0),
+      registrationPerQuota:Math.max(0,+$('cadastroTransferenciaPorCota').value||0)
+    },
+    transferApprovalRequired:$('cessaoExigeAprovacao').value==='yes',
+    transferApproved:$('cessaoAprovada').value==='yes',
     saleFeeCap:Math.max(0,+$('tetoTransferenciaVenda').value||0),
     saleExtraCostPct:Math.max(0,pct($('custoAdicionalVenda').value)),
     payLanceLoanOnQuotaSale:$('quitarEmpVendaSim').checked
@@ -3678,6 +3716,7 @@ if(loanBody){
   if(purchased && cfg.cashbackBasePolicy==='available' && creditAtBuy>principalCreditAtBuy+0.01) warnings.push('A base de cashback está incluindo rendimentos financeiros acumulados da carta. Essa hipótese NÃO foi confirmada documentalmente e existe apenas como sensibilidade.');
   if(purchased && residualUnallocated>0) warnings.push(`Há ${money(residualUnallocated)} de crédito residual sem destinação definida. Por prudência, esse valor NÃO é contado no patrimônio comparável. Escolha “usar em custos de aquisição” se quiser modelar essa destinação; amortização/devolução continuam pendentes de mecânica contratual.`);
   if(purchased && residualAppliedToCosts>0) warnings.push(`${money(residualAppliedToCosts)} do crédito residual foram usados para reduzir os custos de aquisição pagos do bolso. O teto aplicado foi ${(cfg.residualExpenseCapPct*100).toFixed(1).replace('.',',')}% do principal líquido disponível.`);
+  if(r.quotaSaleBlockedByApproval) warnings.push('A cessão das cotas foi bloqueada: o contrato exige aprovação da administradora, ainda não confirmada. Não foi reconhecida receita de venda.');
   if(propertySold && !cfg.sellPropertyPayoff) warnings.push('Na venda do imóvel com substituição de garantia, o modelo presume que a Bamaq aceita outro imóvel como garantia e mantém o consórcio ativo. Essa aceitação precisa ser confirmada; o imóvel substituto não foi somado ao patrimônio da estratégia.');
   if(propertySold && propertySaleTopUp>0) warnings.push(`A venda exigiu ${money(propertySaleTopUp)} adicionais do seu bolso porque o valor líquido não foi suficiente para cobrir custos e quitação escolhida.`);
   if(propertySold && cfg.sellerCapitalGainTaxPct>0) warnings.push('O IR da venda do imóvel é uma aproximação de sensibilidade. A base simplificada considera preço de compra + custos de aquisição configurados; isenções, benfeitorias, atualização fiscal e regras do GCAP não estão modeladas.');
