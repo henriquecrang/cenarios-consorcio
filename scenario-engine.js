@@ -9,7 +9,7 @@
   if(!core) throw new Error('ConsorcioModel is required before ConsorcioEngine');
   if(!policies) throw new Error('ConsorcioPolicies is required before ConsorcioEngine');
   const {resolveEffectiveBid,resolveCashbackBase,calculateCashback}=core;
-  const {rateAtAdjustment,letterMonthlyRateAt,canUseYieldForInstallment}=policies;
+  const {rateAtAdjustment,letterMonthlyRateAt,canUseYieldForInstallment,calculateTransferFee}=policies;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const pct=x=>Number(x)/100;
 
@@ -201,6 +201,7 @@ function runScenario(cfg,overrides={}){
   let quotaSaleCredit=0, quotaSaleDebt=0, quotaSaleLoan=0;
   let quotaSaleDebtByQuota={}, quotaSaleTransferFeeByQuota={};
   let quotaSaleTransferFee=0, quotaSaleExtraCost=0, quotaSaleNetCash=0, quotaSaleTopUp=0;
+  let quotaSaleBlockedByApproval=false;
 
   let totalYieldUsedForInstallments=0;
   let totalLetterYieldAccrued=0;
@@ -638,7 +639,11 @@ function runScenario(cfg,overrides={}){
 
     // Nesta versão, a cessão representa a venda conjunta do conjunto de cotas
     // e só é habilitada depois da última contemplação.
-    if(quotaSale && !quotaSold && !purchased && !redeemed && m===quotaSaleMonth){
+    const quotaSaleAttempt=quotaSale && !quotaSold && !purchased && !redeemed && m===quotaSaleMonth;
+    if(quotaSaleAttempt && cfg.transferApprovalRequired && cfg.transferApproved!==true){
+      quotaSaleBlockedByApproval=true;
+    }
+    if(quotaSaleAttempt && !quotaSaleBlockedByApproval){
       quotaSaleCredit=sumQ(q=>q.letterBalance);
       quotaSaleDebt=sumQ(q=>q.outstanding);
       quotaSaleLoan=sumQ(q=>q.loanBalance);
@@ -650,11 +655,13 @@ function runScenario(cfg,overrides={}){
       const payLoan=quotaSale.payLanceLoanOnSale ?? cfg.payLanceLoanOnQuotaSale;
 
       quotaSaleDebtByQuota=Object.fromEntries(cotas.map(q=>[q.id,q.outstanding]));
-      quotaSaleTransferFeeByQuota=Object.fromEntries(cotas.map(q=>[
-        q.id,
-        Math.min(q.outstanding*feePct,feeCap || Infinity)
-      ]));
-      quotaSaleTransferFee=Object.values(quotaSaleTransferFeeByQuota).reduce((a,v)=>a+v,0);
+      const contractualFees=calculateTransferFee(cotas,{
+        ...(cfg.transferFeePolicy||{}),
+        rate:feePct,
+        cap:feeCap
+      },grossOffer);
+      quotaSaleTransferFeeByQuota=contractualFees.byQuota;
+      quotaSaleTransferFee=contractualFees.total;
       quotaSaleExtraCost=grossOffer*extraPct;
       let proceeds=grossOffer-quotaSaleTransferFee-quotaSaleExtraCost;
       if(payLoan){
@@ -897,7 +904,7 @@ function runScenario(cfg,overrides={}){
     finalPropertyMarketValue,finalPropertyNetRealization,finalPropertyExitCosts,finalPropertyExitTax,
 
     quotaSaleCredit,quotaSaleDebt,quotaSaleLoan,quotaSaleDebtByQuota,quotaSaleTransferFeeByQuota,
-    quotaSaleTransferFee,quotaSaleExtraCost,quotaSaleNetCash,quotaSaleTopUp,
+    quotaSaleTransferFee,quotaSaleExtraCost,quotaSaleNetCash,quotaSaleTopUp,quotaSaleBlockedByApproval,
 
     finalSettlement,cdbBal,strategyCash,cumulativeExternal,realContributionsToday,externalCashFlowsReal,
     totalStrategyToday,benchmarkToday,realGainStrategy,realGainBenchmark,annualizedStrategyReal,annualizedBenchmarkReal,
