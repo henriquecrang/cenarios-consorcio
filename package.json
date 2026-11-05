@@ -3,6 +3,6 @@
   "private": true,
   "version": "3.22.0",
   "scripts": {
-    "test": "node tests/model-core.test.js && node tests/contract-policies.test.js && node tests/property-economics.test.js && node tests/scenario-engine.test.js"
+    "test": "node tests/model-core.test.js && node tests/contract-policies.test.js && node tests/property-economics.test.js && node tests/scenario-engine.test.js && node tests/ui-config.test.js"
   }
 }
