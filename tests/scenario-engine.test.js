@@ -429,3 +429,14 @@ function makeConfig({
 }
 
 console.log('scenario-engine integration tests: ok');
+
+
+ // #25 — O modo legado deve manter números e um calendário contratual alternativo deve variar a carta.
+ {
+   const c=makeConfig({conts:[20,20,20,20],buyRaw:215});
+   const legacy=runScenario(c);
+   const same=runScenario({...c,adjustmentMode:'fixed_annual'});
+   close(legacy.hist[6].preCredit,same.hist[6].preCredit);
+   const custom=runScenario({...c,adjustmentMode:'event_series',adjustmentSeries:[{month:7,rate:0.06}]});
+   assert.ok(custom.hist[6].preCredit>legacy.hist[6].preCredit,'6% em M7 supera o reajuste Bamaq de 3%');
+ }
