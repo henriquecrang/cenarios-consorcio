@@ -9,7 +9,7 @@
   if(!core) throw new Error('ConsorcioModel is required before ConsorcioEngine');
   if(!policies) throw new Error('ConsorcioPolicies is required before ConsorcioEngine');
   const {resolveEffectiveBid,resolveCashbackBase,calculateCashback}=core;
-  const {rateAtAdjustment,letterMonthlyRateAt}=policies;
+  const {rateAtAdjustment,letterMonthlyRateAt,canUseYieldForInstallment}=policies;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const pct=x=>Number(x)/100;
 
@@ -451,7 +451,7 @@ function runScenario(cfg,overrides={}){
     if(m===cont+1) firstGrossLetterYield=monthlyLetterYieldThisMonth;
 
     if(yieldEntries.length>0){
-      if(cfg.rendimentoPagaParcela){
+      if(canUseYieldForInstallment(cfg,m)){
         // P0 V2.59 mantido na V2.60 — sem pooling: cada cota usa somente o próprio rendimento
         // para abater a própria parcela. Excedente permanece na própria carta.
         let yieldUsedThisMonth=0;
@@ -774,6 +774,7 @@ function runScenario(cfg,overrides={}){
       monthlyLetterYield:monthlyLetterYieldThisMonth,
       monthlyLetterYieldByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.monthlyLetterYield])),
       monthlyYieldUsedByQuota:Object.fromEntries(cotas.map(q=>[q.id,q.monthlyYieldUsedForInstallment])),
+      yieldAbatementRequested:canUseYieldForInstallment(cfg,m),
       monthlyNetRent:netRent,
       monthlyStrategyCdbYield:monthlyStrategyCdbYieldThisMonth,
       purchaseCashbackReceived:purchaseCashbackThisMonth,
