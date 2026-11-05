@@ -515,3 +515,18 @@ console.log('scenario-engine integration tests: ok');
    close(allowed.quotaSaleTransferFee,1100);
    assert.deepEqual(Object.keys(allowed.quotaSaleTransferFeeByQuota).sort(),['A','B','C','D']);
  }
+
+
+// #34 — não tentar calcular um veículo/serviço como imóvel; permitir carta sem compra.
+{
+  const cfg=makeConfig({conts:[4,4,4,4],buyRaw:4});
+  const property=runScenario(cfg);
+  const noAsset=runScenario({...cfg,assetType:'none'});
+  assert.equal(property.assetType,'property');
+  assert.equal(noAsset.assetType,'none');
+  assert.equal(noAsset.purchased,false);
+  assert.equal(noAsset.buy,215);
+  assert.ok(noAsset.hist[5].monthlyNetRent===0);
+  assert.ok(noAsset.cotaDetails.some(q=>q.letterBalance>0));
+  assert.throws(()=>runScenario({...cfg,assetType:'vehicle'}),/não suportado/);
+}
