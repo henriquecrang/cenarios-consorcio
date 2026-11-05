@@ -83,5 +83,27 @@
     }else throw new Error('Tipo de rendimento não suportado: '+mode);
     return Math.pow(1+boundedRate(annual,'Taxa líquida anual da carta'),1/12)-1;
   }
-  return {parseRateSeries,rateAtAdjustment,letterMonthlyRateAt};
+  function parseMonthList(raw,maxMonth){
+    const str=String(raw??'').trim();
+    if(!str) return [];
+    const numbers=str.split(/[;,\n]+/).map(v=>Number(v.trim()));
+    const seen=new Set();
+    numbers.forEach(m=>{
+      if(!Number.isSafeInteger(m)||m<1||(Number.isInteger(maxMonth)&&m>maxMonth)||seen.has(m))
+        throw new Error('Meses de solicitação devem ser únicos e dentro do prazo');
+      seen.add(m);
+    });
+    return numbers.sort((a,b)=>a-b);
+  }
+  function canUseYieldForInstallment(cfg,month){
+    const mode=cfg.yieldInstallmentMode||'legacy';
+    if(mode==='legacy') return !!cfg.rendimentoPagaParcela;
+    if(mode==='capitalize') return false;
+    if(!['automatic','requested_months'].includes(mode)) throw new Error('Política de abatimento desconhecida: '+mode);
+    if(cfg.yieldInstallmentApproved!==true)
+      throw new Error('Abatimento de rendimentos exige autorização contratual explícita');
+    if(mode==='automatic') return true;
+    return (cfg.yieldRequestMonths||[]).includes(month);
+  }
+  return {parseRateSeries,rateAtAdjustment,letterMonthlyRateAt,parseMonthList,canUseYieldForInstallment};
 });
