@@ -116,10 +116,6 @@ function runScenario(cfg,overrides={}){
 
   const cdbMonthly=Math.pow(1+cfg.cdbAnnual,1/12)-1;
   const inflationMonthly=Math.pow(1+cfg.inflationAnnual,1/12)-1;
-  const cdiAnnual=Math.max(0,cfg.cdiAnnual||0);
-  const cartaPctCdi=Math.max(0,cfg.cartaPctCdi||0);
-  const cartaAnnual=cdiAnnual*cartaPctCdi;
-  const cartaMonthly=Math.pow(1+cartaAnnual,1/12)-1;
   const loanTrAnnual=Math.max(0,cfg.emprestimoTrAnnual||0);
   const loanTrMonthly=Math.pow(1+loanTrAnnual,1/12)-1;
 
@@ -414,6 +410,7 @@ function runScenario(cfg,overrides={}){
     postInstall=sumQ(q=>q.postInstall);
 
     let monthlyLetterYieldThisMonth=0;
+    const cartaMonthly=letterMonthlyRateAt(cfg,m);
     const yieldEntries=[];
     cotas.forEach(q=>{
       q.monthlyLetterYield=0;
@@ -430,17 +427,17 @@ function runScenario(cfg,overrides={}){
 
     if(m===cont+1) firstGrossLetterYield=monthlyLetterYieldThisMonth;
 
-    if(monthlyLetterYieldThisMonth>0){
+    if(yieldEntries.length>0){
       if(cfg.rendimentoPagaParcela){
         // P0 V2.59 mantido na V2.60 — sem pooling: cada cota usa somente o próprio rendimento
         // para abater a própria parcela. Excedente permanece na própria carta.
         let yieldUsedThisMonth=0;
         yieldEntries.forEach(({q,y})=>{
-          const used=Math.min(y,q.monthlyInstallment);
+          const used=Math.min(Math.max(0,y),q.monthlyInstallment);
           q.monthlyYieldUsedForInstallment=used;
           q.totalYieldUsedForInstallments += used;
           yieldUsedThisMonth += used;
-          q.letterBalance += Math.max(0,y-used);
+          q.letterBalance=Math.max(0,q.letterBalance+y-used);
         });
         cashObrigacoes=Math.max(0,cashObrigacoes-yieldUsedThisMonth);
         totalYieldUsedForInstallments += yieldUsedThisMonth;
@@ -451,7 +448,7 @@ function runScenario(cfg,overrides={}){
           firstPostContConsortiumPayment=Math.max(0,installment-yieldUsedThisMonth);
         }
       }else{
-        yieldEntries.forEach(({q,y})=>{q.letterBalance += y;});
+        yieldEntries.forEach(({q,y})=>{q.letterBalance=Math.max(0,q.letterBalance+y);});
       }
     }
 
