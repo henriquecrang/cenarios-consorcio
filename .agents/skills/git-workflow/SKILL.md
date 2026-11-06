@@ -13,7 +13,7 @@ metadata:
 
 # Git workflow — adaptação local da Netresearch
 
-**Procedência.** Skill baseada nas regras e práticas de [Netresearch git-workflow-skill](https://github.com/netresearch/git-workflow-skill/blob/main/skills/git-workflow/SKILL.md), de Netresearch DTT GmbH, versão 1.39.0 (blob `3706c2c8ad791fc73cd9c9dc076c58822df84a51`). **Adaptação realizada:** versão autocontida para GitHub API/conector, backlog e economia do consórcio, sem instalar os scripts opcionais de Netresearch. Atribuição e compartilhamento desta adaptação sob [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); ver [licença local](LICENSE-CC-BY-SA-4.0). Para as instruções originais completas e referências, consultar o repositório upstream.
+**Procedência.** Skill baseada nas regras e práticas de [Netresearch git-workflow-skill](https://github.com/netresearch/git-workflow-skill/blob/main/skills/git-workflow/SKILL.md), de Netresearch DTT GmbH, versão 1.39.0 (blob `3706c2c8ad791fc73cd9c9dc076c58822df84a51`). A [cópia integral e não modificada da skill original](UPSTREAM_NETRESEARCH_1.39.0.md) está versionada ao lado desta adaptação, para consulta e comparação. **Adaptação realizada:** versão autocontida para GitHub API/conector, backlog e economia do consórcio, sem instalar os scripts opcionais de Netresearch. Atribuição e compartilhamento desta adaptação sob [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); ver [licença local](LICENSE-CC-BY-SA-4.0). Para as instruções originais completas e referências, consultar o repositório upstream.
 
 ## Princípios que preservamos da Netresearch
 
