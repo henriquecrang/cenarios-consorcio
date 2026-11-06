@@ -1,6 +1,6 @@
 ## Issue e objetivo
 
-Refs #<!-- número da issue; use Closes #N abaixo apenas se realmente concluir -->
+**Issue relacionada:** `#N` — use `Refs #N` se parcial; `Closes #N` somente se todos os critérios estiverem atendidos.
 
 **Problema que este PR resolve:**
 
