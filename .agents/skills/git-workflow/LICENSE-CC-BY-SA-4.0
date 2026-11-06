@@ -1,0 +1,17 @@
+Creative Commons Attribution-ShareAlike 4.0 International
+
+Original skill contents: Copyright (c) 2025-2026 Netresearch DTT GmbH.
+Original repository: https://github.com/netresearch/git-workflow-skill
+Original skill version: 1.39.0.
+Project adaptation: henriquecrang/cenarios-consorcio — workflow adapted for GitHub API,
+autonomous issue delivery, financial-model regressions and local project documentation.
+
+This adapted skill and its associated documentation in this directory are licensed
+under the Creative Commons Attribution-ShareAlike 4.0 International License:
+https://creativecommons.org/licenses/by-sa/4.0/
+
+You are free to share and adapt with appropriate credit, license link, indication
+of modifications, and ShareAlike distribution under the same license.
+
+Note: upstream repository uses split licensing: source code/scripts under MIT and
+skill content/documentation under CC BY-SA 4.0. No upstream scripts were copied.
