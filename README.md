@@ -29,6 +29,12 @@ Simulador e documentação de investigação para análise de cenários de cons�
 - `docs/backlog-perguntas-bamaq.md` — perguntas, respostas e reconciliações comerciais/documentais.
 - `docs/follow-up-auditorias.md` — trilha de auditorias e evidências.
 
+## Desenvolvimento e agentes
+
+O projeto adota um fluxo **issue → branch → commits → Pull Request → CI → revisão → merge**, baseado na [Netresearch git-workflow-skill](https://github.com/netresearch/git-workflow-skill) e adaptado para este repositório. As regras estão em [AGENTS.md](AGENTS.md), na [skill local](.agents/skills/git-workflow/SKILL.md) e no [workflow documentado](docs/workflow-desenvolvimento.md).
+
+Não fazer commits diretamente na `main`. O job GitHub Actions `regression` deve passar no PR antes do merge. **Proteção da main é uma configuração do GitHub, separada dos arquivos do repositório**; há um [ruleset importável](docs/main-branch-ruleset.json) para facilitar sua ativação pelo mantenedor. A adoção das instruções não significa que o ruleset já esteja ativo.
+
 ## GitHub Pages
 
 O projeto é um site estático puro, sem build:
