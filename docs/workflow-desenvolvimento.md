@@ -25,6 +25,8 @@ O usuário autorizou execução autônoma e decisões técnicas reversíveis: n�
 
 **Importante:** os arquivos deste PR, por si só, **não ativam proteção no servidor**. É necessário criar um **branch ruleset no GitHub**. Quando a integração de GitHub não expõe operação de regras administrativas, o mantenedor deve fazer o seguinte:
 
+**Arquivo pronto para importação:** [docs/main-branch-ruleset.json](main-branch-ruleset.json), usando a estrutura oficial de rulesets (`target=branch`, `enforcement=active`, `pull_request`, `required_status_checks`, bloqueio de força e exclusão). Na interface do GitHub, use a opção de **Import ruleset** se estiver disponível; caso contrário, configure manualmente pelos passos abaixo. Revise as regras depois de importar para confirmar que o check foi associado corretamente. **O arquivo não ativa nada por si só.**
+
 1. Abrir [Settings → Rules → Rulesets](https://github.com/henriquecrang/cenarios-consorcio/settings/rules) no repositório.
 2. Escolher **New ruleset → New branch ruleset**.
 3. Nome: `main — PR + regression`; **Enforcement status: Active**.
